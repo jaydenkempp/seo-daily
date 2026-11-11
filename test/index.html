@@ -395,11 +395,14 @@ const NEWS = [
 
 /* ---------- Levels: each sets the daily easy / medium / hard mix ---------- */
 const LEVELS = {
-  junior:{label:"Junior", mix:{1:5,2:4,3:1}, blurb:"Fundamentals, Search Console and everyday fixes"},
-  mid:   {label:"Mid-level", mix:{1:2,2:5,3:3}, blurb:"More audits, rendering, redirects and structured data"},
-  senior:{label:"Senior", mix:{1:1,2:4,3:5}, blurb:"Mostly hard: edge cases, crawl budget, JS SEO and migrations"}
+  junior:{label:"Junior", mix:{1:10,2:0,3:0}, blurb:"Fundamentals, Search Console and everyday fixes"},
+  mid:   {label:"Mid-level", mix:{1:0,2:10,3:0}, blurb:"Audits, rendering, redirects, structured data and hreflang"},
+  senior:{label:"Senior", mix:{1:0,2:0,3:10}, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
 };
+/* Each level has its own pool: Junior = easy, Mid = medium, Senior = hard. No question appears at two levels. */
 const lvl = () => LEVELS[S.level] || LEVELS.junior;
+const inLevel = (i, L=lvl()) => QUIZABLE(i) && L.mix[BANK[i][1]] > 0;
+const mixText = L => [[1,"easy"],[2,"medium"],[3,"hard"]].filter(([d])=>L.mix[d]>0).map(([d,n])=>L.mix[d]===10?`all ${n}`:`${L.mix[d]} ${n}`).join(" · ");
 /* ---------- Utilities ---------- */
 const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
 /* TEST mode: the copy at /seo-daily/test/ keeps its own progress, its own leaderboard tab and a day-skipper. */
@@ -428,9 +431,9 @@ function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
    10 questions: up to 2 you previously missed (spaced review), weighted toward your weakest
    categories and least-seen questions, with a 5 easy / 4 medium / 1 hard mix. */
 function buildDaily(key){
-  const r = rng("crawldaily|"+key);
+  const r = rng("crawldaily|"+key+"|"+(S.level||"junior"));
   const ids = [];
-  const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && QUIZABLE(id));
+  const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && inLevel(id));
   const targets = {...lvl().mix};
   for (const id of shuffle(review, r)) {
     if (ids.length >= 2) break;
@@ -453,14 +456,14 @@ function buildDaily(key){
     }
   }
   if (ids.length < 10) {
-    const rest = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && !ids.includes(i)).sort((a,b)=>weight(b)-weight(a));
+    const rest = BANK.map((_,i)=>i).filter(i => inLevel(i) && !ids.includes(i)).sort((a,b)=>weight(b)-weight(a));
     for (const id of rest) { if (ids.length >= 10) break; ids.push(id); }
   }
   return shuffle(ids, r).sort((a,b)=>BANK[a][1]-BANK[b][1]);
 }
 function ensureDaily(){
   const k = dateKey();
-  if (!S.daily || S.daily.date !== k || (!S.daily.answers.length && !S.daily.ids.every(QUIZABLE))) { S.daily = { date:k, ids:buildDaily(k), answers:[], done:false }; save(); }
+  if (!S.daily || S.daily.date !== k || (!S.daily.answers.length && !S.daily.ids.every(i=>inLevel(i)))) { S.daily = { date:k, ids:buildDaily(k), answers:[], done:false }; save(); }
   return S.daily;
 }
 function optionOrder(id, salt){
@@ -480,7 +483,7 @@ function home(){
   const cats = Object.keys(CATS).map(c=>({c,a:catAcc(c),t:(S.cat[c]||[0,0])[1]}));
   const tried = cats.filter(x=>x.t>0).sort((a,b)=>a.a-b.a);
   const weakest = tried.length && tried[0].a<1 ? CATS[tried[0].c] : null;
-  const reviewCount = Object.keys(S.missed).map(Number).filter(QUIZABLE).length;
+  const reviewCount = Object.keys(S.missed).map(Number).filter(i=>inLevel(i)).length;
 
   const todayBlock = d.done ? `
     <div class="label">Today's challenge · complete</div>
@@ -491,7 +494,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions at ${lvl().label} level (${lvl().mix[1]} easy · ${lvl().mix[2]} medium · ${lvl().mix[3]} hard)${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.filter((_,i)=>QUIZABLE(i)).length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">10 questions at ${lvl().label} level (${mixText(lvl())})${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from the ${BANK.filter((_,i)=>inLevel(i)).length} ${lvl().label} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -546,8 +549,8 @@ let RUN = null; // {mode, ids, answers, salt}
 function startDaily(){ const d=ensureDaily(); RUN={mode:"daily",ids:d.ids,answers:d.answers,salt:d.date}; question(); }
 function startPractice(){
   const sel=$("#pcat").value, r=rng("p"+Date.now()+Math.random());
-  let pool=BANK.map((_,i)=>i).filter(i=>QUIZABLE(i) && !(S.level==="senior" && BANK[i][1]===1));
-  if(sel==="__review") pool=Object.keys(S.missed).map(Number).filter(QUIZABLE);
+  let pool=BANK.map((_,i)=>i).filter(i=>inLevel(i));
+  if(sel==="__review") pool=Object.keys(S.missed).map(Number).filter(i=>inLevel(i));
   else if(sel==="__weak"){ const t=Object.keys(CATS).filter(c=>S.cat[c]&&S.cat[c][1]).sort((a,b)=>catAcc(a)-catAcc(b))[0]; pool=pool.filter(i=>BANK[i][0]===t); }
   else if(sel) pool=pool.filter(i=>BANK[i][0]===sel);
   const ids=shuffle(pool,r).slice(0,10).sort((a,b)=>BANK[a][1]-BANK[b][1]);
@@ -747,12 +750,12 @@ function browseQuestions(){
   const cats=Object.keys(CATS);
   const cnt=(c,d)=>ids.filter(i=>BANK[i][0]===c&&BANK[i][1]===d).length;
   const tot=d=>ids.filter(i=>BANK[i][1]===d).length;
-  const lvlRows=Object.entries(LEVELS).map(([k,v])=>`<tr><td><b>${v.label}</b></td><td>${v.mix[1]}</td><td>${v.mix[2]}</td><td>${v.mix[3]}</td><td><button class="btn ghost" style="padding:5px 10px;font-size:12.5px" onclick="qbSample('${k}')">Sample a daily set</button></td></tr>`).join("");
+  const lvlRows=Object.entries(LEVELS).map(([k,v])=>`<tr><td><b>${v.label}</b></td><td>${mixText(v)}</td><td>${ids.filter(i=>inLevel(i,v)).length}</td><td><button class="btn ghost" style="padding:5px 10px;font-size:12.5px" onclick="qbSample('${k}')">Sample a daily set</button></td></tr>`).join("");
   app.innerHTML=`
   <div class="row" style="justify-content:space-between;margin-bottom:14px"><h1 style="margin:0">Question bank</h1><button class="btn ghost" onclick="QB.sample=null;home()">Back to dashboard</button></div>
   <div class="qb-grid">
-    <div class="card"><div class="label">Daily mix by level</div>
-      <table class="qb"><tr><th>Level</th><th>Easy</th><th>Medium</th><th>Hard</th><th></th></tr>${lvlRows}</table></div>
+    <div class="card"><div class="label">Levels (separate pools, no overlap)</div>
+      <table class="qb"><tr><th>Level</th><th>Daily set</th><th>Pool</th><th></th></tr>${lvlRows}</table></div>
     <div class="card"><div class="label">Questions by topic and difficulty (${ids.length} total)</div>
       <table class="qb"><tr><th>Topic</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
       ${cats.map(c=>`<tr><td>${CATS[c]}</td>${[1,2,3].map(d=>`<td${cnt(c,d)===0?' class="zero"':""}>${cnt(c,d)}</td>`).join("")}</tr>`).join("")}
@@ -802,7 +805,7 @@ function nameScreen(){
     <form id="nf" style="margin-top:14px">
       <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
       <div class="label" style="margin:20px 0 10px">Your level</div>
-      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small><em>${v.mix[1]} easy · ${v.mix[2]} medium · ${v.mix[3]} hard</em></span></label>`).join("")}</div>
+      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small><em>${mixText(v)} questions · ${BANK.filter((_,i)=>inLevel(i,v)).length} in its pool</em></span></label>`).join("")}</div>
       <p class="note" id="nerr" style="color:var(--bad);min-height:1.2em;margin:10px 0 0"></p>
       <div class="row" style="margin-top:8px">${returning&&LEVELS[S.level]?'<button class="btn ghost" type="button" id="ncancel">Cancel</button>':""}<button class="btn" type="submit">${returning?"Save":"Start →"}</button></div>
     </form></div>`;
