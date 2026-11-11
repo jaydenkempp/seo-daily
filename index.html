@@ -126,7 +126,7 @@ const CATS = {
   js:"Rendering & JavaScript", cwv:"Core Web Vitals", schema:"Structured data",
   intl:"International & hreflang", sitemap:"XML sitemaps", arch:"Architecture & internal links",
   logs:"Logs & crawl budget", mobile:"Mobile, HTTPS & URLs", gsc:"Search Console", ai:"AI search & bots",
-  onpage:"On-page & content", local:"Local & ecommerce", news:"SEO news (2026)"
+  onpage:"On-page & content", local:"Local & ecommerce"
 };
 const BANK = [
 ["crawl",1,"Where must a robots.txt file live for its rules to apply to `https://shop.example.com`?","At `https://shop.example.com/robots.txt` — the root of that exact host and protocol",["Anywhere on the domain, as long as it's linked from the homepage","At `https://example.com/robots.txt` — the root domain covers all subdomains","Inside the XML sitemap"],"robots.txt only applies to the protocol, host and port it's served from. Every subdomain needs its own file at its root."],
@@ -320,6 +320,7 @@ const NEWS = [
 ]; /*NEWS_END*/
 
 /* ---------- Utilities ---------- */
+const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
 const KEY = "crawldaily-v1";
 const $ = s => document.querySelector(s);
 const app = $("#app");
@@ -345,10 +346,8 @@ function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
 function buildDaily(key){
   const r = rng("crawldaily|"+key);
   const ids = [];
-  const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && BANK[id]);
+  const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && QUIZABLE(id));
   shuffle(review, r).slice(0,2).forEach(id => ids.push(id));
-  const newsIds = BANK.map((_,i)=>i).filter(i=>BANK[i][0]==="news" && !ids.includes(i));
-  if (newsIds.length) { newsIds.sort((a,b)=>((S.seen[a]||0)-(S.seen[b]||0)) || (b-a)); ids.push(newsIds[0]); }
   const targets = {1:5,2:4,3:1};
   ids.forEach(id => targets[BANK[id][1]] = Math.max(0, targets[BANK[id][1]]-1));
   const weight = id => {
@@ -357,7 +356,7 @@ function buildDaily(key){
   };
   const usedCats = {};
   for (const d of [1,2,3]) {
-    let pool = BANK.map((_,i)=>i).filter(i => BANK[i][1]===d && !ids.includes(i));
+    let pool = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && BANK[i][1]===d && !ids.includes(i));
     pool.sort((a,b)=>weight(b)-weight(a));
     for (const id of pool) {
       if (targets[d]<=0) break;
@@ -370,7 +369,7 @@ function buildDaily(key){
 }
 function ensureDaily(){
   const k = dateKey();
-  if (!S.daily || S.daily.date !== k) { S.daily = { date:k, ids:buildDaily(k), answers:[], done:false }; save(); }
+  if (!S.daily || S.daily.date !== k || (!S.daily.answers.length && !S.daily.ids.every(QUIZABLE))) { S.daily = { date:k, ids:buildDaily(k), answers:[], done:false }; save(); }
   return S.daily;
 }
 function optionOrder(id, salt){
@@ -390,7 +389,7 @@ function home(){
   const cats = Object.keys(CATS).map(c=>({c,a:catAcc(c),t:(S.cat[c]||[0,0])[1]}));
   const tried = cats.filter(x=>x.t>0).sort((a,b)=>a.a-b.a);
   const weakest = tried.length && tried[0].a<1 ? CATS[tried[0].c] : null;
-  const reviewCount = Object.keys(S.missed).length;
+  const reviewCount = Object.keys(S.missed).map(Number).filter(QUIZABLE).length;
 
   const todayBlock = d.done ? `
     <div class="label">Today's challenge · complete</div>
@@ -401,7 +400,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions, including 1 from recent SEO news${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">10 questions${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.filter((_,i)=>QUIZABLE(i)).length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -441,7 +440,7 @@ function home(){
     <aside class="card news-col">
       <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Latest SEO news</div><span class="meta" style="font-size:11px">Updated ${new Date(NEWS_UPDATED+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span></div>
       <div class="news">${NEWS.map((n,i)=>`<a class="ni${i>=8?" more hidden":""}" href="${n[4]}" target="_blank" rel="noopener"><span class="nd">${n[0].length>7?new Date(n[0]+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"}):new Date(n[0]+"-15T12:00").toLocaleDateString(undefined,{month:"short",year:"numeric"})} · ${esc(n[1])}</span><b>${fmt(n[2])}</b><span>${fmt(n[3])}</span></a>`).join("")}</div>
-      <div class="row" style="margin-top:12px">${NEWS.length>8?`<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="document.querySelectorAll('.ni.more').forEach(e=>e.classList.toggle('hidden'));this.textContent=this.textContent.startsWith('Show')?'Show less':'Show all ${NEWS.length}'">Show all ${NEWS.length}</button>`:""}<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="startNews()">Quiz me on the news</button></div>
+      <div class="row" style="margin-top:12px">${NEWS.length>8?`<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="document.querySelectorAll('.ni.more').forEach(e=>e.classList.toggle('hidden'));this.textContent=this.textContent.startsWith('Show')?'Show less':'Show all ${NEWS.length}'">Show all ${NEWS.length}</button>`:""}</div>
     </aside>
   </div>`;
   $("#today").textContent = new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
@@ -454,11 +453,10 @@ function tick(){ clearInterval(cdTimer); const f=()=>{ const el=$("#cd"); if(!el
 /* ---------- Quiz engine ---------- */
 let RUN = null; // {mode, ids, answers, salt}
 function startDaily(){ const d=ensureDaily(); RUN={mode:"daily",ids:d.ids,answers:d.answers,salt:d.date}; question(); }
-function startNews(){ const r=rng("n"+Date.now()); const ids=shuffle(BANK.map((_,i)=>i).filter(i=>BANK[i][0]==="news"),r).slice(0,10); RUN={mode:"practice",ids,answers:[],salt:"n"+Date.now()}; question(); }
 function startPractice(){
   const sel=$("#pcat").value, r=rng("p"+Date.now()+Math.random());
-  let pool=BANK.map((_,i)=>i);
-  if(sel==="__review") pool=Object.keys(S.missed).map(Number).filter(i=>BANK[i]);
+  let pool=BANK.map((_,i)=>i).filter(QUIZABLE);
+  if(sel==="__review") pool=Object.keys(S.missed).map(Number).filter(QUIZABLE);
   else if(sel==="__weak"){ const t=Object.keys(CATS).filter(c=>S.cat[c]&&S.cat[c][1]).sort((a,b)=>catAcc(a)-catAcc(b))[0]; pool=pool.filter(i=>BANK[i][0]===t); }
   else if(sel) pool=pool.filter(i=>BANK[i][0]===sel);
   const ids=shuffle(pool,r).slice(0,10).sort((a,b)=>BANK[a][1]-BANK[b][1]);
@@ -473,7 +471,7 @@ function question(){
     <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="meta">${RUN.mode==="daily"?"Daily":"Practice"} · ${i+1} / ${RUN.ids.length}</span><button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="home()">Exit</button></div>
     <div class="progress"><div style="width:${i/RUN.ids.length*100}%"></div></div>
     <div class="card">
-      <div class="tags"><span class="tag">${CATS[q[0]]}</span><span class="tag d${q[1]}">${DIFF[q[1]]} · ${XP[q[1]]}xp</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
+      <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span><span class="tag d${q[1]}">${DIFF[q[1]]} · ${XP[q[1]]}xp</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
       <div class="q">${fmt(q[2])}</div>
       <div class="opts">${opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${"ABCD"[j]}</span><span>${fmt(o.t)}</span></button>`).join("")}</div>
       <div id="after"></div>
