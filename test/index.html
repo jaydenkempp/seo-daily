@@ -832,7 +832,7 @@ ${TEST?"":`    <div class="card" style="margin-bottom:16px">
       <div class="bars">${cats.map(x=>`<div class="bar"><span>${CATS[x.c]}</span><div class="track"><div class="fill" style="width:${x.a===null?0:Math.round(x.a*100)}%;${x.a!==null&&x.a<.6?"background:var(--bad)":""}"></div></div><span class="pct">${x.a===null?"—":Math.round(x.a*100)+"%"}</span></div>`).join("")}</div>
       ${weakest?`<p class="note" style="margin-top:12px">Weakest so far: <b>${weakest}</b>. Daily quizzes lean toward it.</p>`:""}
     </div>
-    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> (${lvl().label}) · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name or level</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
+    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> (${lvl().label}) · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name or level</a> · your progress will be saved. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
   </div>
     <aside class="card news-col">
       <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Latest SEO news</div><span class="meta" style="font-size:11px">Updated ${new Date(NEWS_UPDATED+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span></div>
