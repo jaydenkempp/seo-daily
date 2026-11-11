@@ -105,6 +105,13 @@ code{font-family:var(--mono);font-size:.88em;background:var(--paper);border:1px 
 .lb-row .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-row .nm small{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
 .lb-row .val{font-family:var(--mono);font-size:14px;font-weight:500}
+.lvls{display:grid;gap:10px}
+.lvl{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer}
+.lvl:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.lvl input{margin-top:4px;accent-color:var(--accent)}
+.lvl span{display:grid;gap:2px}
+.lvl small{color:var(--muted);font-size:13.5px}
+.lvl em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .hidden{display:none}
 </style>
 </head>
@@ -295,6 +302,51 @@ const BANK = [
 ["news",2,"In November 2026, John Mueller explained how to keep a third-party popup out of the page Google renders. What did he suggest?","Disallow the popup's script in robots.txt (on the vendor's domain, or a JS file used only for the popup), as long as the page still works without it",["Add `noindex` to the popup's HTML","Block every JavaScript file on the site in robots.txt","Wrap the popup in a `data-nosnippet` element"],"Googlebot doesn't fetch disallowed resources when rendering. Only block a file that does nothing but load the popup — blocking a shared, multipurpose script can break how Google sees the whole page."],
 ["news",2,"Gary Illyes explained redirects in November 2026. After a 302 redirect, which URL does Google usually keep showing in search results?","The original, redirecting URL, because a 302 says the move is temporary",["The target URL, exactly as with a 301","Neither — a 302 drops both URLs from the index","Whichever of the two URLs has more backlinks"],"A 301 (or 308) makes the new URL canonical and moves ranking signals to it. A 302 (or 307) tells Google the old URL will come back. For a permanent move, use a 301."],
 ["news",3,"In November 2026, Google extended its aggregator and supplier units to 'things to do' queries. Where do these units appear?","Only in Google Search for users in the European Economic Area (EEA)",["Worldwide, in every Google Search market","Only in Google Maps in the United States","Only inside AI Mode answers"],"These units are part of Google's Europe-specific results layout, with one unit for comparison sites and one for direct providers. If you run a tours or activities site with EU visitors, check Google's aggregator and supplier unit docs."],
+/* ---- Senior-level questions (added Nov 2026) ---- */
+["crawl",3,"What does Google do when robots.txt keeps returning 5xx server errors?","At first it treats the whole site as disallowed, then it falls back to the last cached copy",["It ignores robots.txt and crawls everything","It deindexes the site straight away","It treats it the same as a 404"],"A server error on robots.txt makes Google cautious: crawling is paused at first. If the errors go on for a long time, Google uses its last cached copy. Some time later, if the site is otherwise reachable, it can behave as if there's no robots.txt."],
+["crawl",3,"Which URLs does `Disallow: /*.pdf$` block?","Only URLs that end in `.pdf` — `/guide.pdf?v=2` is still crawlable",["Any URL that contains `.pdf` anywhere","Only PDF files in the root folder","Nothing — Google doesn't support wildcards"],"`*` matches any run of characters and `$` anchors the match to the end of the URL. A query string after `.pdf` stops the match."],
+["crawl",3,"What's the maximum robots.txt size Google processes?","500 KiB — anything beyond that is ignored",["50 MB","10 KB","There's no limit"],"Google reads the first 500 kibibytes and ignores the rest. Keep the file lean and consolidate rules."],
+["index",3,"What does the robots meta directive `unavailable_after: [date]` do?","Tells Google to stop showing the page in results after that date",["Deletes the page from your server","Delays indexing until that date","Sets cache expiry for users"],"It's useful for time-limited pages like events or promotions. Google may remove the page from results after the date."],
+["status",3,"When does a server return 304 Not Modified to Googlebot?","When Googlebot sends a conditional request (`If-Modified-Since` / `If-None-Match`) and the page hasn't changed",["When a page has moved permanently","When the page is too large","When the crawl rate is too high"],"Supporting conditional requests saves bandwidth and crawl resources, because Google can reuse its stored copy."],
+["status",3,"How does Google interpret an instant (0-second) meta refresh?","As a permanent redirect",["As a temporary redirect","It ignores it","As a soft 404"],"Instant meta refreshes are treated as permanent and delayed ones as temporary. Server-side redirects are still preferred."],
+["cwv",3,"Do scrolling and hovering count as interactions for INP?","No — only clicks, taps and keyboard input count",["Yes, both count","Only scrolling counts","Only hovering counts"],"Scroll and hover aren't measured by INP, although JavaScript triggered by them can still block the main thread."],
+["cwv",3,"Is TTFB a Core Web Vital?","No, but it's a diagnostic metric that directly feeds LCP. Good is about 0.8 s or less",["Yes, it replaced CLS","Yes, it's the most important one","No, and it doesn't affect any other metric"],"A slow server response pushes back everything that follows, including LCP."],
+["cwv",3,"What can stop a page from being eligible for the back/forward cache (bfcache)?","`unload` event handlers, among other things",["Using HTTPS","Having structured data","Lazy-loaded images"],"bfcache makes back and forward navigation instant. `unload` listeners and certain headers, such as `Cache-Control: no-store` in some browsers, block it."],
+["schema",3,"What does `@id` do in JSON-LD?","Gives a node a unique identifier so other parts of the graph can reference it",["Sets the canonical URL","Is required for all rich results","Hides the markup from Google"],"Using `@id`, for example `https://example.com/#organization`, lets you connect Organization, WebSite and Article nodes into one coherent graph."],
+["sitemap",3,"Can you still notify Google of a sitemap with the `google.com/ping?sitemap=` endpoint?","No — Google deprecated the sitemap ping endpoint in 2023",["Yes, it's the fastest method","Yes, but only for news sitemaps","Only for sitemaps under 1 MB"],"Use Search Console or the robots.txt Sitemap line, and keep `<lastmod>` accurate."],
+["sitemap",3,"How many sitemaps can one sitemap index file list?","Up to 50,000",["Up to 500","Up to 1,000","Unlimited"],"A sitemap index follows the same 50,000-entry and 50 MB limits as a regular sitemap."],
+["logs",3,"How do you verify that a request in your logs really came from Googlebot?","A reverse DNS lookup on the IP to googlebot.com or google.com, then a forward lookup to confirm, or checking Google's published IP ranges",["Trust the user-agent string","Check the referrer","Look for a Google Analytics cookie"],"User-agents are easy to spoof. DNS verification or Google's IP lists are reliable."],
+["mobile",3,"With dynamic serving (same URL, different HTML per device), which header should you send?","`Vary: User-Agent`",["`X-Robots-Tag: mobile`","`Content-Language`","`Cache-Control: mobile`"],"It tells caches and crawlers that the response differs by user-agent."],
+["mobile",3,"With separate mobile URLs (m.example.com), how should the annotations work?","Desktop has `rel=alternate` (with media) pointing to mobile, and mobile has `rel=canonical` pointing to desktop",["Both pages canonical to themselves","Mobile canonical to mobile, no alternate","Use hreflang between them"],"This bidirectional annotation tells Google the two URLs are the same content. Responsive design avoids all of this."],
+["mobile",3,"When crawling for Google Search, how much of an HTML file does Googlebot fetch?","The first 2 MB (uncompressed) — anything after that is ignored",["The first 15 MB","The first 100 KB","The whole file, no matter its size"],"Google clarified this in its 2026 docs: Googlebot fetches 2 MB for HTML and 64 MB for PDFs, and 15 MB is the default for Google's other crawlers. CSS, JS and other referenced resources each have their own separate limit."],
+["intl",3,"Where do hreflang annotations go in an XML sitemap?","As `<xhtml:link rel=\"alternate\" hreflang=\"..\" href=\"..\"/>` elements inside each `<url>` entry",["In a separate `<hreflang>` root element","In the sitemap index only","As a comment"],"Each `<url>` lists every alternate, including itself. Sitemaps keep large hreflang sets out of the HTML head."],
+["sitemap",3,"Image sitemaps: which tags does Google still support?","Only `<image:image>` and `<image:loc>` — caption, title, geo_location and license were deprecated",["All image tags including caption and title","None — image sitemaps are deprecated","Only `<image:title>`"],"Google simplified image sitemaps in 2022. Alt text and the surrounding content on the page matter more."],
+["index",3,"Your `rel=canonical` points to `/shoes`, but Google keeps choosing `/shoes?sort=price` as canonical. What most often overrides a canonical tag?","Other signals pointing at the parameter URL, such as internal links, sitemap entries or redirects",["The meta description being too long","The page using JSON-LD instead of microdata","A slow LCP on the clean URL"],"Canonical tags are one signal among several. Make internal links, sitemaps, redirects and hreflang all agree on the clean URL so the hint isn't outvoted."],
+["index",3,"A page sends `X-Robots-Tag: noindex` in the HTTP header and `<meta name=\"robots\" content=\"index\">` in the HTML. What does Google do?","Applies the more restrictive directive, so the page isn't indexed",["Uses the HTML meta tag, because it's more specific","Uses whichever it reads last","Ignores both and indexes the page"],"When robots directives conflict, Google follows the most restrictive one. Audit both headers and HTML, especially when a CDN or server config adds headers you can't see in the source."],
+["index",3,"What does the robots meta value `none` mean?","The same as `noindex, nofollow`",["The same as `index, follow`","No snippet, but still indexed","It's invalid and ignored"],"`none` is shorthand for `noindex, nofollow`. It's easy to misread as 'no restrictions', which makes it a classic audit catch."],
+["crawl",3,"robots.txt has one group for `User-agent: Googlebot` and another for `User-agent: *`. Which rules does Googlebot follow?","Only the `Googlebot` group — groups don't combine, and the most specific matching group wins",["Both groups merged together","Only the `*` group","Whichever group appears first in the file"],"A crawler obeys a single group. If you add a Googlebot-specific group, repeat every rule from `*` that should still apply to Googlebot."],
+["crawl",3,"What does an empty `Disallow:` line (no path) under `User-agent: *` mean?","Nothing is disallowed — all URLs may be crawled",["Everything is blocked","Only the homepage is blocked","It's a syntax error, so the file is ignored"],"An empty Disallow value allows everything. Compare it with `Disallow: /`, which blocks the whole site; it's a one-character difference that matters a lot."],
+["js",3,"Does Googlebot keep cookies, localStorage and sessionStorage between page loads when it renders?","No — rendering is stateless, and that data is cleared between page loads",["Yes, for the whole crawl session","Only cookies are kept","Only localStorage is kept"],"Content that depends on a stored preference, a cookie wall or a returning-visitor state may never be seen by Googlebot. Make the default, stateless view contain your indexable content."],
+["js",3,"Your page asks for location permission before showing store results. How does Googlebot handle permission prompts?","It declines them, so the page needs a usable fallback without the permission",["It accepts every permission","It waits for a timeout, then accepts","It skips the page entirely"],"Googlebot declines permission requests such as geolocation or notifications. Use feature detection and render meaningful content when permission is denied."],
+["status",3,"Your server returns 403 to Googlebot on some URLs to 'slow it down'. What actually happens?","Google treats them like other 4xx errors: the URLs can drop out of the index, and the crawl rate isn't reduced as intended",["Googlebot slows down politely","Google retries every hour forever","Nothing — 403s are ignored"],"Only 429 and 5xx responses signal Googlebot to slow down. Other 4xx codes say the content doesn't exist, so misusing them can deindex pages."],
+["status",3,"Which 4xx status code does Googlebot treat as a signal to slow down, rather than as 'content doesn't exist'?","429 Too Many Requests",["404 Not Found","410 Gone","401 Unauthorized"],"429 is grouped with 5xx errors as a server-overload signal. Use it, or 503, briefly when you really need to reduce crawling."],
+["cwv",3,"A carousel loads five large images, but only the first is visible. Which attribute helps the browser prioritize correctly?","`fetchpriority=\"low\"` on the hidden slides (and `high` on the visible LCP image)",["`loading=\"eager\"` on every slide","`decoding=\"sync\"` on every slide","`rel=\"preload\"` on all five images"],"Priority hints let the LCP image win the bandwidth race. Preloading or eager-loading everything just makes the images compete."],
+["cwv",3,"A click handler runs 400 ms of JavaScript before the UI updates, which hurts INP. What's the most effective fix?","Break the work up and yield to the main thread so the next paint can happen first",["Add a loading spinner after the work finishes","Move the script into the `<head>`","Increase the server's TTFB budget"],"INP measures time to the next paint. Update the UI first, then do the heavy work in smaller chunks, for example with `scheduler.yield()` or `setTimeout`."],
+["cwv",3,"What does the CSS property `content-visibility: auto` do?","Skips rendering work for off-screen content until it's needed, which can speed up initial rendering",["Hides content from Googlebot","Lazy-loads images only","Prevents layout shifts automatically"],"It's a rendering optimization for long pages. Pair it with `contain-intrinsic-size` so placeholder sizes don't cause layout shifts while scrolling."],
+["schema",3,"A product comes in several sizes and colors, each with its own URL. Which structured data pattern does Google support for this?","`ProductGroup` with `hasVariant` and `variesBy`",["One `Product` with every variant's price in `description`","A separate `Offer` with no `Product`","`ItemList` of `ListItem`s on each variant page"],"Variant markup groups related products and tells Google which properties change, such as size or color. Keep each variant's price and availability accurate."],
+["schema",3,"Your structured data has errors in the Rich Results Test. What's the consequence?","The page just isn't eligible for those rich results — there's no ranking penalty unless the markup is spammy or misleading",["An automatic ranking demotion","The page is deindexed","A manual action is applied automatically"],"Invalid markup costs you rich results, not rankings. Manual actions are reserved for markup that misleads, such as fake reviews or hidden content."],
+["intl",3,"Some URLs in your hreflang cluster now 301 redirect after a migration. What's the risk?","Google may ignore those annotations — hreflang should point to canonical, indexable 200 URLs",["None, redirects are followed for hreflang","The redirecting URLs get a ranking boost","Google merges all the languages into one page"],"After a migration, update hreflang to the final URLs. Mismatched, redirected or non-canonical alternates are one of the most common causes of hreflang errors."],
+["arch",3,"You're moving the blog from `example.com/blog/` to `blog.example.com`. What's essential?","Page-to-page 301s, plus updating internal links, canonicals, hreflang and sitemaps to the new URLs",["A single 301 from `/blog/` to the new homepage","Only adding the new subdomain to Search Console","Keeping both versions live with noindex on the old one"],"Every old URL needs a one-to-one redirect, and every internal signal should point to the new URLs. Then monitor indexing and crawl stats for both hosts."],
+["logs",3,"Logs show Googlebot re-downloading your JS and CSS files often. What reduces this most reliably?","Content-fingerprinted file names (e.g. `app.3f9a1c.js`), so changed files get new URLs and unchanged ones can be cached",["Blocking JS and CSS in robots.txt","Short cache lifetimes","Inlining every script into the HTML"],"Google's renderer caches resources aggressively and may ignore cache headers. Versioned file names let it reuse what hasn't changed and fetch only what has."],
+["gsc",3,"In the Performance report, the per-query table adds up to fewer clicks than the chart total. Why?","Anonymized queries (rare or privacy-sensitive) are left out of the query table but included in the totals",["The chart includes paid clicks","It's a data-processing bug","Clicks from images are double-counted in the chart"],"Expect a gap, often a large one for long-tail sites. Use page-level data or the BigQuery bulk export for fuller analysis."],
+["gsc",3,"Clicks went up month over month, but average position got worse. What's the most likely explanation?","The site started appearing for many more queries at lower positions, which pulls the average down",["Rankings fell across the board","Search Console is broken","Google stopped counting mobile data"],"Average position is impression-weighted. New long-tail visibility at positions 20 to 50 can lower the average while bringing in more clicks overall. Segment by query or page before drawing conclusions."],
+["gsc",3,"URL Inspection's live test shows your fix, but the 'Google index' tab still shows the old version. Why?","The live test fetches the page now, while the index tab reflects the last crawl. Google hasn't reprocessed it yet",["The fix didn't deploy","The live test uses a different Googlebot","The page is blocked by robots.txt"],"Live test confirms that Google can see the fix. Request indexing for important pages, then check the indexed version after the next crawl."],
+["onpage",3,"Which statement about E-E-A-T is accurate?","It's a framework from Google's quality rater guidelines, not a single ranking factor. Google's systems use many signals that align with it",["It's a score Google calculates for every page","It only applies to YMYL sites","Adding author schema guarantees it"],"Raters use E-E-A-T to evaluate results, and their feedback helps Google check its systems. Real experience, credible authorship and trustworthy sites are what the signals reward."],
+["onpage",3,"What's Google's position on AI-generated content?","It's fine if it's helpful. Producing content at scale mainly to manipulate rankings is spam, however it's made",["All AI content is penalized","AI content must carry a label to rank","AI content can't appear in AI Overviews"],"The scaled content abuse policy targets the purpose and the result, not the tool. Human editing, original insight and accuracy are what keep AI-assisted content safe."],
+["local",3,"A business has three branches. How should the site and structured data be set up?","A separate page per branch, each with its own `LocalBusiness` markup (address, phone, opening hours)",["One page listing all three addresses in a single `LocalBusiness` block","Only the head office in markup","Three Google Business Profiles but no location pages"],"One location per page, with consistent NAP and matching Business Profiles, gives Google a clear entity for each branch."],
+["local",3,"What makes an ecommerce product page eligible for merchant listing experiences in organic results?","`Product` markup with an `Offer` (price, currency, availability), or the product data in a Merchant Center feed",["Review stars alone","An FAQ section","A breadcrumb trail"],"Merchant listings need commercial data. Keep the markup and the feed consistent with what the page shows, or listings get disapproved."],
+["mobile",3,"Does Google index content inside an `<iframe>` as part of the parent page?","Sometimes — it may attribute iframed content to the parent page, but that isn't guaranteed",["Always, exactly like inline content","Never","Only if the iframe is on the same domain"],"Keep content that needs to rank in the page's own HTML. Treat iframed content as a bonus at best."],
+["sitemap",3,"Can a sitemap hosted on `cdn.example.com` list URLs for `www.example.com`?","Yes, if you prove ownership of both hosts, either in Search Console or by referencing the sitemap in www's robots.txt",["No, never","Yes, with no setup at all","Only for image sitemaps"],"Cross-site sitemap submission is allowed once ownership is proven. It's useful when sitemaps are generated and hosted somewhere else."],
 /*BANK_END*/
 ];
 
@@ -319,6 +371,13 @@ const NEWS = [
 ["2026-05-21","Search Engine Journal","Google rolls out the May 2026 core update","The second broad core update of 2026, about six weeks after the March update finished.","https://www.searchenginejournal.com/google-begins-rolling-out-may-2026-core-update/575589/"]
 ]; /*NEWS_END*/
 
+/* ---------- Levels: each sets the daily easy / medium / hard mix ---------- */
+const LEVELS = {
+  junior:{label:"Junior", mix:{1:5,2:4,3:1}, blurb:"Fundamentals, Search Console and everyday fixes"},
+  mid:   {label:"Mid-level", mix:{1:2,2:5,3:3}, blurb:"More audits, rendering, redirects and structured data"},
+  senior:{label:"Senior", mix:{1:1,2:4,3:5}, blurb:"Mostly hard: edge cases, crawl budget, JS SEO and migrations"}
+};
+const lvl = () => LEVELS[S.level] || LEVELS.junior;
 /* ---------- Utilities ---------- */
 const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
 const KEY = "crawldaily-v1";
@@ -347,9 +406,12 @@ function buildDaily(key){
   const r = rng("crawldaily|"+key);
   const ids = [];
   const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && QUIZABLE(id));
-  shuffle(review, r).slice(0,2).forEach(id => ids.push(id));
-  const targets = {1:5,2:4,3:1};
-  ids.forEach(id => targets[BANK[id][1]] = Math.max(0, targets[BANK[id][1]]-1));
+  const targets = {...lvl().mix};
+  for (const id of shuffle(review, r)) {
+    if (ids.length >= 2) break;
+    const d = BANK[id][1];
+    if (targets[d] > 0) { ids.push(id); targets[d]--; }
+  }
   const weight = id => {
     const c = BANK[id][0], acc = catAcc(c), seen = S.seen[id]||0;
     return (1/(1+seen*1.5)) * (acc===null ? 1.2 : 1.6-acc) * (0.5+r());
@@ -364,6 +426,10 @@ function buildDaily(key){
       if (c==="news" || (usedCats[c]||0) >= 2) continue;
       ids.push(id); usedCats[c]=(usedCats[c]||0)+1; targets[d]--;
     }
+  }
+  if (ids.length < 10) {
+    const rest = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && !ids.includes(i)).sort((a,b)=>weight(b)-weight(a));
+    for (const id of rest) { if (ids.length >= 10) break; ids.push(id); }
   }
   return shuffle(ids, r).sort((a,b)=>BANK[a][1]-BANK[b][1]);
 }
@@ -380,7 +446,7 @@ function optionOrder(id, salt){
 /* ---------- Views ---------- */
 function home(){
   document.onkeydown=null;
-  if(!S.name) return nameScreen();
+  if(!S.name || !LEVELS[S.level]) return nameScreen();
   const d = ensureDaily(), k = d.date;
   const {r,n} = rankOf(S.xp);
   const pct = n ? Math.round((S.xp-r[0])/(n[0]-r[0])*100) : 100;
@@ -400,7 +466,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.filter((_,i)=>QUIZABLE(i)).length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">10 questions at ${lvl().label} level (${lvl().mix[1]} easy · ${lvl().mix[2]} medium · ${lvl().mix[3]} hard)${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.filter((_,i)=>QUIZABLE(i)).length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -435,7 +501,7 @@ function home(){
       <div class="bars">${cats.map(x=>`<div class="bar"><span>${CATS[x.c]}</span><div class="track"><div class="fill" style="width:${x.a===null?0:Math.round(x.a*100)}%;${x.a!==null&&x.a<.6?"background:var(--bad)":""}"></div></div><span class="pct">${x.a===null?"—":Math.round(x.a*100)+"%"}</span></div>`).join("")}</div>
       ${weakest?`<p class="note" style="margin-top:12px">Weakest so far: <b>${weakest}</b>. Daily quizzes lean toward it.</p>`:""}
     </div>
-    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
+    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> (${lvl().label}) · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name or level</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
   </div>
     <aside class="card news-col">
       <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Latest SEO news</div><span class="meta" style="font-size:11px">Updated ${new Date(NEWS_UPDATED+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span></div>
@@ -455,7 +521,7 @@ let RUN = null; // {mode, ids, answers, salt}
 function startDaily(){ const d=ensureDaily(); RUN={mode:"daily",ids:d.ids,answers:d.answers,salt:d.date}; question(); }
 function startPractice(){
   const sel=$("#pcat").value, r=rng("p"+Date.now()+Math.random());
-  let pool=BANK.map((_,i)=>i).filter(QUIZABLE);
+  let pool=BANK.map((_,i)=>i).filter(i=>QUIZABLE(i) && !(S.level==="senior" && BANK[i][1]===1));
   if(sel==="__review") pool=Object.keys(S.missed).map(Number).filter(QUIZABLE);
   else if(sel==="__weak"){ const t=Object.keys(CATS).filter(c=>S.cat[c]&&S.cat[c][1]).sort((a,b)=>catAcc(a)-catAcc(b))[0]; pool=pool.filter(i=>BANK[i][0]===t); }
   else if(sel) pool=pool.filter(i=>BANK[i][0]===sel);
@@ -546,7 +612,7 @@ function copyScore(s,n,mode){
   try{ navigator.clipboard.writeText(txt).then(()=>{$("#cp").textContent="Copied!"},()=>{$("#cp").textContent="Copy blocked"}); }catch(e){ $("#cp").textContent="Copy blocked"; }
 }
 let resetArmed=false;
-function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
+function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
 
 /* ---------- Team leaderboard (Google Sheet via Apps Script) ----------
    Paste your Apps Script web app URL between the quotes. Leave empty to hide the leaderboard. */
@@ -614,7 +680,7 @@ async function loadBoard(){
     const season=typeof j.season==="string"?j.season.slice(0,64):"";
     if(!SEASON_SEEN){ SEASON_SEEN=true;
       if((S.season||"")!==season){
-        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid}; if(RUN&&RUN.mode==="daily") RUN=null; }
+        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level}; if(RUN&&RUN.mode==="daily") RUN=null; }
         S.season=season; save(); if(VIEW==="home") home();
       }
       pushScore();
@@ -630,11 +696,30 @@ function initBoard(){
 /* ---------- Name ---------- */
 function nameScreen(){
   VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
-  app.innerHTML=`<div class="card"><div class="label">Welcome to SEO Daily</div><h1>What's your name?</h1>
-    <p class="note">This is how you'll appear on the team leaderboard. Your progress saves in this browser, like Wordle.</p>
-    <form id="nf" class="row" style="margin-top:14px"><input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="flex:1;min-width:180px;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)"><button class="btn" type="submit">Start →</button></form></div>`;
-  $("#nm").value=S.name||""; $("#nm").focus();
-  $("#nf").onsubmit=e=>{ e.preventDefault(); const v=$("#nm").value.replace(/\s+/g," ").trim().slice(0,30); if(!v) return; S.name=v; if(!S.pid) S.pid=newId(); save(); lastPushed=""; pushScore(); home(); };
+  const returning=!!S.name;
+  app.innerHTML=`<div class="card"><div class="label">${returning?"Your profile":"Welcome to SEO Daily"}</div><h1>${returning?"Name and level":"What's your name?"}</h1>
+    <p class="note">Your name is how you'll appear on the team leaderboard. Your progress saves in this browser, like Wordle.</p>
+    <form id="nf" style="margin-top:14px">
+      <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
+      <div class="label" style="margin:20px 0 10px">Your level</div>
+      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small><em>${v.mix[1]} easy · ${v.mix[2]} medium · ${v.mix[3]} hard</em></span></label>`).join("")}</div>
+      <p class="note" id="nerr" style="color:var(--bad);min-height:1.2em;margin:10px 0 0"></p>
+      <div class="row" style="margin-top:8px">${returning&&LEVELS[S.level]?'<button class="btn ghost" type="button" id="ncancel">Cancel</button>':""}<button class="btn" type="submit">${returning?"Save":"Start →"}</button></div>
+    </form></div>`;
+  $("#nm").value=S.name||""; if(!returning) $("#nm").focus();
+  if($("#ncancel")) $("#ncancel").onclick=()=>{ if(LEVELS[S.level]) home(); };
+  $("#nf").onsubmit=e=>{
+    e.preventDefault();
+    const v=$("#nm").value.replace(/\s+/g," ").trim().slice(0,30);
+    const pickedEl=document.querySelector('input[name="lvl"]:checked'), picked=pickedEl&&pickedEl.value;
+    if(!v){ $("#nerr").textContent="Please enter your name."; return; }
+    if(!LEVELS[picked]){ $("#nerr").textContent="Please choose your level."; return; }
+    const changed=S.level!==picked;
+    S.name=v; S.level=picked; if(!S.pid) S.pid=newId();
+    // a new level gets a fresh daily set, unless today's quiz is already under way
+    if(changed && S.daily && !S.daily.answers.length && !S.daily.done) S.daily=null;
+    save(); lastPushed=""; pushScore(); home();
+  };
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
 home();
