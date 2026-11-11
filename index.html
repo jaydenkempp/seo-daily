@@ -614,7 +614,7 @@ async function loadBoard(){
     const season=typeof j.season==="string"?j.season.slice(0,64):"";
     if(!SEASON_SEEN){ SEASON_SEEN=true;
       if((S.season||"")!==season){
-        if(S.season!==undefined){ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid}; if(RUN&&RUN.mode==="daily") RUN=null; }
+        if(S.season!==undefined||season!==""){  // a reset has happened since this browser last synced: wipe S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid}; if(RUN&&RUN.mode==="daily") RUN=null; }
         S.season=season; save(); if(VIEW==="home") home();
       }
       pushScore();
