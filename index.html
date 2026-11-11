@@ -725,7 +725,7 @@ function shuffle(arr,r){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ con
 function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function fmt(s){ return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>"); }
 const DIFF = {0:"Beginner",1:"Easy",2:"Medium",3:"Hard"}, XP = {0:10,1:10,2:20,3:30};
-const RANKS = [[0,"Trainee"],[200,"Junior SEO"],[600,"SEO Specialist"],[1300,"Senior SEO"],[2500,"Technical SEO Lead"],[4500,"Crawl Whisperer"]];
+const RANKS = [[0,"Intern"],[200,"Junior SEO"],[600,"SEO Specialist"],[1300,"Senior SEO"],[2500,"Technical SEO Lead"],[4500,"Crawl Whisperer"]];
 function rankOf(xp){ let r=RANKS[0],n=null; for(let i=0;i<RANKS.length;i++){ if(xp>=RANKS[i][0]){ r=RANKS[i]; n=RANKS[i+1]||null; } } return {r,n}; }
 function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
 
