@@ -1129,7 +1129,7 @@ function nameScreen(){
   VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const returning=!!S.name;
   app.innerHTML=`<div class="card"><div class="label">${returning?"Your profile":"Welcome to SEO Daily"}</div><h1>${returning?"Name and level":"What's your name?"}</h1>
-    <p class="note">Your name is how you'll appear on the team leaderboard.</p>
+    <p class="note">Your name is how you'll appear on the team leaderboard. Your progress will be saved.</p>
     <form id="nf" style="margin-top:14px">
       <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
       <div class="label" style="margin:20px 0 10px">Your level</div>
