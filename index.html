@@ -112,6 +112,11 @@ code{font-family:var(--mono);font-size:.88em;background:var(--paper);border:1px 
 .lvl span{display:grid;gap:2px}
 .lvl small{color:var(--muted);font-size:13.5px}
 .lvl em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+#testbar:not(:empty){display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-8px 0 20px;padding:10px 14px;border-radius:10px;background:#7a4b00;color:#fff3dc;font-size:13.5px}
+#testbar b{font-family:var(--mono);letter-spacing:.08em}
+#testbar button{font:500 12.5px var(--sans);padding:5px 10px;border-radius:7px;border:1px solid #ffffff55;background:transparent;color:inherit;cursor:pointer}
+#testbar button:hover{background:#ffffff1f}
+#testbar span{margin-right:auto}
 .hidden{display:none}
 </style>
 </head>
@@ -121,6 +126,7 @@ code{font-family:var(--mono);font-size:.88em;background:var(--paper);border:1px 
     <div class="brand">SEO<span>Daily</span></div>
     <div class="meta" id="today"></div>
   </header>
+  <div id="testbar"></div>
   <main id="app"></main>
 </div>
 
@@ -380,14 +386,17 @@ const LEVELS = {
 const lvl = () => LEVELS[S.level] || LEVELS.junior;
 /* ---------- Utilities ---------- */
 const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
-const KEY = "crawldaily-v1";
+/* TEST mode: the copy at /seo-daily/test/ keeps its own progress, its own leaderboard tab and a day-skipper. */
+const TEST = /\/test\/?(index\.html)?$/.test(location.pathname);
+const KEY = TEST ? "seodaily-test-v1" : "crawldaily-v1";
+let DAY_OFFSET = 0; if (TEST) { try { DAY_OFFSET = parseInt(localStorage.getItem("seodaily-test-offset")) || 0; } catch(e){} }
 const $ = s => document.querySelector(s);
 const app = $("#app");
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || null; }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 let S = load() || { xp:0, streak:0, bestStreak:0, lastDaily:null, history:{}, cat:{}, seen:{}, missed:{}, daily:null };
 
-function dateKey(d=new Date()){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function dateKey(d=new Date(Date.now()+DAY_OFFSET*864e5)){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function addDays(k,n){ const [y,m,d]=k.split("-").map(Number); const dt=new Date(y,m-1,d); dt.setDate(dt.getDate()+n); return dateKey(dt); }
 function hash(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; } return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return (h^=h>>>16)>>>0; }; }
 function rng(seed){ let a=hash(seed)(); return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -625,7 +634,7 @@ function recentHistory(){ const k=dateKey(), out={}; for(let i=0;i<14;i++){ cons
 function newId(){ const a=new Uint8Array(12); try{ crypto.getRandomValues(a); }catch(e){ for(let i=0;i<12;i++) a[i]=Math.random()*256|0; } return Array.from(a,b=>b.toString(16).padStart(2,"0")).join(""); }
 function pushScore(){
   if(!SHEET_URL||!S.pid||!S.name||!SEASON_SEEN) return;
-  const row={id:S.pid, name:S.name, xp:S.xp, streak:S.streak, bestStreak:S.bestStreak, lastDaily:S.lastDaily||"", recent:recentHistory(), season:S.season||""};
+  const row={board:TEST?"test":"", id:S.pid, name:S.name, xp:S.xp, streak:S.streak, bestStreak:S.bestStreak, lastDaily:S.lastDaily||"", recent:recentHistory(), season:S.season||""};
   const sig=JSON.stringify(row); if(sig===lastPushed) return; lastPushed=sig;
   writeChain=writeChain.then(()=>fetch(SHEET_URL,{method:"POST",body:sig})).then(()=>loadBoard()).catch(()=>{ lastPushed=""; });
 }
@@ -644,6 +653,7 @@ function renderBoard(){
   const el=document.getElementById("board"); if(!el) return;
   const live=document.getElementById("board-live");
   if(!SHEET_URL){ el.innerHTML='<p class="note">The team leaderboard isn\'t connected yet.</p>'; return; }
+  if(BOARD_STATE==="needs-script"){ el.innerHTML='<p class="note">Test leaderboard is off: update the Google Sheet script to the version with test-board support, then refresh.</p>'; return; }
   if(BOARD_STATE==="loading"&&!BOARD.length){ el.innerHTML='<p class="note">Loading leaderboard…</p>'; return; }
   if(BOARD_STATE==="error"&&!BOARD.length){ el.innerHTML='<p class="note">Can\'t reach the leaderboard right now. Your progress is still saved in this browser.</p>'; return; }
   const rows=boardRows();
@@ -673,8 +683,9 @@ function renderBoard(){
 async function loadBoard(){
   if(!SHEET_URL) return;
   try{
-    const r=await fetch(SHEET_URL+(SHEET_URL.includes("?")?"&":"?")+"t="+Date.now());
+    const r=await fetch(SHEET_URL+(SHEET_URL.includes("?")?"&":"?")+(TEST?"board=test&":"")+"t="+Date.now());
     const j=await r.json();
+    if(TEST && j.board!=="test"){ BOARD=[]; BOARD_STATE="needs-script"; renderBoard(); return; }  // old Sheet script: never write test data to the real board
     BOARD=Array.isArray(j.rows)?j.rows:[]; BOARD_STATE="ok";
     // Season: running resetLeaderboard() in the Sheet's script starts a new season, which wipes everyone's progress.
     const season=typeof j.season==="string"?j.season.slice(0,64):"";
@@ -692,6 +703,20 @@ function initBoard(){
   if(!SHEET_URL){ renderBoard(); return; }
   loadBoard();
   clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden&&VIEW==="home") loadBoard(); },60000);
+}
+
+/* ---------- Test tools (only on /test/) ---------- */
+function testTools(){
+  const el=document.getElementById("testbar"); if(!TEST||!el) return;
+  if(!document.title.startsWith("TEST")) document.title="TEST · "+document.title;
+  el.innerHTML=`<b>TEST</b><span>Your team can't see this copy. Progress and leaderboard are separate. Pretend date: <strong>${dateKey()}</strong>${DAY_OFFSET?` (+${DAY_OFFSET} day${DAY_OFFSET===1?"":"s"})`:""}</span>
+    <button onclick="testShift(1)">Skip to next day</button>${DAY_OFFSET?'<button onclick="testShift(-DAY_OFFSET)">Back to today</button>':""}<button id="twipe" onclick="testWipe(this)">Wipe test data</button>`;
+}
+function testShift(n){ DAY_OFFSET=Math.max(0,DAY_OFFSET+n); try{ localStorage.setItem("seodaily-test-offset",String(DAY_OFFSET)); }catch(e){} RUN=null; testTools(); home(); }
+function testWipe(btn){
+  if(btn.dataset.armed!=="1"){ btn.dataset.armed="1"; btn.textContent="Click again to wipe"; setTimeout(()=>{ if(btn.isConnected){ btn.dataset.armed=""; btn.textContent="Wipe test data"; } },4000); return; }
+  try{ localStorage.removeItem(KEY); localStorage.removeItem("seodaily-test-offset"); }catch(e){}
+  location.reload();
 }
 /* ---------- Name ---------- */
 function nameScreen(){
@@ -722,6 +747,7 @@ function nameScreen(){
   };
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
+testTools();
 home();
 initBoard();
 </script>

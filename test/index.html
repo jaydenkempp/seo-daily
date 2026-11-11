@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEO Daily — Technical SEO Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4f1ea; --card:#fffdf8; --ink:#1c1b19; --muted:#6b675e; --line:#e2ddd1;
+  --accent:#1f7a4d; --accent-soft:#e3f1e8; --bad:#b4442c; --bad-soft:#f8e6e0; --gold:#b9852a;
+  --mono:'IBM Plex Mono',ui-monospace,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif; --serif:'Fraunces',Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#141513; --card:#1c1d1a; --ink:#ece9e1; --muted:#9a968c; --line:#2e2f2b;
+  --accent:#4cbf86; --accent-soft:#1d3328; --bad:#e2775e; --bad-soft:#3a221c; --gold:#d9a84a;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+.narrow{max-width:760px;margin:0 auto}
+.home-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+.news-col{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow:auto}
+@media (max-width:1000px){.home-grid{grid-template-columns:1fr}.news-col{position:static;max-height:none}}
+.opt.sel{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.confirm{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--paper)}
+.confirm span{margin-right:auto;font-size:14.5px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.brand{font-family:var(--serif);font-weight:700;font-size:28px;letter-spacing:-.02em}
+.brand span{color:var(--accent)}
+.meta{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.1}
+.stat small{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}}
+h1,h2{font-family:var(--serif);letter-spacing:-.015em;margin:0 0 8px}
+h1{font-size:30px}h2{font-size:21px}
+p{margin:0 0 12px}
+.btn{font:600 15px var(--sans);border:0;border-radius:10px;padding:12px 20px;cursor:pointer;background:var(--accent);color:#fff;transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select{font:500 14px var(--sans);padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.section{margin-top:22px}
+.label{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.bars{display:grid;gap:9px}
+.bar{display:grid;grid-template-columns:190px 1fr 56px;gap:10px;align-items:center;font-size:13.5px}
+.bar .track{height:8px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:6px}
+.bar .pct{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+@media (max-width:560px){.bar{grid-template-columns:130px 1fr 46px;font-size:12.5px}}
+.week{display:flex;gap:6px}
+.day{flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.day i{display:block;height:34px;border-radius:7px;background:var(--line);margin-bottom:4px;font-style:normal;line-height:34px;color:var(--ink);font-size:12px}
+.day i.on{background:var(--accent);color:#fff}
+.day i.today{outline:2px solid var(--accent);outline-offset:1px}
+.progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:18px}
+.progress div{height:100%;background:var(--accent);transition:width .3s}
+.tags{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:6px;background:var(--paper);border:1px solid var(--line);color:var(--muted)}
+.tag.d1{color:var(--accent)}.tag.d2{color:var(--gold)}.tag.d3{color:var(--bad)}
+.tag.rev{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.q{font-size:19px;font-weight:500;margin-bottom:18px;line-height:1.45}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;font:15px/1.45 var(--sans);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:13px 15px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px;flex:none;margin-top:2px}
+.opt.right{border-color:var(--accent);background:var(--accent-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.explain{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--paper);border-left:3px solid var(--accent);font-size:14.5px}
+.explain.bad{border-left-color:var(--bad)}
+.explain strong{display:block;margin-bottom:4px}
+code{font-family:var(--mono);font-size:.88em;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.explain code{background:var(--card)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}
+.big{font-family:var(--serif);font-size:56px;font-weight:700;line-height:1}
+.review{display:grid;gap:8px;margin-top:10px}
+.rv{display:flex;gap:10px;font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.rv .m{font-family:var(--mono);font-weight:500;flex:none}
+.rv .m.ok{color:var(--accent)}.rv .m.no{color:var(--bad)}
+.rank{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px}
+.rank b{color:var(--ink)}
+.note{font-size:13px;color:var(--muted)}
+.news{display:grid;gap:2px}
+.ni{display:block;text-decoration:none;color:var(--ink);padding:11px 12px;margin:0 -12px;border-radius:9px}
+.ni:hover{background:var(--paper)}
+.ni .nd{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.ni b{display:block;font-weight:600;font-size:15px;line-height:1.35}
+.ni span:last-child{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.board-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.board-tabs button{font:500 13px var(--sans);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.board-tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.lb{display:grid;gap:4px}
+.lb-row{display:grid;grid-template-columns:28px 30px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px}
+.lb-row.me{background:var(--accent-soft)}
+.lb-row .pos{font-family:var(--mono);font-size:13px;color:var(--muted);text-align:center}
+.lb-row .pos.top{color:var(--gold);font-weight:600}
+.lb-row .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:13px}
+.lb-row .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-row .nm small{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
+.lb-row .val{font-family:var(--mono);font-size:14px;font-weight:500}
+.lvls{display:grid;gap:10px}
+.lvl{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer}
+.lvl:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.lvl input{margin-top:4px;accent-color:var(--accent)}
+.lvl span{display:grid;gap:2px}
+.lvl small{color:var(--muted);font-size:13.5px}
+.lvl em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+#testbar:not(:empty){display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-8px 0 20px;padding:10px 14px;border-radius:10px;background:#7a4b00;color:#fff3dc;font-size:13.5px}
+#testbar b{font-family:var(--mono);letter-spacing:.08em}
+#testbar button{font:500 12.5px var(--sans);padding:5px 10px;border-radius:7px;border:1px solid #ffffff55;background:transparent;color:inherit;cursor:pointer}
+#testbar button:hover{background:#ffffff1f}
+#testbar span{margin-right:auto}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header id="hdr">
+    <div class="brand">SEO<span>Daily</span></div>
+    <div class="meta" id="today"></div>
+  </header>
+  <div id="testbar"></div>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ---------- Question bank ----------
+   Format: [category, difficulty(1-3), question, correct answer, [wrong answers], explanation]
+   IDs are array positions — only ever append new questions to keep progress stable. */
+const CATS = {
+  crawl:"Crawling & robots.txt", index:"Indexing & canonicals", status:"Status codes & redirects",
+  js:"Rendering & JavaScript", cwv:"Core Web Vitals", schema:"Structured data",
+  intl:"International & hreflang", sitemap:"XML sitemaps", arch:"Architecture & internal links",
+  logs:"Logs & crawl budget", mobile:"Mobile, HTTPS & URLs", gsc:"Search Console", ai:"AI search & bots",
+  onpage:"On-page & content", local:"Local & ecommerce"
+};
+const BANK = [
+["crawl",1,"Where must a robots.txt file live for its rules to apply to `https://shop.example.com`?","At `https://shop.example.com/robots.txt` — the root of that exact host and protocol",["Anywhere on the domain, as long as it's linked from the homepage","At `https://example.com/robots.txt` — the root domain covers all subdomains","Inside the XML sitemap"],"robots.txt only applies to the protocol, host and port it's served from. Every subdomain needs its own file at its root."],
+["crawl",1,"A URL is disallowed in robots.txt. Can it still show up in Google's index?","Yes — if it's linked from elsewhere, Google can index the URL without crawling its content",["No, disallowed URLs are always removed from the index","Only if it has a noindex tag","Only on Bing, never on Google"],"Disallow controls crawling, not indexing. A blocked URL with external links can be indexed with no snippet ('No information is available for this page')."],
+["crawl",2,"You want a page out of Google's index for good. What's the reliable method?","Let Google crawl it and serve a `noindex` robots meta tag or `X-Robots-Tag` header",["Add `Disallow:` for it in robots.txt","Add `Noindex:` for it in robots.txt","Add `rel=\"nofollow\"` to every internal link pointing to it"],"Google has to crawl the page to see noindex. Blocking it in robots.txt hides the noindex. Google stopped supporting `Noindex:` in robots.txt in 2019."],
+["crawl",1,"How does Googlebot treat a `Crawl-delay` line in robots.txt?","It ignores it",["It waits that many seconds between requests","It waits that many milliseconds between requests","It applies it to images only"],"Google doesn't support crawl-delay. Googlebot adjusts its crawl rate automatically based on how your server responds. Some other crawlers, such as Bingbot, do respect it."],
+["crawl",2,"robots.txt has `Disallow: /shop/` and `Allow: /shop/sale/`. Can Googlebot crawl `/shop/sale/shoes`?","Yes — the most specific (longest) matching rule wins",["No — Disallow always beats Allow","No — the first rule in the file wins","Only if the sitemap lists it"],"Google uses the longest matching path. If two matching rules are the same length, the less restrictive one (Allow) wins."],
+["crawl",2,"What happens when a site's robots.txt returns a 404?","Google assumes there are no crawl restrictions",["Google stops crawling the whole site","Google treats every URL as disallowed","Google drops the site from the index"],"Most 4xx responses for robots.txt are treated as 'no robots.txt'. 5xx responses are a different story."],
+["crawl",2,"After a site release, Search Console shows crawling suddenly dropping and a robots.txt fetch problem. What should you check first?","Whether `/robots.txt` loads properly — if it returns a server error, Google pauses crawling",["Whether the XML sitemap has new URLs","Whether the homepage title changed","Whether Google Analytics is still tracking"],"If Google can't fetch robots.txt because of a server error, it plays safe and stops crawling. Open `yoursite.com/robots.txt` after every big release, and check the robots.txt report under Settings in Search Console."],
+["crawl",2,"You want to stop Google crawling internal site-search pages like `/search?q=shoes`. What's the simplest robots.txt rule?","`Disallow: /search`",["`Noindex: /search`","`Disallow: shoes`","`Block: /search?q=`"],"Disallow rules match the start of the URL path, so `/search` covers every internal search URL. Just check it doesn't also catch real pages, like `/search-tips`."],
+["crawl",1,"What's the quickest way to check whether Google is allowed to crawl and index a specific page?","Search Console's URL Inspection tool",["Search for the page's title in Google","Run the page through PageSpeed Insights","Read the page's meta description"],"URL Inspection shows whether crawling and indexing are allowed, the last crawl date and the canonical Google chose. It's the best first check when a page isn't showing up."],
+["crawl",2,"Are robots.txt path rules case-sensitive?","Yes — `Disallow: /Admin/` doesn't block `/admin/`",["No, paths are matched case-insensitively","Only the user-agent line is case-sensitive","Only on Windows servers"],"Paths in Allow and Disallow rules are case-sensitive. User-agent names are not."],
+["ai",2,"What does the `Google-Extended` user-agent token in robots.txt control?","Whether your content can be used to train and ground Gemini models. It doesn't affect Google Search ranking or inclusion",["Whether your pages appear in Google Search","Whether Googlebot renders JavaScript","How often Googlebot-Image crawls"],"Google-Extended is a control token, not a separate crawler. Blocking it doesn't remove you from Search, and AI Overviews are governed by Search's own controls."],
+["index",1,"What is `rel=\"canonical\"` to Google?","A strong hint, which Google can override",["A directive Google always obeys","A redirect","A ranking factor that boosts the canonical page"],"Google weighs canonical tags alongside redirects, internal links, sitemaps and content similarity. Conflicting signals can lead it to choose a different canonical."],
+["index",2,"Page A has `rel=canonical` pointing to page B, and page B is `noindex`. What's the problem?","Mixed signals: the canonical target should be an indexable 200 page",["Nothing — this is the recommended way to hide duplicates","Page A gets a manual action","Google indexes both pages"],"A canonical says 'index B instead', while noindex on B says 'don't index B'. Point canonicals at indexable, 200-status URLs."],
+["index",1,"Why do most SEOs add a self-referencing canonical to every indexable page?","It consolidates parameter, tracking and case variants back to the clean URL",["It's required for a page to be indexed","It doubles the PageRank the page receives","It stops scrapers from copying the page"],"URLs like `?utm_source=` or `?ref=` create duplicates. A self-canonical tells Google which version you prefer."],
+["index",2,"How can you set a canonical for a PDF file?","With an HTTP `Link: <url>; rel=\"canonical\"` response header",["With a `<link rel=canonical>` tag inside the PDF","You can't — PDFs can't be canonicalized","Through robots.txt"],"Non-HTML files can't carry HTML tags, so you send the canonical, and directives such as `X-Robots-Tag: noindex`, as HTTP headers."],
+["index",1,"Which header lets you noindex a PDF or an image file?","`X-Robots-Tag: noindex`",["`Cache-Control: noindex`","`Link: noindex`","`Content-Type: noindex`"],"X-Robots-Tag supports the same directives as the robots meta tag, sent in the HTTP response."],
+["gsc",2,"What does 'Crawled – currently not indexed' in Search Console usually mean?","Google fetched the page but chose not to index it, often because of quality or duplication",["robots.txt blocked the page","The server returned 5xx","The page has a manual action"],"It's Google's choice, not a technical block. Improve uniqueness and value, internal links and consolidation."],
+["gsc",2,"What does 'Discovered – currently not indexed' mean?","Google knows the URL but hasn't crawled it yet, often because of crawl capacity or low perceived priority",["Google crawled the page and rejected it","The page is noindex","The page redirects"],"Google found the URL in links or sitemaps but put off crawling it. On large sites this often points to crawl budget or server capacity limits."],
+["gsc",2,"'Duplicate, Google chose different canonical than user' means:","Google ignored your declared canonical and chose another URL",["Your canonical tag is malformed","You have two canonical tags","The page has a hreflang error"],"Your signals conflict, for example internal links or the sitemap pointing at the other version. Align your signals so they back up your canonical."],
+["index",1,"How does Google treat `example.com/page#pricing` compared with `example.com/page`?","As the same URL — fragments are generally ignored for indexing",["As two separate pages","As a duplicate content violation","As a redirect"],"Fragments after `#` aren't sent to the server and are ignored for indexing. Don't rely on them for distinct pages."],
+["index",3,"Search Console's URL Parameters tool is gone. How should you manage parameter duplication now?","Canonical tags, clean internal linking, and robots.txt rules for crawl-wasting parameters",["Email Google support with a parameter list","Use the Removals tool every month","Add `nofollow` to every page"],"Google retired the tool in 2022, saying its systems can figure out parameters. You control it on your own site."],
+["index",2,"What does the `data-nosnippet` HTML attribute do?","Stops a specific section of text from being used in search snippets",["Removes the page from the index","Hides the element from users","Stops Google from following links in that element"],"You can put it on span, div and section elements to exclude that text from snippets. The page stays indexed."],
+["index",2,"How long does a Search Console Removals request hide a URL?","About 6 months — it's temporary, so you also need noindex, a 404/410 or a block to make it permanent",["Forever","24 hours","Until the next core update"],"Removals is an emergency hide. Without a permanent signal, the URL can come back once the request expires."],
+["index",1,"Last year's Black Friday page still ranks, but the offer has ended. What's usually the best move?","Keep the URL and update it for the next sale, so it keeps the rankings it built",["Leave it live with the old prices","Delete it and redirect it to the homepage","Add `nofollow` to the page"],"Reusing one evergreen URL for a recurring promo, like `/black-friday`, keeps its links and history. Redirecting to the homepage is often treated as a soft 404."],
+["status",1,"Does a 302 redirect pass PageRank?","Yes. Both 301 and 302 pass signals; the difference is which URL Google tends to keep as canonical",["No, only 301s pass PageRank","Only for 30 days","Only if the target is on the same domain"],"A 301 strongly signals that the target should become canonical. A 302 signals a temporary move, so Google tends to keep the source URL. Use the code that matches your intent."],
+["status",2,"404 vs 410 — what's the practical difference for Google?","Both remove the URL. 410 may be treated as slightly more definitive, but the difference is minor",["410 gets you a penalty","404 keeps the page indexed forever","410 redirects users to the homepage"],"Both are fine for removed content. Use 410 when you're sure it's gone for good, but don't lose sleep over which you pick."],
+["status",1,"What's a 'soft 404'?","A page that returns 200 OK but looks like an error or empty page to users and Google",["A 404 with a pretty design","A 404 that's linked internally","A 301 to a 404 page"],"Examples are 'no results found' pages or thin, empty templates served with a 200. Return a real 404/410, or add content."],
+["status",2,"Your site is down for 2 hours of planned maintenance. Which status code should it return?","503 Service Unavailable, ideally with a `Retry-After` header",["404 Not Found","200 with a maintenance message","301 to a maintenance page"],"A 503 tells crawlers the outage is temporary. A 200 maintenance page risks being indexed as soft 404s. Long-running 503s can still lead to deindexing."],
+["status",1,"A Screaming Frog crawl shows lots of internal links pointing to URLs that 301 redirect. What should you do?","Update those internal links to point straight to the final URL",["Nothing — internal redirects help SEO","Change the 301s to 302s","Add the redirecting URLs to the sitemap"],"The redirects still work, but linking directly is faster for users and saves crawl effort. Fix the most-linked ones first, like the navigation and footer."],
+["status",3,"How many redirect hops will Googlebot follow before giving up?","Up to 10",["Up to 3","Just 1","Unlimited"],"Google follows up to 10 hops. Every hop adds latency and risk, so collapse chains into a single redirect."],
+["status",2,"How does Google treat a 308 redirect?","Like a 301 — permanent",["Like a 302 — temporary","As an error","As a soft 404"],"308 is the permanent redirect that preserves the HTTP method. 307 is its temporary counterpart and is treated like a 302."],
+["status",1,"You're changing a blog URL from `/blog/seo-tips-2025` to `/blog/seo-tips`. What should you set up?","A 301 redirect from the old URL to the new one, then update internal links",["A 302 redirect, in case it changes again","Nothing — Google finds the new URL on its own","Delete the old page and wait"],"A 301 sends visitors and ranking signals to the new URL. Updating internal links and the sitemap helps Google pick up the change faster."],
+["status",2,"Your server starts returning many 429 and 5xx responses to Googlebot. What happens?","Googlebot automatically slows its crawl rate",["Googlebot speeds up to retry faster","Nothing changes","All URLs are deindexed at once"],"Google backs off when your server struggles. If errors persist, URLs can eventually drop out of the index."],
+["status",1,"During an HTTP → HTTPS migration, how should redirects work?","301 each HTTP URL to its exact HTTPS equivalent, page to page",["301 every HTTP URL to the HTTPS homepage","302 everything for the first year","No redirects needed — Google figures it out"],"One-to-one redirects keep signals for each page. Redirecting everything to the homepage creates soft 404s."],
+["status",2,"A dev proposes redirecting every 404 to the homepage 'to save link equity'. What usually happens?","Google treats those redirects as soft 404s, and users get confused",["Rankings for the homepage go up","It counts as a good 301 strategy","Google treats it as cloaking and bans the site"],"Redirect only to a closely relevant replacement. Otherwise return 404/410."],
+["js",1,"What browser engine does Googlebot use to render pages?","An evergreen (regularly updated) version of Chromium",["A frozen Chrome 41","Firefox","No engine — Google only reads raw HTML"],"Google moved to an evergreen Chromium renderer in 2019, so modern JavaScript features are generally supported."],
+["js",1,"Which of these links can Google reliably discover and follow?","`<a href=\"/pricing\">Pricing</a>`",["`<span onclick=\"goTo('/pricing')\">Pricing</span>`","`<a onclick=\"goTo('/pricing')\">Pricing</a>` with no href","`<a href=\"javascript:void(0)\">Pricing</a>`"],"Google follows `<a>` elements that have a resolvable URL in `href`. Click handlers alone aren't crawlable links."],
+["js",2,"Products only load after a user clicks a 'Load more' button. What's the SEO risk?","Googlebot doesn't click buttons, so those products may never be discovered",["None — Googlebot clicks every button","Google will penalize the button","Only the button text gets indexed"],"Back infinite scroll and load-more patterns with crawlable paginated URLs, such as `?page=2`, using real `<a href>` links."],
+["js",3,"The raw HTML has `<meta name=\"robots\" content=\"noindex\">`, and JavaScript removes it after load. What happens?","Google may skip rendering and honor the noindex",["Google renders first, sees no noindex, and indexes the page","Google indexes the page twice","Google flags it as cloaking"],"If Google sees noindex in the initial HTML, it may not render the page at all. Never rely on JS to remove a noindex."],
+["js",2,"Why is server-side rendering (SSR) generally safer for SEO than pure client-side rendering?","The full content and links are in the initial HTML response, so crawlers that don't execute JS still see them",["Google ranks SSR pages higher by default","SSR pages don't need internal links","CSR is banned by Google"],"Google can render JS, but rendering can be delayed, and many other crawlers, including most AI crawlers, don't execute JavaScript."],
+["js",3,"What is Google's current stance on dynamic rendering (serving pre-rendered HTML to bots)?","It's a workaround, not a recommended long-term solution. Use SSR, static rendering or hydration instead",["It's the recommended best practice","It's cloaking and gets penalized","It's required for React sites"],"Google's docs call dynamic rendering a workaround. It isn't cloaking if the content is equivalent, but it adds complexity."],
+["js",1,"Should you block your JS and CSS files in robots.txt?","No — Google needs them to render the page properly",["Yes, it saves crawl budget with no downside","Yes, but only the CSS","Only on mobile"],"Blocking rendering resources can make Google see a broken or empty page."],
+["js",2,"An SPA uses hash routing such as `/#/products/shoes`. What's the SEO problem?","Google ignores fragments, so all routes collapse to one URL. Use History API routes such as `/products/shoes`",["None — hash URLs are ideal","Hashes double crawl budget","Google treats hashes as subdomains"],"Each view needs its own real, crawlable URL."],
+["gsc",1,"How can you see the HTML Google rendered for a page?","Search Console's URL Inspection tool → Test live URL → View tested page",["View source in your browser","Google Analytics","The robots.txt report"],"The tested page shows the rendered HTML, a screenshot and any resource-loading errors, so you see what Google sees."],
+["cwv",2,"Should you lazy-load the main hero image, which is the LCP element?","No — lazy-loading the LCP image delays it. Load it eagerly, ideally with `fetchpriority=\"high\"`",["Yes, always lazy-load every image","Yes, but only on mobile","It makes no difference"],"Lazy-load below-the-fold images. The LCP image should be discoverable early in the HTML and prioritized."],
+["cwv",1,"What are the three Core Web Vitals?","LCP, INP, CLS",["LCP, FID, CLS","TTFB, FCP, CLS","LCP, INP, TTFB"],"INP (Interaction to Next Paint) replaced FID as a Core Web Vital in March 2024."],
+["cwv",1,"What's the 'good' threshold for Largest Contentful Paint (LCP)?","2.5 seconds or less",["1 second or less","4 seconds or less","200 ms or less"],"Good is ≤2.5 s, needs improvement is up to 4 s, and poor is anything above 4 s."],
+["cwv",1,"What's the 'good' threshold for Interaction to Next Paint (INP)?","200 ms or less",["100 ms or less","500 ms or less","2.5 seconds or less"],"Good is ≤200 ms, needs improvement is up to 500 ms, and poor is anything above 500 ms."],
+["cwv",1,"What's the 'good' threshold for Cumulative Layout Shift (CLS)?","0.1 or less",["0.25 or less","1.0 or less","100 ms or less"],"CLS is a unitless score. Good is ≤0.1 and poor is anything above 0.25."],
+["cwv",3,"At what percentile is a page assessed for passing Core Web Vitals?","The 75th percentile of real-user page loads, split by mobile and desktop",["The median (50th)","The 95th percentile","The average of lab tests"],"If 75% of visits meet the 'good' threshold, the metric passes. This is field data from CrUX."],
+["cwv",2,"What's the difference between CrUX and Lighthouse data?","CrUX is field data from real Chrome users, and Lighthouse is lab data from a simulated test",["They're identical","CrUX is lab data and Lighthouse is field data","Lighthouse is what Google uses for ranking"],"Google's page experience assessment uses field data. Lab tools are for debugging."],
+["cwv",1,"Which of these commonly causes high CLS?","Images and ads without reserved dimensions (no width and height or aspect-ratio)",["A slow server response","Too many internal links","Using HTTPS"],"Reserve space for images, embeds, ads and banners. Late-loading web fonts can also shift text."],
+["cwv",2,"What does INP measure?","The latency of user interactions (clicks, taps, key presses) across the whole visit, reporting roughly the worst one",["Only the first interaction","The time to the first byte","How long the page takes to load fully"],"Unlike FID, which only measured the first input's delay, INP covers interactions across the whole page lifecycle."],
+["cwv",1,"Where can you see whether real visitors get good Core Web Vitals across your whole site?","Search Console's Core Web Vitals report",["Search Console's Links report","Google Ads","The robots.txt report"],"It groups URLs as Good, Needs improvement or Poor using real Chrome user data. Use PageSpeed Insights to dig into a single page."],
+["cwv",2,"What's a 'long task' in performance terms?","Main-thread work longer than 50 ms, which delays the response to interactions",["Any request over 1 MB","A page with over 3,000 words","A redirect chain"],"Breaking up long tasks, for example by yielding to the main thread, is a key INP fix."],
+["cwv",2,"PageSpeed Insights flags 'Properly size images' and 'Serve images in next-gen formats' on a product page. What's the practical fix?","Compress and resize the images, and serve formats like WebP or AVIF",["Remove all images from the page","Lazy-load the main product image","Turn off HTTPS"],"Oversized images are one of the most common causes of slow loading. Most CMSs and image CDNs can resize and convert images automatically."],
+["cwv",1,"A banner appears at the top of the page after a second and pushes everything down. Which metric does this hurt?","CLS (Cumulative Layout Shift)",["LCP (Largest Contentful Paint)","INP (Interaction to Next Paint)","TTFB (Time to First Byte)"],"Content jumping around after it appears is a layout shift. Reserve space for banners, cookie notices and ads, or overlay them instead."],
+["schema",1,"Which structured data format does Google recommend?","JSON-LD",["Microdata","RDFa","Open Graph"],"Google supports all three structured data formats but recommends JSON-LD because it's the easiest to implement and maintain. Open Graph isn't schema.org markup."],
+["schema",1,"Does valid structured data guarantee rich results?","No — it makes a page eligible, and Google decides whether to show them",["Yes, within 24 hours","Yes, if the Rich Results Test passes","Only for Product markup"],"Eligibility isn't a guarantee. Quality, relevance and policy compliance all matter."],
+["schema",2,"Which sites can still get FAQ rich results in Google?","Only well-known, authoritative government and health sites",["Every site with valid FAQPage markup","Only e-commerce sites","No sites — FAQPage is invalid schema"],"Google restricted FAQ rich results in August 2023. The markup is still valid schema.org; it just won't show for most sites."],
+["schema",2,"What's the status of HowTo rich results?","Deprecated — Google no longer shows them",["Shown on desktop and mobile","Shown on mobile only","Required for recipe sites"],"Google deprecated HowTo rich results in 2023."],
+["schema",1,"Which tool checks whether a page is eligible for Google rich results?","Google's Rich Results Test",["PageSpeed Insights","The robots.txt report","Google Tag Manager"],"The Schema Markup Validator checks general schema.org validity, while the Rich Results Test checks Google-specific eligibility."],
+["schema",2,"You add Review markup to content that isn't visible on the page. What's the risk?","It violates Google's guidelines and can lead to a structured data manual action",["None — hidden markup is fine","A slight ranking boost","The page gets AMP status"],"Markup must describe content that users can see on the page."],
+["schema",3,"Can a business show star ratings from reviews about itself (self-serving) using LocalBusiness or Organization markup?","No — self-serving reviews on LocalBusiness and Organization aren't eligible for review stars",["Yes, always","Yes, if there are more than 50 reviews","Only with microdata"],"Google stopped showing self-serving review snippets for these types in 2019."],
+["schema",2,"Which schema.org property links an entity to its official profiles, such as LinkedIn or Wikipedia?","`sameAs`",["`url`","`relatedLink`","`hasPart`"],"`sameAs` helps search engines tie your entity to its other authoritative representations."],
+["schema",1,"Which structured data type can help show price, stock and review stars for an ecommerce page in Google?","`Product` (with offer and review details)",["`Article`","`BreadcrumbList`","`FAQPage`"],"Product markup makes product pages eligible for rich results. Keep the price and stock in the markup matching what's visible on the page."],
+["schema",2,"In Article markup, what format should `datePublished` use?","ISO 8601, ideally with a timezone, e.g. `2026-03-14T09:00:00+00:00`",["`14/03/2026`","`March 14th, 2026`","A Unix timestamp"],"ISO 8601 with a timezone avoids any ambiguity about the date."],
+["intl",1,"Which hreflang value is invalid?","`en-UK`",["`en-GB`","`es-419`","`fr`"],"The region code for the United Kingdom is `GB` (ISO 3166-1 alpha-2). `es-419` (Latin America) is a valid UN M.49 region."],
+["intl",1,"What is `hreflang=\"x-default\"` for?","The fallback page for users whose language or region doesn't match any listed version",["The default canonical","The English version","The mobile version"],"x-default is typically a language selector or global homepage."],
+["intl",2,"Page A (en) lists page B (de) in hreflang, but page B doesn't list page A. What happens?","Google may ignore the annotation — hreflang needs return links",["It works fine one-way","Google penalizes page B","Page B gets redirected"],"Each page must link to every alternate, and the alternates must link back."],
+["intl",2,"Should each page include a hreflang tag pointing to itself?","Yes — the set should be self-referencing",["No, that creates a loop","Only the x-default page","Only if it's English"],"Every page in the cluster lists all versions, including itself."],
+["intl",2,"Which of these is NOT a supported way to implement hreflang?","robots.txt",["HTML `<link>` tags in the head","HTTP headers","An XML sitemap"],"Pick one of the three supported methods. Mixing methods raises the risk of conflicts."],
+["intl",3,"Your /fr/ page canonicalizes to the /en/ page while also having hreflang. What's wrong?","Each language version should self-canonicalize. Cross-language canonicals tell Google to drop the French page",["Nothing, that's correct","hreflang overrides the canonical anyway","You need a 301 as well"],"Canonicals across languages conflict with hreflang. Translated pages aren't duplicates."],
+["intl",3,"Can you use a region-only hreflang value such as `hreflang=\"us\"`?","No — the language code is required; region is optional",["Yes, region-only works","Only for English-speaking countries","Only in sitemaps"],"Use the format `language` or `language-REGION`, e.g. `en-US`. Region alone isn't valid."],
+["intl",2,"Why is auto-redirecting visitors by IP location risky for SEO?","Googlebot mostly crawls from US IPs and may never see the other versions",["Google bans geo-redirects","It increases CLS","It breaks HTTPS"],"Let users choose with a banner or selector, and keep every version crawlable."],
+["intl",2,"Which domain setup sends the strongest geotargeting signal?","A country-code TLD such as `.de` or `.fr`",["A subfolder like `/de/`","A URL parameter like `?lang=de`","A subdomain on a .com"],"ccTLDs are inherently tied to a country. Search Console's International Targeting report has been retired."],
+["sitemap",1,"What are the limits for a single XML sitemap file?","50,000 URLs or 50 MB uncompressed, whichever comes first",["10,000 URLs or 10 MB","1,000 URLs","No limits"],"Split larger sets across multiple sitemaps tied together by a sitemap index."],
+["sitemap",2,"Which sitemap fields does Google use?","`<lastmod>`, if it's consistently accurate. Google ignores `<priority>` and `<changefreq>`",["All three equally","Only `<priority>`","None of them"],"Only update lastmod when content meaningfully changes. Faking it destroys its value as a signal."],
+["sitemap",1,"Which URLs belong in an XML sitemap?","Canonical, indexable URLs that return 200",["Every URL including redirects and 404s","Only the homepage","noindexed pages, so Google can find the noindex"],"A sitemap is a list of pages you want indexed. Including junk weakens its value as a signal."],
+["sitemap",2,"How do you reference a sitemap in robots.txt?","`Sitemap: https://example.com/sitemap.xml` — a full absolute URL, anywhere in the file",["`Sitemap: /sitemap.xml` inside a user-agent group only","`Allow: sitemap.xml`","You can't — it must be submitted in Search Console"],"The Sitemap line is independent of user-agent groups and must be an absolute URL."],
+["sitemap",1,"You've just launched a new section of the site. What's the simplest way to help Google find the new pages?","Add them to the XML sitemap and link to them from existing pages",["Wait — Google will find them eventually","Email Google support","Add an `index` meta tag to every page"],"Sitemaps help discovery, but links from pages Google already crawls are often what gets new pages found quickly."],
+["sitemap",2,"Which search engines support IndexNow?","Bing, Yandex and others — but not Google",["Google only","All engines including Google","No one — it's deprecated"],"IndexNow lets you push URL changes instantly to participating engines. Google hasn't adopted it."],
+["sitemap",2,"Search Console's Sitemaps report says 'Couldn't fetch' for your sitemap. What should you check first?","That the sitemap URL loads in a browser and returns valid XML",["That every page has a meta description","That the sitemap lists your social profiles","That the sitemap is under 1 KB"],"Typos in the submitted URL, a robots.txt block or a server error are the usual causes. Fix it, then resubmit in Search Console."],
+["arch",1,"What's an orphan page?","A page with no internal links pointing to it",["A page with no outbound links","A page without a canonical","A page that returns 404"],"Orphans are hard for crawlers and users to find. A sitemap can surface them, but internal links matter more."],
+["arch",2,"Does adding `nofollow` to internal links 'sculpt' PageRank toward important pages?","No — the PageRank on those links is lost rather than redistributed, so it's not a useful tactic",["Yes, it's best practice","Yes, but only on the homepage","Only for footer links"],"Google changed how nofollow PageRank flows years ago. Fix architecture instead: link more to what matters."],
+["arch",2,"What's the biggest technical SEO risk of faceted navigation (filters)?","A near-infinite set of crawlable filter combinations that waste crawl budget and create duplicates",["Filters slow down LCP","Filters can't be indexed at all","Google penalizes e-commerce filters"],"Decide which facets deserve indexable pages. Keep the rest out of crawl paths with robots.txt rules and non-crawlable links, plus canonicals."],
+["arch",2,"How does Google use `rel=\"next\"` and `rel=\"prev\"` for pagination today?","It doesn't — Google stopped using them as an indexing signal years ago",["As the main pagination signal","To merge all pages into page 1","Only for blogs"],"Give paginated pages self-referencing canonicals and crawlable links between them."],
+["arch",2,"Should page 2 of a category canonicalize to page 1?","No — each paginated page should self-canonicalize, or products deeper in the list may not be found",["Yes, always","Only if page 2 has fewer than 10 items","Only on mobile"],"Canonicalizing page 2 to page 1 tells Google page 2's unique content (its product links) doesn't matter."],
+["arch",1,"What's 'click depth'?","The number of clicks needed to reach a page from the homepage",["How many times users click a result","Time on page","The number of outbound links"],"Important pages should be shallow, typically within about 3 clicks. Deep pages get crawled and valued less."],
+["arch",3,"An event calendar has 'next month' links that go on forever. What's this called?","A crawl trap, or infinite space",["A link wheel","Cloaking","A doorway page"],"Crawlers can follow endless generated URLs. Limit the range or make those links non-crawlable."],
+["arch",1,"Why does descriptive internal anchor text matter?","It tells users and search engines what the target page is about",["It's purely decorative","It increases CLS","Google ignores internal anchors"],"'Technical SEO audit checklist' beats 'click here' for both relevance and accessibility."],
+["logs",2,"What two things make up Google's crawl budget?","Crawl capacity limit and crawl demand",["Page count and domain age","Backlinks and bounce rate","Sitemap size and robots.txt size"],"Capacity is how much your server can take without strain. Demand is how much Google wants to crawl, based on popularity and freshness."],
+["logs",2,"Which sites usually need to worry about crawl budget?","Very large sites (roughly 1M+ pages) or fast-changing ones (10k+ pages changing daily)",["Every site with over 100 pages","Only new sites","Only sites on shared hosting"],"For most small sites, Google crawls everything it needs. Crawl budget is a large-site problem."],
+["logs",2,"An audit finds 3,000 orphan pages (no internal links) that are only listed in the sitemap. What's the usual fix?","Link to the ones worth keeping from relevant pages, and remove or redirect the rest",["Leave them — the sitemap is enough","Noindex the whole site","Add all of them to the main menu"],"Pages that only exist in a sitemap tend to get crawled less and rank poorly. Audits are a good time to merge or prune thin orphans."],
+["logs",1,"What can server log analysis tell you that a crawler tool like Screaming Frog can't?","What search engine bots actually crawled, how often, and which status codes they got",["Your rankings","Your competitors' traffic","Keyword search volume"],"A site crawler simulates a crawl. Logs show what Googlebot really did."],
+["logs",1,"Where is the Crawl Stats report in Search Console?","Settings → Crawl stats",["Performance → Crawl","URL Inspection","Links report"],"It shows requests over time, response codes, file types, host status and Googlebot type."],
+["logs",2,"Does `noindex` save crawl budget?","Not really — Google still has to crawl a page to see its noindex",["Yes, noindexed pages are never crawled","Yes, it halves crawling","Only with nofollow"],"To stop crawling, use robots.txt. noindex controls indexing, not crawling, although Google may crawl long-noindexed pages less often."],
+["logs",2,"Which of these wastes the most crawl budget on a large site?","Endless parameter URLs, redirect chains and soft 404s",["Having a sitemap","Using HTTPS","Self-referencing canonicals"],"Every unnecessary fetch uses crawl capacity that could go to valuable pages."],
+["mobile",1,"Under mobile-first indexing, a block of content exists on desktop but is removed from the mobile HTML. What happens?","It likely won't be indexed — Google indexes the mobile version",["It's indexed from desktop anyway","It ranks higher on desktop only","Google merges both versions"],"Keep content parity between mobile and desktop."],
+["mobile",2,"Is content inside tabs or accordions on mobile indexed with full weight?","Yes — in mobile-first indexing, content hidden for UX reasons is treated normally",["No, hidden content is ignored","It gets half weight","Only if it's open by default"],"Hiding content in tabs or accordions to save mobile screen space is fine."],
+["mobile",1,"On phones, your site shows the full desktop layout shrunk down, and visitors have to pinch to zoom. What's usually missing?","A responsive design with a viewport meta tag",["An XML sitemap","A canonical tag","Structured data"],"Without `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">`, phones render the desktop layout zoomed out. Responsive design is Google's recommended mobile setup."],
+["mobile",1,"Chrome shows 'Not secure' next to your site's address. What's the usual cause?","The page loads over HTTP rather than HTTPS, or the SSL certificate has a problem",["The site has no XML sitemap","The page is missing a meta description","The site has too many redirects"],"HTTPS is a small ranking signal and a big trust signal. Check the certificate hasn't expired and that every HTTP URL 301s to HTTPS."],
+["mobile",2,"Are `example.com/page` and `example.com/page/` the same URL to Google?","No — they're separate URLs (apart from the root `example.com/`)",["Yes, always","Only on HTTPS","Only if a sitemap lists both"],"Pick one format, redirect the other, and link consistently."],
+["mobile",2,"Are URL paths case-sensitive?","Yes — `/Shoes` and `/shoes` are different URLs",["No, never","Only the domain is","Only on Linux servers, and Google normalizes them"],"Domains are case-insensitive, but paths and parameters are case-sensitive. Normalize to lowercase and redirect."],
+["mobile",1,"What's 'mixed content'?","An HTTPS page that loads resources such as images or scripts over HTTP",["Content in two languages","A mix of text and video","Duplicate content across domains"],"Browsers block or warn on mixed content. Update every resource URL to HTTPS."],
+["mobile",2,"What does the HSTS header do?","Tells browsers to always connect over HTTPS for that domain",["Speeds up DNS","Sets the canonical","Blocks bots"],"`Strict-Transport-Security` prevents protocol downgrade attacks and skips the HTTP → HTTPS redirect hop for returning visitors."],
+["mobile",1,"Which is the most SEO-friendly URL for a product page?","`/mens-running-shoes/nike-pegasus-41`",["`/p?id=83749&cat=12`","`/Mens_Running_Shoes/NIKE-Pegasus-41/`","`/products/item/view/83749/default.aspx?ref=nav`"],"Short, lowercase, readable URLs with hyphens are easiest for people and search engines. Don't change URLs that already rank unless you redirect them."],
+["mobile",2,"Does Google index images set as CSS `background-image` in Google Images?","No — use `<img>` elements with alt text for images you want indexed",["Yes, the same as `<img>`","Only PNGs","Only if they're in the sitemap"],"Google Images indexes `<img>` src (including srcset). Background images aren't picked up as image content."],
+["gsc",2,"How is 'Average position' calculated in the Performance report?","The average of your site's topmost position each time it appeared",["The median of all rankings","The average of every URL's position, including lower ones","Your position on page 1 only"],"If your site appears at positions 3 and 7 for one query, that impression counts as position 3."],
+["gsc",1,"How much historical data does the Performance report keep?","16 months",["Forever","90 days","5 years"],"Export your data regularly, or use the BigQuery bulk export, if you need a longer history."],
+["gsc",1,"What does a Domain property in Search Console cover that a URL-prefix property doesn't?","Every protocol and subdomain (http, https, www, m., etc.) — it requires DNS verification",["Only the homepage","Competitors' sites","Paid search data"],"URL-prefix properties cover a single protocol and host prefix."],
+["gsc",2,"Does clicking 'Request indexing' in URL Inspection guarantee a page gets indexed?","No — it queues a crawl. The quota is limited and indexing isn't guaranteed",["Yes, within an hour","Yes, permanently","Only for HTTPS pages"],"Use it for important new or updated pages. It won't override quality or technical issues."],
+["ai",2,"What special markup do you need to appear in Google's AI Overviews?","None — the page just needs to be indexed and eligible for a snippet in Google Search",["`AIOverview` schema","An llms.txt file","A Google-Extended Allow rule"],"Google says the usual Search best practices apply. There's no special optimization file or markup."],
+["ai",2,"How can you limit what content Google shows from your page in AI Overviews?","Use `nosnippet`, `data-nosnippet` or `max-snippet` — the same snippet controls as Search",["Block Google-Extended","Use llms.txt","Add `noai` to robots.txt"],"Google's AI features in Search follow the same preview controls as regular snippets."],
+["ai",3,"If you block `GPTBot` in robots.txt, are you blocked from ChatGPT search results?","Not necessarily — OpenAI uses `OAI-SearchBot` for search. GPTBot is for training",["Yes, GPTBot powers everything","Yes, and from Google too","Only for images"],"AI companies often run separate crawlers for training and for search or retrieval. Check each one's documentation and decide one at a time."],
+["ai",2,"What is llms.txt?","A proposed convention for giving LLMs a markdown summary of a site. Google has said Search doesn't use it",["An official Google standard required for AI Overviews","A robots.txt replacement","A W3C standard"],"It's an emerging proposal with uneven adoption. Don't expect it to affect Google Search."],
+["ai",3,"Why can heavy client-side rendering hurt visibility in AI assistants and answer engines?","Many AI crawlers fetch the raw HTML and don't execute JavaScript, so they miss JS-only content",["AI crawlers can't read HTML","LLMs penalize React","AI crawlers only read sitemaps"],"Server-rendered content is readable by the widest range of bots."],
+["crawl",2,"A dev adds `Disallow: /` under `User-agent: *` on staging, and it ships to production. What's the first symptom you'd expect?","Pages start showing in results with no description, then traffic drops as Google stops crawling",["Instant removal of every page","A manual action notice","No effect, because sitemaps override it"],"Already-indexed URLs may linger without snippets. Always check robots.txt after every deploy."],
+["index",3,"A page has two different `rel=canonical` tags. How does Google handle it?","It will likely ignore both and pick its own canonical",["It uses the first one","It uses the last one","It indexes both URLs"],"Multiple conflicting canonicals cancel each other out. Make sure plugins and templates don't both add one."],
+["index",2,"Where must the robots meta tag go to be reliably honored?","In the `<head>` of the HTML",["Anywhere in the body","In the footer","In the sitemap"],"If invalid elements break the head early (for example an injected `<img>` or `<div>`), the browser parser may end the head and the robots tag may be missed."],
+["status",3,"What's the main drawback of a JavaScript redirect compared with a server-side 301?","Google only sees it after rendering, so it's slower and less reliable. Other crawlers may never see it",["Google can't follow it at all","It passes negative PageRank","It creates a soft 404"],"Use server-side redirects whenever you can. Use JS redirects only when you have no server access."],
+["cwv",2,"How can you make the LCP image load sooner?","Put the image in the initial HTML, preload it if needed, and add `fetchpriority=\"high\"`",["Lazy-load it","Load it with JavaScript after `onload`","Convert it to a CSS background"],"The browser should discover the LCP resource as early as possible and treat it as a priority."],
+["schema",3,"You mark up a product with `offers.price` that differs from the price shown on the page. What's the likely outcome?","The markup may be disregarded, and it can trigger a manual action for misleading structured data",["Google shows the markup price","Nothing — Google ignores price","It improves click-through rate"],"Structured data must match the visible content. Merchant Center mismatches can also get products disapproved."],
+["intl",1,"You have the same English page for the US and the UK, with different prices. What tells Google which version to show in each country?","hreflang tags (`en-US` and `en-GB`) on both pages, pointing to each other",["A canonical from the UK page to the US page","Translating the UK page into another language","Putting both versions on one URL"],"hreflang helps Google show the right regional version. Each page should list itself and every alternate."],
+["arch",3,"Breadcrumb navigation mainly helps technical SEO by:","Adding hierarchical internal links and making the site structure clear to crawlers",["Removing the need for a sitemap","Improving INP","Blocking duplicate content"],"Breadcrumbs link each page up to its parent categories, which spreads link equity through the hierarchy."],
+["sitemap",1,"Where in Search Console can you see whether your sitemap was read and how many pages it found?","Indexing → Sitemaps",["Performance → Search results","Links","Settings → Users and permissions"],"The Sitemaps report shows status, last read date and discovered pages. Click through to see indexing for just that sitemap's URLs."],
+["logs",3,"Log files show Googlebot hitting thousands of `?sort=price&color=red&size=9` URLs. What's the best first fix?","Stop linking to these combinations in crawlable form and disallow low-value parameter patterns in robots.txt",["Add noindex to them","Delete your sitemap","Return 500 for parameter URLs"],"noindex still requires crawling. robots.txt and link hygiene cut the crawl waste at the source."],
+["crawl",3,"Google's large-site crawler docs: what can trap an important page in 'Discovered – currently not indexed' for months?","A huge volume of low-value URLs, such as faceted or parameter URLs, using up Googlebot's crawl capacity",["Having too few backlinks to the homepage","Using JSON-LD instead of microdata","Serving the site over HTTP/2"],"When Googlebot spends its crawl capacity on junk URLs, discovered pages wait in the queue. Clean up crawl paths so it reaches what matters."],
+/* ---- News questions (auto-refreshed section: append new items above BANK_END) ---- */
+["news",2,"In April 2026, Google added 'back button hijacking' to its spam policies. Which policy category does it fall under?","Malicious practices — with enforcement from June 15, 2026",["Site reputation abuse","Scaled content abuse","Link spam"],"Google classed manipulating browser history to trap users as a malicious practice, with manual actions or automated demotions as penalties. Third-party ad scripts and libraries can be the cause, so audit them too."],
+["news",2,"Google's 2026 docs say Googlebot only reads the first 2 MB of a page's HTML. Who does this actually affect?","Very few sites — only pages with enormous HTML, such as huge inline scripts or data",["Every site — most pages are over 2 MB","Image-heavy pages, because images count toward the limit","Only sites on slow hosting"],"Images, CSS and JS are fetched separately and don't count toward it. For almost every normal page, this is nothing to worry about."],
+["news",1,"In March 2026, Google moved the files that list its crawler IP addresses. Who usually needs to act?","Your developer or hosting team, if they run firewall or bot-blocking rules that use those files",["Every site owner must resubmit their sitemap","Content writers must update their pages","Nobody — Google deleted the files"],"Most SEOs don't need to do anything. If your site uses custom bot checks, let the devs know so the real Googlebot doesn't get blocked."],
+["news",2,"In October 2026, Google, OpenAI, Anthropic and Microsoft backed a shared robots.txt token for opting out of AI training. What is it?","`__usage_ai-training`",["`Google-Extended`","`noai`","`GPTBot`"],"It comes from an IETF AI Preferences draft. Google said it aims to support it in 2027, and Google-Extended keeps working in the meantime. Blocking AI training doesn't stop Googlebot from indexing you for Search."],
+["news",2,"What does the generative AI control that Google added to Search Console in 2026 do?","Lets a site opt out of appearing in, and grounding, AI Overviews, AI Mode and Discover's AI features. Google says it isn't a ranking signal for regular results",["It blocks Google from training Gemini on your content","It removes the site from Google Search entirely","It turns off AI Overviews for everyone searching your brand"],"It's a presentation control for Search's generative features, not a training control. Sites that opt out get no traffic or impressions from those features."],
+["news",1,"What was unusual about Google's February 2026 core update?","It was the first core update Google publicly labeled as Discover-only",["It was the first update targeting AI-written content","Google rolled it back after a week","It only affected EU countries"],"Google's 2026 run of updates included the February Discover core update, a March spam update, a March core update and a May core update."],
+["news",2,"In November 2026, Gary Illyes explained what can happen when a very important URL suddenly starts returning a 4xx. What did he say?","Google Search may temporarily protect it from dropping out of the index right away",["It's removed from the index within the hour","Google shows the 4xx error page in results","It triggers an automatic manual review"],"His example was VLC's site serving a 418 status. Normally 4xx means 'not found', but Google can briefly hold on to very important URLs. Don't count on that for your own pages."],
+["news",1,"What do Search Console's platform properties, rolled out globally in 2026, let you see?","How your content on platforms such as YouTube, Instagram, TikTok and X performs in Google Search",["Your social media ad spend","Backlinks from social networks","Competitors' social traffic"],"Platform properties bring Search performance data for your third-party channel content into Search Console."],
+["news",1,"Which manual workaround does Search Console's branded queries filter replace?","Writing your own regex filters to separate brand queries from non-brand queries",["Exporting data to Google Analytics","Buying brand keywords in Google Ads","Submitting brand names through the Disavow tool"],"Google now classifies branded queries automatically, so you can track non-brand SEO growth without maintaining a regex."],
+["news",2,"Which image format did Google confirm in October 2026 is NOT supported by Google Images or Discover?","JPEG XL",["WebP","AVIF","SVG"],"WebP, AVIF and SVG are all supported in Google Images. If you serve JPEG XL, provide a fallback format through `<picture>` or content negotiation."],
+["news",2,"Where can you see how your pages perform in Google's AI Overviews and AI Mode?","Search Console's Search Generative AI performance reports",["Only in Google Analytics","Nowhere — Google doesn't report it","In Merchant Center"],"Google launched dedicated generative AI performance reports in Search Console in 2026 and later rolled them out to all sites."],
+["news",2,"You spot `Google-Agent` in a bot traffic report. According to Google's March 2026 docs, what is it?","A visit made by Google's AI agent on behalf of a person, not regular Search crawling",["Googlebot indexing your site for Search","A fake bot — Google has no crawler by that name","Google Ads checking your landing pages"],"It's separate from Googlebot, so it tells you nothing about indexing. It's just useful for explaining new traffic in bot reports."],
+["news",2,"Since August 30, 2026, what happens to a site reputation abuse manual action for searchers inside the European Economic Area (EEA)?","It no longer affects results shown to EEA users, though it still applies outside the EEA",["It applies worldwide, including the EEA, with no change","It now demotes the whole site in the EEA, not just the violating section","The policy was retired everywhere"],"Google changed this after talks with the European Commission and in November 2026 began emailing affected sites through Search Console. If you work with EU and non-EU markets, parasite-style sections can rank differently by region, so check rankings per market before assuming a penalty is gone."],
+["news",1,"What did Search Console's Performance report add in November 2026, a month after multi-select country filters?","Multi-select device filters, so you can combine Desktop, Mobile and Tablet in one view",["A Core Web Vitals column for each query","Hourly data going back 16 months","Competitor click data for shared queries"],"You no longer need separate views or exports to compare or group device types. Try combining Mobile and Tablet to see total small-screen performance."],
+["news",1,"Google's Gary Illyes said in October 2026 that fake 'Googlebot' traffic is growing. What's the safest way to handle it?","Let your CDN or firewall verify the real Googlebot, rather than blocking anything that calls itself Googlebot",["Block every request that says Googlebot","Add `Disallow: /` for Googlebot in robots.txt","Ignore it — fake bots can't affect your site"],"Fake bots scrape content and load your server. But blocking by name alone risks blocking the real Googlebot and dropping out of Search."],
+/* ---- Everyday SEO (added Nov 2026) ---- */
+["onpage",1,"Roughly how long should a title tag be so it usually isn't cut off in Google results?","About 50–60 characters",["10–15 characters","150–160 characters","There's no visible limit"],"Google truncates by pixel width, so treat this as a guide. Put the main keyword and the page's key benefit near the start."],
+["onpage",1,"Does the meta description directly affect rankings?","No, but a good one can improve click-through rate",["Yes, it's a major ranking factor","Only if it repeats the keyword three times","Only on mobile"],"Google often rewrites descriptions to match the search. Write a clear, specific summary of what the page offers."],
+["onpage",1,"How many H1 headings should a typical page have?","Usually one, describing the page's main topic",["At least five","None — Google ignores headings","One for every paragraph"],"Google says multiple H1s aren't a problem, but one clear H1 keeps things simple. Use H2s and H3s for sections."],
+["onpage",2,"Two blog posts on your site target almost the same keyword and keep swapping places in rankings. What's this, and the common fix?","Keyword cannibalization — merge them into one stronger page and 301 the other",["A duplicate content penalty — delete both","Keyword stuffing — add more keywords","Link spam — disavow their links"],"In Search Console, filter Performance by the query and open the Pages tab to see which URLs compete. One strong page usually beats two split ones."],
+["onpage",1,"What's image alt text mainly for?","Describing the image for screen readers and search engines",["Making the image load faster","Setting the image size","Hiding the image from Google"],"Write a short, accurate description. Include a keyword only when it naturally describes the image."],
+["onpage",2,"A useful page ranks on page 2. Which change is most likely to help?","Link to it from relevant, strong pages on your site with descriptive anchor text",["Change its URL every month","Add keywords to the meta keywords tag","Hide extra keywords in white text"],"Internal links help Google find and understand your important pages. Google ignores the meta keywords tag, and hidden text is spam."],
+["onpage",2,"Google shows a different title in the results from your title tag. Why?","Google can rewrite titles it thinks don't describe the page well, such as ones that are too long, stuffed or boilerplate",["Your site has a manual action","robots.txt is blocking the title tag","Google always uses the H1 instead"],"Keep titles accurate, unique and concise. When Google rewrites a title, it often uses the H1 or other prominent text."],
+["gsc",1,"In the Performance report, what's the difference between impressions and clicks?","Impressions count how often your result was shown, and clicks count how often someone clicked it",["They're the same thing","Clicks include ad clicks","Impressions only count page-one appearances"],"CTR is clicks divided by impressions. High impressions with a low CTR often means the title or snippet needs work."],
+["gsc",2,"Organic clicks dropped 30% week over week. What's a good first step in Search Console?","Compare the two weeks in Performance to see which pages, queries, countries and devices lost clicks",["Delete and re-add the property","Request indexing for every URL","Disavow all your backlinks"],"First work out whether it's one page or sitewide. Then check the Pages (indexing) report, Manual actions, and whether Google has confirmed an update."],
+["gsc",1,"Where in Search Console do you see why pages aren't indexed?","Indexing → Pages",["Performance → Search results","Settings → Users and permissions","Links → Top linking sites"],"It lists reasons like 'Excluded by noindex tag', 'Page with redirect' and 'Not found (404)'. Lots of exclusions are normal, so focus on pages you actually want indexed."],
+["gsc",2,"A page you want ranking shows 'Excluded by noindex tag'. What usually happened?","A noindex was left on the page, often from staging or a CMS or plugin setting",["Google penalized the page","The sitemap is blocking it","It has too few words"],"Check the page source for `noindex`, and settings like WordPress's 'Discourage search engines'. Remove it, then request indexing in URL Inspection."],
+["status",1,"A site audit finds 150 internal links pointing to 404 pages. What's the fix?","Point the links at working pages, or 301 the dead URLs to the closest relevant page",["Ignore them — 404s never matter","Redirect all of them to the homepage","Add the 404 URLs to the sitemap"],"Broken internal links frustrate users and waste link value. Start with links in the navigation and on high-traffic pages."],
+["index",1,"An audit flags hundreds of pages with the same title tag, like 'Products | Brand'. Why fix it?","Unique titles help Google and searchers tell the pages apart and pick the right one",["Duplicate titles trigger a manual action","Google will deindex the site","It slows the site down"],"A template is usually the cause. Set it to include each category or product name automatically."],
+["local",1,"What matters most for showing up in Google's local map results?","A complete, accurate Google Business Profile, plus relevance, distance and prominence (such as reviews)",["Having the most pages on your website","Running Google Ads","Having the keyword in your domain name"],"Google says local results are mainly based on relevance, distance and prominence. Keep categories, hours and photos up to date, and reply to reviews."],
+["local",1,"Why keep your business name, address and phone number consistent across the web?","So Google and customers can trust it's the same business everywhere",["It's a legal requirement","It blocks competitors' listings","It's needed for HTTPS"],"Mismatched details across directories, your site and your Business Profile confuse people and search engines. Update all of them after a move."],
+["local",2,"A product is temporarily out of stock. What's usually best for SEO?","Keep the page live, show it as out of stock (in the structured data too) and suggest alternatives",["Delete the page and let it 404","Redirect it to the homepage","Noindex it until it's back"],"The URL keeps its rankings and links. Only redirect or remove pages for products that are gone for good."],
+["local",2,"Color and size filters on a category page create thousands of URLs. What's a sensible starting rule?","Only make filter pages people actually search for (like 'red running shoes') indexable",["Let every filter combination be indexed","Block the whole category in robots.txt","Noindex the main category page"],"Popular filters can deserve their own optimized pages. The rest should canonicalize to the main category or stay out of the crawl."],
+["local",1,"Your product pages use the manufacturer's description word for word, like dozens of other stores. What's the risk?","Your pages add nothing unique, so they struggle to rank against the same text elsewhere",["A penalty that deindexes the site","Nothing — Google prefers manufacturer text","The products get removed from Google Shopping"],"There's no penalty, but Google usually shows just one version of identical text. Add your own details, sizing tips, FAQs and reviews."],
+["news",2,"In November 2026, John Mueller explained how to keep a third-party popup out of the page Google renders. What did he suggest?","Disallow the popup's script in robots.txt (on the vendor's domain, or a JS file used only for the popup), as long as the page still works without it",["Add `noindex` to the popup's HTML","Block every JavaScript file on the site in robots.txt","Wrap the popup in a `data-nosnippet` element"],"Googlebot doesn't fetch disallowed resources when rendering. Only block a file that does nothing but load the popup — blocking a shared, multipurpose script can break how Google sees the whole page."],
+["news",2,"Gary Illyes explained redirects in November 2026. After a 302 redirect, which URL does Google usually keep showing in search results?","The original, redirecting URL, because a 302 says the move is temporary",["The target URL, exactly as with a 301","Neither — a 302 drops both URLs from the index","Whichever of the two URLs has more backlinks"],"A 301 (or 308) makes the new URL canonical and moves ranking signals to it. A 302 (or 307) tells Google the old URL will come back. For a permanent move, use a 301."],
+["news",3,"In November 2026, Google extended its aggregator and supplier units to 'things to do' queries. Where do these units appear?","Only in Google Search for users in the European Economic Area (EEA)",["Worldwide, in every Google Search market","Only in Google Maps in the United States","Only inside AI Mode answers"],"These units are part of Google's Europe-specific results layout, with one unit for comparison sites and one for direct providers. If you run a tours or activities site with EU visitors, check Google's aggregator and supplier unit docs."],
+/* ---- Senior-level questions (added Nov 2026) ---- */
+["crawl",3,"What does Google do when robots.txt keeps returning 5xx server errors?","At first it treats the whole site as disallowed, then it falls back to the last cached copy",["It ignores robots.txt and crawls everything","It deindexes the site straight away","It treats it the same as a 404"],"A server error on robots.txt makes Google cautious: crawling is paused at first. If the errors go on for a long time, Google uses its last cached copy. Some time later, if the site is otherwise reachable, it can behave as if there's no robots.txt."],
+["crawl",3,"Which URLs does `Disallow: /*.pdf$` block?","Only URLs that end in `.pdf` — `/guide.pdf?v=2` is still crawlable",["Any URL that contains `.pdf` anywhere","Only PDF files in the root folder","Nothing — Google doesn't support wildcards"],"`*` matches any run of characters and `$` anchors the match to the end of the URL. A query string after `.pdf` stops the match."],
+["crawl",3,"What's the maximum robots.txt size Google processes?","500 KiB — anything beyond that is ignored",["50 MB","10 KB","There's no limit"],"Google reads the first 500 kibibytes and ignores the rest. Keep the file lean and consolidate rules."],
+["index",3,"What does the robots meta directive `unavailable_after: [date]` do?","Tells Google to stop showing the page in results after that date",["Deletes the page from your server","Delays indexing until that date","Sets cache expiry for users"],"It's useful for time-limited pages like events or promotions. Google may remove the page from results after the date."],
+["status",3,"When does a server return 304 Not Modified to Googlebot?","When Googlebot sends a conditional request (`If-Modified-Since` / `If-None-Match`) and the page hasn't changed",["When a page has moved permanently","When the page is too large","When the crawl rate is too high"],"Supporting conditional requests saves bandwidth and crawl resources, because Google can reuse its stored copy."],
+["status",3,"How does Google interpret an instant (0-second) meta refresh?","As a permanent redirect",["As a temporary redirect","It ignores it","As a soft 404"],"Instant meta refreshes are treated as permanent and delayed ones as temporary. Server-side redirects are still preferred."],
+["cwv",3,"Do scrolling and hovering count as interactions for INP?","No — only clicks, taps and keyboard input count",["Yes, both count","Only scrolling counts","Only hovering counts"],"Scroll and hover aren't measured by INP, although JavaScript triggered by them can still block the main thread."],
+["cwv",3,"Is TTFB a Core Web Vital?","No, but it's a diagnostic metric that directly feeds LCP. Good is about 0.8 s or less",["Yes, it replaced CLS","Yes, it's the most important one","No, and it doesn't affect any other metric"],"A slow server response pushes back everything that follows, including LCP."],
+["cwv",3,"What can stop a page from being eligible for the back/forward cache (bfcache)?","`unload` event handlers, among other things",["Using HTTPS","Having structured data","Lazy-loaded images"],"bfcache makes back and forward navigation instant. `unload` listeners and certain headers, such as `Cache-Control: no-store` in some browsers, block it."],
+["schema",3,"What does `@id` do in JSON-LD?","Gives a node a unique identifier so other parts of the graph can reference it",["Sets the canonical URL","Is required for all rich results","Hides the markup from Google"],"Using `@id`, for example `https://example.com/#organization`, lets you connect Organization, WebSite and Article nodes into one coherent graph."],
+["sitemap",3,"Can you still notify Google of a sitemap with the `google.com/ping?sitemap=` endpoint?","No — Google deprecated the sitemap ping endpoint in 2023",["Yes, it's the fastest method","Yes, but only for news sitemaps","Only for sitemaps under 1 MB"],"Use Search Console or the robots.txt Sitemap line, and keep `<lastmod>` accurate."],
+["sitemap",3,"How many sitemaps can one sitemap index file list?","Up to 50,000",["Up to 500","Up to 1,000","Unlimited"],"A sitemap index follows the same 50,000-entry and 50 MB limits as a regular sitemap."],
+["logs",3,"How do you verify that a request in your logs really came from Googlebot?","A reverse DNS lookup on the IP to googlebot.com or google.com, then a forward lookup to confirm, or checking Google's published IP ranges",["Trust the user-agent string","Check the referrer","Look for a Google Analytics cookie"],"User-agents are easy to spoof. DNS verification or Google's IP lists are reliable."],
+["mobile",3,"With dynamic serving (same URL, different HTML per device), which header should you send?","`Vary: User-Agent`",["`X-Robots-Tag: mobile`","`Content-Language`","`Cache-Control: mobile`"],"It tells caches and crawlers that the response differs by user-agent."],
+["mobile",3,"With separate mobile URLs (m.example.com), how should the annotations work?","Desktop has `rel=alternate` (with media) pointing to mobile, and mobile has `rel=canonical` pointing to desktop",["Both pages canonical to themselves","Mobile canonical to mobile, no alternate","Use hreflang between them"],"This bidirectional annotation tells Google the two URLs are the same content. Responsive design avoids all of this."],
+["mobile",3,"When crawling for Google Search, how much of an HTML file does Googlebot fetch?","The first 2 MB (uncompressed) — anything after that is ignored",["The first 15 MB","The first 100 KB","The whole file, no matter its size"],"Google clarified this in its 2026 docs: Googlebot fetches 2 MB for HTML and 64 MB for PDFs, and 15 MB is the default for Google's other crawlers. CSS, JS and other referenced resources each have their own separate limit."],
+["intl",3,"Where do hreflang annotations go in an XML sitemap?","As `<xhtml:link rel=\"alternate\" hreflang=\"..\" href=\"..\"/>` elements inside each `<url>` entry",["In a separate `<hreflang>` root element","In the sitemap index only","As a comment"],"Each `<url>` lists every alternate, including itself. Sitemaps keep large hreflang sets out of the HTML head."],
+["sitemap",3,"Image sitemaps: which tags does Google still support?","Only `<image:image>` and `<image:loc>` — caption, title, geo_location and license were deprecated",["All image tags including caption and title","None — image sitemaps are deprecated","Only `<image:title>`"],"Google simplified image sitemaps in 2022. Alt text and the surrounding content on the page matter more."],
+["index",3,"Your `rel=canonical` points to `/shoes`, but Google keeps choosing `/shoes?sort=price` as canonical. What most often overrides a canonical tag?","Other signals pointing at the parameter URL, such as internal links, sitemap entries or redirects",["The meta description being too long","The page using JSON-LD instead of microdata","A slow LCP on the clean URL"],"Canonical tags are one signal among several. Make internal links, sitemaps, redirects and hreflang all agree on the clean URL so the hint isn't outvoted."],
+["index",3,"A page sends `X-Robots-Tag: noindex` in the HTTP header and `<meta name=\"robots\" content=\"index\">` in the HTML. What does Google do?","Applies the more restrictive directive, so the page isn't indexed",["Uses the HTML meta tag, because it's more specific","Uses whichever it reads last","Ignores both and indexes the page"],"When robots directives conflict, Google follows the most restrictive one. Audit both headers and HTML, especially when a CDN or server config adds headers you can't see in the source."],
+["index",3,"What does the robots meta value `none` mean?","The same as `noindex, nofollow`",["The same as `index, follow`","No snippet, but still indexed","It's invalid and ignored"],"`none` is shorthand for `noindex, nofollow`. It's easy to misread as 'no restrictions', which makes it a classic audit catch."],
+["crawl",3,"robots.txt has one group for `User-agent: Googlebot` and another for `User-agent: *`. Which rules does Googlebot follow?","Only the `Googlebot` group — groups don't combine, and the most specific matching group wins",["Both groups merged together","Only the `*` group","Whichever group appears first in the file"],"A crawler obeys a single group. If you add a Googlebot-specific group, repeat every rule from `*` that should still apply to Googlebot."],
+["crawl",3,"What does an empty `Disallow:` line (no path) under `User-agent: *` mean?","Nothing is disallowed — all URLs may be crawled",["Everything is blocked","Only the homepage is blocked","It's a syntax error, so the file is ignored"],"An empty Disallow value allows everything. Compare it with `Disallow: /`, which blocks the whole site; it's a one-character difference that matters a lot."],
+["js",3,"Does Googlebot keep cookies, localStorage and sessionStorage between page loads when it renders?","No — rendering is stateless, and that data is cleared between page loads",["Yes, for the whole crawl session","Only cookies are kept","Only localStorage is kept"],"Content that depends on a stored preference, a cookie wall or a returning-visitor state may never be seen by Googlebot. Make the default, stateless view contain your indexable content."],
+["js",3,"Your page asks for location permission before showing store results. How does Googlebot handle permission prompts?","It declines them, so the page needs a usable fallback without the permission",["It accepts every permission","It waits for a timeout, then accepts","It skips the page entirely"],"Googlebot declines permission requests such as geolocation or notifications. Use feature detection and render meaningful content when permission is denied."],
+["status",3,"Your server returns 403 to Googlebot on some URLs to 'slow it down'. What actually happens?","Google treats them like other 4xx errors: the URLs can drop out of the index, and the crawl rate isn't reduced as intended",["Googlebot slows down politely","Google retries every hour forever","Nothing — 403s are ignored"],"Only 429 and 5xx responses signal Googlebot to slow down. Other 4xx codes say the content doesn't exist, so misusing them can deindex pages."],
+["status",3,"Which 4xx status code does Googlebot treat as a signal to slow down, rather than as 'content doesn't exist'?","429 Too Many Requests",["404 Not Found","410 Gone","401 Unauthorized"],"429 is grouped with 5xx errors as a server-overload signal. Use it, or 503, briefly when you really need to reduce crawling."],
+["cwv",3,"A carousel loads five large images, but only the first is visible. Which attribute helps the browser prioritize correctly?","`fetchpriority=\"low\"` on the hidden slides (and `high` on the visible LCP image)",["`loading=\"eager\"` on every slide","`decoding=\"sync\"` on every slide","`rel=\"preload\"` on all five images"],"Priority hints let the LCP image win the bandwidth race. Preloading or eager-loading everything just makes the images compete."],
+["cwv",3,"A click handler runs 400 ms of JavaScript before the UI updates, which hurts INP. What's the most effective fix?","Break the work up and yield to the main thread so the next paint can happen first",["Add a loading spinner after the work finishes","Move the script into the `<head>`","Increase the server's TTFB budget"],"INP measures time to the next paint. Update the UI first, then do the heavy work in smaller chunks, for example with `scheduler.yield()` or `setTimeout`."],
+["cwv",3,"What does the CSS property `content-visibility: auto` do?","Skips rendering work for off-screen content until it's needed, which can speed up initial rendering",["Hides content from Googlebot","Lazy-loads images only","Prevents layout shifts automatically"],"It's a rendering optimization for long pages. Pair it with `contain-intrinsic-size` so placeholder sizes don't cause layout shifts while scrolling."],
+["schema",3,"A product comes in several sizes and colors, each with its own URL. Which structured data pattern does Google support for this?","`ProductGroup` with `hasVariant` and `variesBy`",["One `Product` with every variant's price in `description`","A separate `Offer` with no `Product`","`ItemList` of `ListItem`s on each variant page"],"Variant markup groups related products and tells Google which properties change, such as size or color. Keep each variant's price and availability accurate."],
+["schema",3,"Your structured data has errors in the Rich Results Test. What's the consequence?","The page just isn't eligible for those rich results — there's no ranking penalty unless the markup is spammy or misleading",["An automatic ranking demotion","The page is deindexed","A manual action is applied automatically"],"Invalid markup costs you rich results, not rankings. Manual actions are reserved for markup that misleads, such as fake reviews or hidden content."],
+["intl",3,"Some URLs in your hreflang cluster now 301 redirect after a migration. What's the risk?","Google may ignore those annotations — hreflang should point to canonical, indexable 200 URLs",["None, redirects are followed for hreflang","The redirecting URLs get a ranking boost","Google merges all the languages into one page"],"After a migration, update hreflang to the final URLs. Mismatched, redirected or non-canonical alternates are one of the most common causes of hreflang errors."],
+["arch",3,"You're moving the blog from `example.com/blog/` to `blog.example.com`. What's essential?","Page-to-page 301s, plus updating internal links, canonicals, hreflang and sitemaps to the new URLs",["A single 301 from `/blog/` to the new homepage","Only adding the new subdomain to Search Console","Keeping both versions live with noindex on the old one"],"Every old URL needs a one-to-one redirect, and every internal signal should point to the new URLs. Then monitor indexing and crawl stats for both hosts."],
+["logs",3,"Logs show Googlebot re-downloading your JS and CSS files often. What reduces this most reliably?","Content-fingerprinted file names (e.g. `app.3f9a1c.js`), so changed files get new URLs and unchanged ones can be cached",["Blocking JS and CSS in robots.txt","Short cache lifetimes","Inlining every script into the HTML"],"Google's renderer caches resources aggressively and may ignore cache headers. Versioned file names let it reuse what hasn't changed and fetch only what has."],
+["gsc",3,"In the Performance report, the per-query table adds up to fewer clicks than the chart total. Why?","Anonymized queries (rare or privacy-sensitive) are left out of the query table but included in the totals",["The chart includes paid clicks","It's a data-processing bug","Clicks from images are double-counted in the chart"],"Expect a gap, often a large one for long-tail sites. Use page-level data or the BigQuery bulk export for fuller analysis."],
+["gsc",3,"Clicks went up month over month, but average position got worse. What's the most likely explanation?","The site started appearing for many more queries at lower positions, which pulls the average down",["Rankings fell across the board","Search Console is broken","Google stopped counting mobile data"],"Average position is impression-weighted. New long-tail visibility at positions 20 to 50 can lower the average while bringing in more clicks overall. Segment by query or page before drawing conclusions."],
+["gsc",3,"URL Inspection's live test shows your fix, but the 'Google index' tab still shows the old version. Why?","The live test fetches the page now, while the index tab reflects the last crawl. Google hasn't reprocessed it yet",["The fix didn't deploy","The live test uses a different Googlebot","The page is blocked by robots.txt"],"Live test confirms that Google can see the fix. Request indexing for important pages, then check the indexed version after the next crawl."],
+["onpage",3,"Which statement about E-E-A-T is accurate?","It's a framework from Google's quality rater guidelines, not a single ranking factor. Google's systems use many signals that align with it",["It's a score Google calculates for every page","It only applies to YMYL sites","Adding author schema guarantees it"],"Raters use E-E-A-T to evaluate results, and their feedback helps Google check its systems. Real experience, credible authorship and trustworthy sites are what the signals reward."],
+["onpage",3,"What's Google's position on AI-generated content?","It's fine if it's helpful. Producing content at scale mainly to manipulate rankings is spam, however it's made",["All AI content is penalized","AI content must carry a label to rank","AI content can't appear in AI Overviews"],"The scaled content abuse policy targets the purpose and the result, not the tool. Human editing, original insight and accuracy are what keep AI-assisted content safe."],
+["local",3,"A business has three branches. How should the site and structured data be set up?","A separate page per branch, each with its own `LocalBusiness` markup (address, phone, opening hours)",["One page listing all three addresses in a single `LocalBusiness` block","Only the head office in markup","Three Google Business Profiles but no location pages"],"One location per page, with consistent NAP and matching Business Profiles, gives Google a clear entity for each branch."],
+["local",3,"What makes an ecommerce product page eligible for merchant listing experiences in organic results?","`Product` markup with an `Offer` (price, currency, availability), or the product data in a Merchant Center feed",["Review stars alone","An FAQ section","A breadcrumb trail"],"Merchant listings need commercial data. Keep the markup and the feed consistent with what the page shows, or listings get disapproved."],
+["mobile",3,"Does Google index content inside an `<iframe>` as part of the parent page?","Sometimes — it may attribute iframed content to the parent page, but that isn't guaranteed",["Always, exactly like inline content","Never","Only if the iframe is on the same domain"],"Keep content that needs to rank in the page's own HTML. Treat iframed content as a bonus at best."],
+["sitemap",3,"Can a sitemap hosted on `cdn.example.com` list URLs for `www.example.com`?","Yes, if you prove ownership of both hosts, either in Search Console or by referencing the sitemap in www's robots.txt",["No, never","Yes, with no setup at all","Only for image sitemaps"],"Cross-site sitemap submission is allowed once ownership is proven. It's useful when sitemaps are generated and hosted somewhere else."],
+/*BANK_END*/
+];
+
+
+/* ---------- News feed (refreshed by a scheduled task; newest first) ---------- */
+const NEWS_UPDATED = "2026-11-10";
+const NEWS = [
+["2026-11-09","Google Search Central","EEA aggregator and supplier units now cover 'things to do' searches","Google's documentation changelog says the Europe-only comparison and direct-provider units now also appear for tours, attractions and activities queries.","https://developers.google.com/search/updates"],
+["2026-11-05","Search Engine Journal","Gary Illyes on how 301 and 302 redirects treat ranking signals","A 301 makes the target URL canonical and moves signals to it; with a 302, Google keeps showing the old URL because the move is meant to be temporary.","https://www.searchenginejournal.com/google-explains-how-redirects-affect-ranking-signals/595967/"],
+["2026-11-03","Search Engine Roundtable","Mueller: robots.txt can keep a popup script out of Google's render","Disallowing a popup vendor's domain, or a JS file used only for the popup, stops Googlebot fetching it while rendering. Don't block shared, multipurpose scripts.","https://seroundtable.com/google-robots-block-popups-42445.html"],
+["2026-11-05","Search Engine Roundtable","Search Console's Performance report gets multi-select device filters","You can now pick several device types at once, following the multi-select country filter added about a month ago.","https://www.seroundtable.com/google-performance-report-multi-select-device-filters-42457.html"],
+["2026-11-04","Search Engine Roundtable","Google tells sites their site reputation abuse actions no longer apply in the EEA","Search Console emails confirm the August 30 change: these manual actions no longer affect results for European Economic Area users, but still apply elsewhere.","https://seroundtable.com/google-email-site-reputation-policy-eea-42462.html"],
+["2026-10-30","Search Engine Roundtable","Gary Illyes: AI scraping has made fake Googlebot traffic worse","Faking the Googlebot user agent is trivial, so verify by IP with reverse and forward DNS or Google's published IP range files.","https://www.seroundtable.com/google-ai-made-bot-impersonation-worse-42422.html"],
+["2026-11-06","Search Engine Roundtable","OpenAI says ChatGPT search is about 20% of Google's search volume","The same weekly recap covers Facebook's AI-content strategy and Google's scaled content abuse policy.","https://www.seroundtable.com/video-11-06-2026-42469.html"],
+["2026-11-05","Search Engine Roundtable","Google can temporarily protect important URLs from being deindexed","Gary Illyes: when a very important URL serves a 4xx (VLC served a 418), Search may keep it indexed briefly.","https://seroundtable.com/google-protected-important-urls-index-42464.html"],
+["2026-10-30","Google Search Central","Google plans to support a shared AI-training opt-out in robots.txt","The cross-provider token `__usage_ai-training` from an IETF draft. Google aims for 2027, and Google-Extended keeps working.","https://www.digitalapplied.com/blog/google-robots-txt-ai-training-control"],
+["2026-10-30","Search Engine Roundtable","AI Overviews on 80%+ of searches; Google updates UGC spam guidance","Third-party data shows AI Overview coverage rising. Google's user-generated spam doc now covers tools that let users publish pages and apps.","https://www.seroundtable.com/video-10-30-2026-42418.html"],
+["2026-10-23","Search Engine Roundtable","JPEG XL isn't supported by Google Images or Discover","Also this week: AI Overview citation cards with AI summaries, and a Google video on robots.txt rules.","https://www.seroundtable.com/video-10-23-2026-42362.html"],
+["2026-07-10","Search Engine Roundtable","Search Console shows performance for YouTube, Instagram, TikTok and X content","Platform properties rolled out. Google says canonicalization fixes can take up to two weeks.","https://www.seroundtable.com/video-07-10-2026-41660.html"],
+["2026-06-03","Google","New Search Console control to opt out of generative AI Search features","Sites can opt out of AI Overviews, AI Mode and Discover AI features. Google says it isn't a ranking signal for regular results.","https://blog.google/products-and-platforms/products/search/new-controls-website-owners/"],
+["2026-06","Google Search Central","Search Generative AI performance reports arrive in Search Console","Dedicated reporting for AI features, rolled out to all sites worldwide by the end of August.","https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports"],
+["2026-05-21","Search Engine Journal","Google rolls out the May 2026 core update","The second broad core update of 2026, about six weeks after the March update finished.","https://www.searchenginejournal.com/google-begins-rolling-out-may-2026-core-update/575589/"]
+]; /*NEWS_END*/
+
+/* ---------- Levels: each sets the daily easy / medium / hard mix ---------- */
+const LEVELS = {
+  junior:{label:"Junior", mix:{1:5,2:4,3:1}, blurb:"Fundamentals, Search Console and everyday fixes"},
+  mid:   {label:"Mid-level", mix:{1:2,2:5,3:3}, blurb:"More audits, rendering, redirects and structured data"},
+  senior:{label:"Senior", mix:{1:1,2:4,3:5}, blurb:"Mostly hard: edge cases, crawl budget, JS SEO and migrations"}
+};
+const lvl = () => LEVELS[S.level] || LEVELS.junior;
+/* ---------- Utilities ---------- */
+const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
+/* TEST mode: the copy at /seo-daily/test/ keeps its own progress, its own leaderboard tab and a day-skipper. */
+const TEST = /\/test\/?(index\.html)?$/.test(location.pathname);
+const KEY = TEST ? "seodaily-test-v1" : "crawldaily-v1";
+let DAY_OFFSET = 0; if (TEST) { try { DAY_OFFSET = parseInt(localStorage.getItem("seodaily-test-offset")) || 0; } catch(e){} }
+const $ = s => document.querySelector(s);
+const app = $("#app");
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+let S = load() || { xp:0, streak:0, bestStreak:0, lastDaily:null, history:{}, cat:{}, seen:{}, missed:{}, daily:null };
+
+function dateKey(d=new Date(Date.now()+DAY_OFFSET*864e5)){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function addDays(k,n){ const [y,m,d]=k.split("-").map(Number); const dt=new Date(y,m-1,d); dt.setDate(dt.getDate()+n); return dateKey(dt); }
+function hash(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; } return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return (h^=h>>>16)>>>0; }; }
+function rng(seed){ let a=hash(seed)(); return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffle(arr,r){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmt(s){ return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>"); }
+const DIFF = {1:"Easy",2:"Medium",3:"Hard"}, XP = {1:10,2:20,3:30};
+const RANKS = [[0,"Intern"],[200,"Junior SEO"],[600,"SEO Specialist"],[1300,"Senior SEO"],[2500,"Technical SEO Lead"],[4500,"Crawl Whisperer"]];
+function rankOf(xp){ let r=RANKS[0],n=null; for(let i=0;i<RANKS.length;i++){ if(xp>=RANKS[i][0]){ r=RANKS[i]; n=RANKS[i+1]||null; } } return {r,n}; }
+function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
+
+/* ---------- Daily set generation ----------
+   10 questions: up to 2 you previously missed (spaced review), weighted toward your weakest
+   categories and least-seen questions, with a 5 easy / 4 medium / 1 hard mix. */
+function buildDaily(key){
+  const r = rng("crawldaily|"+key);
+  const ids = [];
+  const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && QUIZABLE(id));
+  const targets = {...lvl().mix};
+  for (const id of shuffle(review, r)) {
+    if (ids.length >= 2) break;
+    const d = BANK[id][1];
+    if (targets[d] > 0) { ids.push(id); targets[d]--; }
+  }
+  const weight = id => {
+    const c = BANK[id][0], acc = catAcc(c), seen = S.seen[id]||0;
+    return (1/(1+seen*1.5)) * (acc===null ? 1.2 : 1.6-acc) * (0.5+r());
+  };
+  const usedCats = {};
+  for (const d of [1,2,3]) {
+    let pool = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && BANK[i][1]===d && !ids.includes(i));
+    pool.sort((a,b)=>weight(b)-weight(a));
+    for (const id of pool) {
+      if (targets[d]<=0) break;
+      const c = BANK[id][0];
+      if (c==="news" || (usedCats[c]||0) >= 2) continue;
+      ids.push(id); usedCats[c]=(usedCats[c]||0)+1; targets[d]--;
+    }
+  }
+  if (ids.length < 10) {
+    const rest = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && !ids.includes(i)).sort((a,b)=>weight(b)-weight(a));
+    for (const id of rest) { if (ids.length >= 10) break; ids.push(id); }
+  }
+  return shuffle(ids, r).sort((a,b)=>BANK[a][1]-BANK[b][1]);
+}
+function ensureDaily(){
+  const k = dateKey();
+  if (!S.daily || S.daily.date !== k || (!S.daily.answers.length && !S.daily.ids.every(QUIZABLE))) { S.daily = { date:k, ids:buildDaily(k), answers:[], done:false }; save(); }
+  return S.daily;
+}
+function optionOrder(id, salt){
+  const q = BANK[id]; const opts = [q[3], ...q[4]];
+  return shuffle(opts.map((t,i)=>({t, ok:i===0})), rng(salt+"|"+id));
+}
+
+/* ---------- Views ---------- */
+function home(){
+  document.onkeydown=null;
+  if(!S.name || !LEVELS[S.level]) return nameScreen();
+  const d = ensureDaily(), k = d.date;
+  const {r,n} = rankOf(S.xp);
+  const pct = n ? Math.round((S.xp-r[0])/(n[0]-r[0])*100) : 100;
+  const streakLive = S.lastDaily===k || S.lastDaily===addDays(k,-1) ? S.streak : 0;
+  const days = []; for(let i=6;i>=0;i--){ const dk=addDays(k,-i); const sc=S.history[dk]; days.push(`<div class="day"><i class="${sc!=null?'on':''} ${i===0?'today':''}">${sc!=null?sc:''}</i>${["S","M","T","W","T","F","S"][new Date(dk+"T12:00").getDay()]}</div>`); }
+  const cats = Object.keys(CATS).map(c=>({c,a:catAcc(c),t:(S.cat[c]||[0,0])[1]}));
+  const tried = cats.filter(x=>x.t>0).sort((a,b)=>a.a-b.a);
+  const weakest = tried.length && tried[0].a<1 ? CATS[tried[0].c] : null;
+  const reviewCount = Object.keys(S.missed).map(Number).filter(QUIZABLE).length;
+
+  const todayBlock = d.done ? `
+    <div class="label">Today's challenge · complete</div>
+    <div class="row" style="justify-content:space-between">
+      <div><div class="big">${S.history[k]!=null?S.history[k]:(d.answers||[]).reduce((a,b)=>a+b,0)}<span style="font-size:24px;color:var(--muted)">/10</span></div>
+      <p class="note" style="margin-top:6px">New questions in <span id="cd"></span></p></div>
+      <button class="btn ghost" onclick="results(true)">Review answers</button>
+    </div>` : `
+    <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
+    <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
+    <p class="note">10 questions at ${lvl().label} level (${lvl().mix[1]} easy · ${lvl().mix[2]} medium · ${lvl().mix[3]} hard)${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.filter((_,i)=>QUIZABLE(i)).length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
+
+  app.className=""; document.getElementById("hdr").className="";
+  app.innerHTML = `<div class="home-grid"><div>
+    <div class="card">${todayBlock}</div>
+    <div class="stats">
+      <div class="stat"><b>${streakLive}🔥</b><small>Day streak</small></div>
+      <div class="stat"><b>${S.bestStreak}</b><small>Best streak</small></div>
+      <div class="stat"><b>${S.xp}</b><small>Total XP</small></div>
+      <div class="stat"><b>${reviewCount}</b><small>To review</small></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Team leaderboard</div><span class="meta" style="font-size:11px" id="board-live"></span></div>
+      <div class="board-tabs">${[["today","Today"],["week","This week"],["xp","All-time XP"],["streak","Streaks"]].map(([k,l])=>`<button class="${BOARD_TAB===k?"on":""}" onclick="setTab('${k}')">${l}</button>`).join("")}</div>
+      <div id="board"><p class="note">Loading leaderboard…</p></div>
+    </div>
+    <div class="card">
+      <div class="rank"><span>Rank: <b>${r[1]}</b></span><span>${n?`${n[0]-S.xp} XP to ${n[1]}`:"Max rank"}</span></div>
+      <div class="progress" style="margin:0"><div style="width:${pct}%"></div></div>
+      <div class="section"><div class="label">Last 7 days</div><div class="week">${days.join("")}</div></div>
+    </div>
+    <div class="card section">
+      <div class="label">Practice mode · unlimited, no streak pressure</div>
+      <div class="row">
+        <select id="pcat"><option value="">All topics</option>${weakest?`<option value="__weak">My weakest topic (${weakest})</option>`:""}${reviewCount?`<option value="__review">Questions I've missed (${reviewCount})</option>`:""}${Object.entries(CATS).map(([c,l])=>`<option value="${c}">${l}</option>`).join("")}</select>
+        <button class="btn ghost" onclick="startPractice()">Start 10-question round</button>
+      </div>
+      <p class="note" style="margin-top:10px">Practice earns half XP and doesn't affect your streak.</p>
+    </div>
+    <div class="card section">
+      <div class="label">Topic mastery</div>
+      <div class="bars">${cats.map(x=>`<div class="bar"><span>${CATS[x.c]}</span><div class="track"><div class="fill" style="width:${x.a===null?0:Math.round(x.a*100)}%;${x.a!==null&&x.a<.6?"background:var(--bad)":""}"></div></div><span class="pct">${x.a===null?"—":Math.round(x.a*100)+"%"}</span></div>`).join("")}</div>
+      ${weakest?`<p class="note" style="margin-top:12px">Weakest so far: <b>${weakest}</b>. Daily quizzes lean toward it.</p>`:""}
+    </div>
+    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> (${lvl().label}) · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name or level</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
+  </div>
+    <aside class="card news-col">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Latest SEO news</div><span class="meta" style="font-size:11px">Updated ${new Date(NEWS_UPDATED+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span></div>
+      <div class="news">${NEWS.map((n,i)=>`<a class="ni${i>=8?" more hidden":""}" href="${n[4]}" target="_blank" rel="noopener"><span class="nd">${n[0].length>7?new Date(n[0]+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"}):new Date(n[0]+"-15T12:00").toLocaleDateString(undefined,{month:"short",year:"numeric"})} · ${esc(n[1])}</span><b>${fmt(n[2])}</b><span>${fmt(n[3])}</span></a>`).join("")}</div>
+      <div class="row" style="margin-top:12px">${NEWS.length>8?`<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="document.querySelectorAll('.ni.more').forEach(e=>e.classList.toggle('hidden'));this.textContent=this.textContent.startsWith('Show')?'Show less':'Show all ${NEWS.length}'">Show all ${NEWS.length}</button>`:""}</div>
+    </aside>
+  </div>`;
+  $("#today").textContent = new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
+  if (d.done) tick();
+  VIEW="home"; renderBoard();
+}
+let cdTimer;
+function tick(){ clearInterval(cdTimer); const f=()=>{ const el=$("#cd"); if(!el) return clearInterval(cdTimer); const now=new Date(), m=new Date(now); m.setHours(24,0,0,0); const s=Math.floor((m-now)/1000); el.textContent=`${Math.floor(s/3600)}h ${Math.floor(s%3600/60)}m`; if(s<=0){clearInterval(cdTimer);home();} }; f(); cdTimer=setInterval(f,30000); }
+
+/* ---------- Quiz engine ---------- */
+let RUN = null; // {mode, ids, answers, salt}
+function startDaily(){ const d=ensureDaily(); RUN={mode:"daily",ids:d.ids,answers:d.answers,salt:d.date}; question(); }
+function startPractice(){
+  const sel=$("#pcat").value, r=rng("p"+Date.now()+Math.random());
+  let pool=BANK.map((_,i)=>i).filter(i=>QUIZABLE(i) && !(S.level==="senior" && BANK[i][1]===1));
+  if(sel==="__review") pool=Object.keys(S.missed).map(Number).filter(QUIZABLE);
+  else if(sel==="__weak"){ const t=Object.keys(CATS).filter(c=>S.cat[c]&&S.cat[c][1]).sort((a,b)=>catAcc(a)-catAcc(b))[0]; pool=pool.filter(i=>BANK[i][0]===t); }
+  else if(sel) pool=pool.filter(i=>BANK[i][0]===sel);
+  const ids=shuffle(pool,r).slice(0,10).sort((a,b)=>BANK[a][1]-BANK[b][1]);
+  RUN={mode:"practice",ids,answers:[],salt:"p"+Date.now()}; question();
+}
+function question(){
+  VIEW="quiz"; app.className="narrow"; document.getElementById("hdr").className="narrow";
+  const i=RUN.answers.length; if(i>=RUN.ids.length) return finish();
+  const id=RUN.ids[i], q=BANK[id], opts=optionOrder(id,RUN.salt);
+  const isReview = RUN.mode==="daily" && S.missed[id]!==undefined;
+  app.innerHTML=`
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="meta">${RUN.mode==="daily"?"Daily":"Practice"} · ${i+1} / ${RUN.ids.length}</span><button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="home()">Exit</button></div>
+    <div class="progress"><div style="width:${i/RUN.ids.length*100}%"></div></div>
+    <div class="card">
+      <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span><span class="tag d${q[1]}">${DIFF[q[1]]} · ${XP[q[1]]}xp</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
+      <div class="q">${fmt(q[2])}</div>
+      <div class="opts">${opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${"ABCD"[j]}</span><span>${fmt(o.t)}</span></button>`).join("")}</div>
+      <div id="after"></div>
+    </div>`;
+  const btns=[...document.querySelectorAll(".opt")];
+  let sel=-1;
+  const choose=j=>{
+    if(btns[0].disabled) return;
+    sel=j; btns.forEach((b,k)=>b.classList.toggle("sel",k===j));
+    $("#after").innerHTML=`<div class="confirm"><span>Lock in answer <b>${"ABCD"[j]}</b>? Are you sure?</span><button class="btn ghost" id="chg">Change</button><button class="btn" id="lock">Yes, lock it in</button></div>`;
+    $("#chg").onclick=()=>{ sel=-1; btns.forEach(b=>b.classList.remove("sel")); $("#after").innerHTML=""; };
+    $("#lock").onclick=()=>pick(sel); $("#lock").focus();
+  };
+  const pick=j=>{
+    if(btns[0].disabled||j<0) return;
+    btns.forEach(b=>{ b.disabled=true; b.classList.remove("sel"); });
+    const ok=opts[j].ok;
+    btns.forEach((b,k)=>{ if(opts[k].ok) b.classList.add("right"); else if(k===j) b.classList.add("wrong"); });
+    record(id,ok);
+    RUN.answers.push(ok?1:0); if(RUN.mode==="daily"){ S.daily.answers=RUN.answers; } save();
+    const last=RUN.answers.length>=RUN.ids.length;
+    $("#after").innerHTML=`<div class="explain ${ok?"":"bad"}"><strong>${ok?"Correct — +"+(RUN.mode==="daily"?XP[q[1]]:XP[q[1]]/2)+" XP":"Not quite"}</strong>${fmt(q[5])}</div>
+      <div class="foot"><span class="note">Press Enter to continue</span><button class="btn" id="next">${last?"See results":"Next question"} →</button></div>`;
+    $("#next").onclick=question; $("#next").focus();
+  };
+  btns.forEach((b,j)=>b.onclick=()=>choose(j));
+  document.onkeydown=e=>{
+    if(btns[0].disabled) return;
+    if(e.key==="Enter"&&sel>-1){ e.preventDefault(); pick(sel); return; }
+    if(e.key==="Escape"&&sel>-1){ $("#chg").click(); return; }
+    const n="1234abcd".indexOf(e.key.toLowerCase()); if(n>-1&&n%4<btns.length) choose(n%4);
+  };
+}
+function record(id,ok){
+  const q=BANK[id], c=q[0];
+  S.cat[c]=S.cat[c]||[0,0]; S.cat[c][1]++; if(ok) S.cat[c][0]++;
+  S.seen[id]=(S.seen[id]||0)+1;
+  if(ok){ S.xp+=RUN.mode==="daily"?XP[q[1]]:XP[q[1]]/2; delete S.missed[id]; }
+  else S.missed[id]=dateKey();
+}
+function finish(){
+  document.onkeydown=null;
+  if(RUN.mode==="daily" && !S.daily.done){
+    const k=S.daily.date, score=RUN.answers.reduce((a,b)=>a+b,0);
+    S.daily.done=true; S.history[k]=score;
+    S.streak = S.lastDaily===addDays(k,-1) ? S.streak+1 : (S.lastDaily===k ? S.streak : 1);
+    S.lastDaily=k; S.bestStreak=Math.max(S.bestStreak,S.streak);
+    if(score===10) S.xp+=50;
+    save();
+  }
+  pushScore();
+  results();
+}
+function results(forceDaily){
+  VIEW="results"; app.className="narrow"; document.getElementById("hdr").className="narrow";
+  const run = !forceDaily && RUN && RUN.answers.length===RUN.ids.length ? RUN : {mode:"daily",ids:S.daily.ids,answers:S.daily.answers};
+  const score=run.answers.reduce((a,b)=>a+b,0), n=run.ids.length;
+  const msg = score===n?"Flawless crawl. +50 XP bonus.":score>=8?"Strong work — you know your stuff.":score>=5?"Solid. Read the explanations for the misses.":"Rough one — missed questions come back for review.";
+  app.innerHTML=`
+    <div class="card">
+      <div class="label">${run.mode==="daily"?"Daily results":"Practice results"}</div>
+      <div class="big">${score}<span style="font-size:24px;color:var(--muted)">/${n}</span></div>
+      <p style="margin-top:8px">${msg}</p>
+      ${run.mode==="daily"?`<p class="note">Streak: ${S.streak} day${S.streak===1?"":"s"} 🔥 · Come back tomorrow for a new set.</p>`:""}
+      <div class="row" style="margin-top:14px"><button class="btn" onclick="home()">Back to dashboard</button><button class="btn ghost" onclick="copyScore(${score},${n},'${run.mode}')" id="cp">Copy score</button></div>
+    </div>
+    <div class="section"><div class="label">Review</div><div class="review">${run.ids.map((id,i)=>{const q=BANK[id],ok=run.answers[i];return `<details class="rv" style="display:block"><summary style="display:flex;gap:10px;cursor:pointer;list-style:none"><span class="m ${ok?"ok":"no"}">${ok?"✓":"✗"}</span><span>${fmt(q[2])}</span></summary><div class="explain ${ok?"":"bad"}" style="margin-top:10px"><strong>Answer: ${fmt(q[3])}</strong>${fmt(q[5])}</div></details>`}).join("")}</div></div>`;
+}
+function copyScore(s,n,mode){
+  const sq=(RUN&&RUN.answers.length===RUN.ids.length?RUN.answers:S.daily.answers).map(a=>a?"🟩":"🟥").join("");
+  const txt=`SEO Daily ${mode==="daily"?S.daily.date:"practice"} — ${s}/${n}\n${sq}${mode==="daily"?`\n🔥 ${S.streak}-day streak`:""}`;
+  try{ navigator.clipboard.writeText(txt).then(()=>{$("#cp").textContent="Copied!"},()=>{$("#cp").textContent="Copy blocked"}); }catch(e){ $("#cp").textContent="Copy blocked"; }
+}
+let resetArmed=false;
+function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
+
+/* ---------- Team leaderboard (Google Sheet via Apps Script) ----------
+   Paste your Apps Script web app URL between the quotes. Leave empty to hide the leaderboard. */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwny_kai6IqjBCpYHqAcKhiFXxWcN4pnrcJFh91ezSI4r4Nl_Dw5VwwjMyEcBh4RMlY/exec";
+let BOARD=[], BOARD_STATE="loading", BOARD_TAB="week", VIEW="home", SEASON_SEEN=false;
+let writeChain=Promise.resolve(), lastPushed="", pollTimer=null;
+const num=(v,max=1e7)=>{ const n=Number(v); return Number.isFinite(n)&&n>=0 ? Math.min(n,max) : 0; };
+function weekStartKey(k){ const [y,m,d]=k.split("-").map(Number); const dt=new Date(y,m-1,d); dt.setDate(dt.getDate()-((dt.getDay()+6)%7)); return dateKey(dt); }
+function recentHistory(){ const k=dateKey(), out={}; for(let i=0;i<14;i++){ const dk=addDays(k,-i); if(S.history[dk]!=null) out[dk]=S.history[dk]; } return out; }
+function newId(){ const a=new Uint8Array(12); try{ crypto.getRandomValues(a); }catch(e){ for(let i=0;i<12;i++) a[i]=Math.random()*256|0; } return Array.from(a,b=>b.toString(16).padStart(2,"0")).join(""); }
+function pushScore(){
+  if(!SHEET_URL||!S.pid||!S.name||!SEASON_SEEN) return;
+  const row={board:TEST?"test":"", id:S.pid, name:S.name, xp:S.xp, streak:S.streak, bestStreak:S.bestStreak, lastDaily:S.lastDaily||"", recent:recentHistory(), season:S.season||""};
+  const sig=JSON.stringify(row); if(sig===lastPushed) return; lastPushed=sig;
+  writeChain=writeChain.then(()=>fetch(SHEET_URL,{method:"POST",body:sig})).then(()=>loadBoard()).catch(()=>{ lastPushed=""; });
+}
+function setTab(t){ BOARD_TAB=t; document.querySelectorAll(".board-tabs button").forEach((b,i)=>b.classList.toggle("on",["today","week","xp","streak"][i]===t)); renderBoard(); }
+function boardRows(){
+  const today=dateKey(), yest=addDays(today,-1), ws=weekStartKey(today);
+  return BOARD.map(r=>{
+    const recent=(r.recent&&typeof r.recent==="object")?r.recent:{};
+    const live=(r.lastDaily===today||r.lastDaily===yest)?num(r.streak,5000):0;
+    let week=0; for(const [d,v] of Object.entries(recent)) if(d>=ws&&d<=today) week+=num(v,10);
+    const val={today:recent[today]!=null?num(recent[today],10):null, week, xp:num(r.xp), streak:live}[BOARD_TAB];
+    return {id:String(r.id), name:String(r.name||"").slice(0,30), val, xp:num(r.xp)};
+  }).filter(r=>r.val!==null && r.val>0).sort((a,b)=>b.val-a.val||b.xp-a.xp).slice(0,25);
+}
+function renderBoard(){
+  const el=document.getElementById("board"); if(!el) return;
+  const live=document.getElementById("board-live");
+  if(!SHEET_URL){ el.innerHTML='<p class="note">The team leaderboard isn\'t connected yet.</p>'; return; }
+  if(BOARD_STATE==="needs-script"){ el.innerHTML='<p class="note">Test leaderboard is off: update the Google Sheet script to the version with test-board support, then refresh.</p>'; return; }
+  if(BOARD_STATE==="loading"&&!BOARD.length){ el.innerHTML='<p class="note">Loading leaderboard…</p>'; return; }
+  if(BOARD_STATE==="error"&&!BOARD.length){ el.innerHTML='<p class="note">Can\'t reach the leaderboard right now. Your progress is still saved in this browser.</p>'; return; }
+  const rows=boardRows();
+  if(live) live.textContent = BOARD.length ? `${BOARD.length} player${BOARD.length===1?"":"s"}` : "";
+  el.innerHTML="";
+  const unit={today:"/10",week:" pts",xp:" XP",streak:" 🔥"}[BOARD_TAB];
+  const empty={today:"Nobody has finished today's quiz yet. Be the first.",week:"No scores yet this week.",xp:"No players yet.",streak:"No active streaks right now."}[BOARD_TAB];
+  if(!rows.length){ const p=document.createElement("p"); p.className="note"; p.textContent=empty; el.appendChild(p); }
+  else {
+    const list=document.createElement("div"); list.className="lb";
+    rows.forEach((r,i)=>{
+      const me=r.id===S.pid;
+      const row=document.createElement("div"); row.className="lb-row"+(me?" me":"");
+      const pos=document.createElement("span"); pos.className="pos"+(i<3?" top":""); pos.textContent=i<3?["🥇","🥈","🥉"][i]:String(i+1);
+      const av=document.createElement("span"); av.className="av"; av.textContent=(r.name.trim()[0]||"?").toUpperCase(); av.style.background=`hsl(${[...r.id].reduce((h,c)=>h*31+c.charCodeAt(0)>>>0,7)%360} 45% 45%)`;
+      const nm=document.createElement("span"); nm.className="nm"; nm.textContent=r.name||"Player";
+      if(me){ const y=document.createElement("small"); y.textContent="you"; nm.appendChild(y); }
+      const val=document.createElement("span"); val.className="val"; val.textContent=r.val+unit;
+      row.append(pos,av,nm,val); list.appendChild(row);
+    });
+    el.appendChild(list);
+  }
+  const note=document.createElement("p"); note.className="note"; note.style.marginTop="10px";
+  note.textContent="Your score posts when you finish a quiz. Weekly totals reset every Monday.";
+  el.appendChild(note);
+}
+async function loadBoard(){
+  if(!SHEET_URL) return;
+  try{
+    const r=await fetch(SHEET_URL+(SHEET_URL.includes("?")?"&":"?")+(TEST?"board=test&":"")+"t="+Date.now());
+    const j=await r.json();
+    if(TEST && j.board!=="test"){ BOARD=[]; BOARD_STATE="needs-script"; renderBoard(); return; }  // old Sheet script: never write test data to the real board
+    BOARD=Array.isArray(j.rows)?j.rows:[]; BOARD_STATE="ok";
+    // Season: running resetLeaderboard() in the Sheet's script starts a new season, which wipes everyone's progress.
+    const season=typeof j.season==="string"?j.season.slice(0,64):"";
+    if(!SEASON_SEEN){ SEASON_SEEN=true;
+      if((S.season||"")!==season){
+        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level}; if(RUN&&RUN.mode==="daily") RUN=null; }
+        S.season=season; save(); if(VIEW==="home") home();
+      }
+      pushScore();
+    }
+  }catch(e){ BOARD_STATE="error"; }
+  renderBoard();
+}
+function initBoard(){
+  if(!SHEET_URL){ renderBoard(); return; }
+  loadBoard();
+  clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden&&VIEW==="home") loadBoard(); },60000);
+}
+
+/* ---------- Test tools (only on /test/) ---------- */
+function testTools(){
+  const el=document.getElementById("testbar"); if(!TEST||!el) return;
+  if(!document.title.startsWith("TEST")) document.title="TEST · "+document.title;
+  el.innerHTML=`<b>TEST</b><span>Your team can't see this copy. Progress and leaderboard are separate. Pretend date: <strong>${dateKey()}</strong>${DAY_OFFSET?` (+${DAY_OFFSET} day${DAY_OFFSET===1?"":"s"})`:""}</span>
+    <button onclick="testShift(1)">Skip to next day</button>${DAY_OFFSET?'<button onclick="testShift(-DAY_OFFSET)">Back to today</button>':""}<button id="twipe" onclick="testWipe(this)">Wipe test data</button>`;
+}
+function testShift(n){ DAY_OFFSET=Math.max(0,DAY_OFFSET+n); try{ localStorage.setItem("seodaily-test-offset",String(DAY_OFFSET)); }catch(e){} RUN=null; testTools(); home(); }
+function testWipe(btn){
+  if(btn.dataset.armed!=="1"){ btn.dataset.armed="1"; btn.textContent="Click again to wipe"; setTimeout(()=>{ if(btn.isConnected){ btn.dataset.armed=""; btn.textContent="Wipe test data"; } },4000); return; }
+  try{ localStorage.removeItem(KEY); localStorage.removeItem("seodaily-test-offset"); }catch(e){}
+  location.reload();
+}
+/* ---------- Name ---------- */
+function nameScreen(){
+  VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
+  const returning=!!S.name;
+  app.innerHTML=`<div class="card"><div class="label">${returning?"Your profile":"Welcome to SEO Daily"}</div><h1>${returning?"Name and level":"What's your name?"}</h1>
+    <p class="note">Your name is how you'll appear on the team leaderboard. Your progress saves in this browser, like Wordle.</p>
+    <form id="nf" style="margin-top:14px">
+      <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
+      <div class="label" style="margin:20px 0 10px">Your level</div>
+      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small><em>${v.mix[1]} easy · ${v.mix[2]} medium · ${v.mix[3]} hard</em></span></label>`).join("")}</div>
+      <p class="note" id="nerr" style="color:var(--bad);min-height:1.2em;margin:10px 0 0"></p>
+      <div class="row" style="margin-top:8px">${returning&&LEVELS[S.level]?'<button class="btn ghost" type="button" id="ncancel">Cancel</button>':""}<button class="btn" type="submit">${returning?"Save":"Start →"}</button></div>
+    </form></div>`;
+  $("#nm").value=S.name||""; if(!returning) $("#nm").focus();
+  if($("#ncancel")) $("#ncancel").onclick=()=>{ if(LEVELS[S.level]) home(); };
+  $("#nf").onsubmit=e=>{
+    e.preventDefault();
+    const v=$("#nm").value.replace(/\s+/g," ").trim().slice(0,30);
+    const pickedEl=document.querySelector('input[name="lvl"]:checked'), picked=pickedEl&&pickedEl.value;
+    if(!v){ $("#nerr").textContent="Please enter your name."; return; }
+    if(!LEVELS[picked]){ $("#nerr").textContent="Please choose your level."; return; }
+    const changed=S.level!==picked;
+    S.name=v; S.level=picked; if(!S.pid) S.pid=newId();
+    // a new level gets a fresh daily set, unless today's quiz is already under way
+    if(changed && S.daily && !S.daily.answers.length && !S.daily.done) S.daily=null;
+    save(); lastPushed=""; pushScore(); home();
+  };
+}
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
+testTools();
+home();
+initBoard();
+</script>
+</body>
+</html>
