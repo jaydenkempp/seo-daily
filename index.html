@@ -82,7 +82,7 @@ select{font:600 14px var(--sans);padding:11px 12px;border-radius:10px;border:1.5
 .progress div{height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
 .tags{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .tag{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--chip);color:var(--chip-ink)}
-.tag.d1{background:var(--good-soft);color:var(--good-ink)}.tag.d2{background:var(--gold-soft);color:var(--gold-ink)}.tag.d3{background:var(--bad-soft);color:var(--bad-ink)}
+.tag.d0,.tag.d1{background:var(--good-soft);color:var(--good-ink)}.tag.d2{background:var(--gold-soft);color:var(--gold-ink)}.tag.d3{background:var(--bad-soft);color:var(--bad-ink)}
 .tag.rev{background:var(--accent-soft);color:var(--accent-ink)}
 .q{font-size:19px;font-weight:700;margin-bottom:18px;line-height:1.45;letter-spacing:-.01em}
 .opts{display:grid;gap:10px}
@@ -174,6 +174,74 @@ input:focus,select:focus{outline:none;border-color:var(--accent)!important;box-s
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
 .swatches button{width:30px;height:30px;border-radius:50%;border:0;cursor:pointer;outline-offset:3px}
 .swatches button.on{outline:2.5px solid var(--ink)}
+
+/* ===== Block style 3: minimal data strip (no boxes, rules and big numbers) ===== */
+.card{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:22px 2px}
+.card.hero{background:transparent;border:0;border-top:3px solid var(--accent);color:var(--ink);padding:18px 2px 24px}
+.hero .label{color:var(--accent)} .hero .note{color:var(--muted)}
+.hero h1,.hero .big{color:var(--ink)} .hero .big span{color:var(--muted)!important}
+.hero .btn{background:var(--accent);color:#fff}
+.hero .btn:hover{background:var(--accent-dark)}
+.hero .btn.ghost{background:transparent;color:var(--accent);border:0;border-bottom:2px solid var(--accent);border-radius:0;padding:4px 0}
+.big{font-size:64px;font-weight:900;letter-spacing:-.05em}
+.btn{border-radius:4px;font-weight:800}
+.btn.ghost{background:transparent;border:0;border-bottom:2px solid currentColor;border-radius:0;padding:4px 0;color:var(--accent)}
+.btn.ghost:hover{background:transparent;color:var(--ink);border-color:var(--ink)}
+.stats{gap:0;margin:0 0 6px;padding:18px 0;border-top:1px solid var(--line)}
+.stat,.stat:nth-child(n){background:transparent;color:var(--ink);border-radius:0;padding:2px 16px;border-right:1px solid var(--line)}
+.stat:first-child{padding-left:2px} .stat:last-child{border-right:0}
+.stat b{font-size:34px;font-weight:900;letter-spacing:-.04em}
+.stat:nth-child(1) b{color:var(--gold)} .stat:nth-child(3) b{color:var(--accent)} .stat:nth-child(4) b{color:var(--good)}
+.stat small{color:var(--muted);font-weight:700;opacity:1}
+@media (max-width:560px){.stat:nth-child(2){border-right:0}.stat:nth-child(3){padding-left:2px;margin-top:14px}.stat:nth-child(4){margin-top:14px}}
+.label{font-weight:800}
+.news-col{background:transparent;border:0;border-left:1px solid var(--line);border-top:0;border-radius:0;padding:0 0 0 22px}
+.ni{margin:0;padding:12px 0;border-bottom:1px solid var(--line);border-radius:0}
+.ni:hover{background:transparent} .ni:hover b{color:var(--accent)}
+@media (max-width:1000px){.news-col{border-left:0;border-top:1px solid var(--line);padding:22px 2px 0}}
+.progress{height:3px;border-radius:0}.progress div{border-radius:0}
+.bar .track{height:4px;border-radius:0}.bar .fill{border-radius:0}
+.day i{border-radius:2px;height:30px;line-height:30px}
+.tags{gap:14px}
+.tag,.tag.d1,.tag.d2,.tag.d3{background:transparent;padding:0;border-radius:0;color:var(--accent);font-weight:800}
+.tag.rev{background:transparent;color:var(--good)}
+.q{font-size:21px;font-weight:800}
+.opts{gap:0;border-top:1px solid var(--line)}
+.opt{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:15px 10px}
+.opt:hover:not(:disabled){background:var(--accent-soft);border-color:var(--line)}
+.opt .k{background:transparent;color:var(--muted);padding:0;width:16px;font-weight:900}
+.opt.sel{border:0;border-bottom:1px solid var(--line);background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent);color:var(--ink)}
+.opt.sel .k{background:transparent;color:var(--accent)}
+.opt.right{border:0;border-bottom:1px solid var(--line);background:var(--good-soft);box-shadow:inset 3px 0 0 var(--good);color:var(--ink)}
+.opt.right .k{background:transparent;color:var(--good)}
+.opt.wrong{border:0;border-bottom:1px solid var(--line);background:var(--bad-soft);box-shadow:inset 3px 0 0 var(--bad);color:var(--ink)}
+.opt.wrong .k{background:transparent;color:var(--bad)}
+.confirm{background:transparent;border-radius:0;padding:16px 0 0;margin-top:4px}
+.confirm span{color:var(--ink)}
+.explain{background:transparent;border-left:3px solid var(--good);border-radius:0;color:var(--ink);padding:4px 0 4px 16px;margin-top:20px}
+.explain strong{color:var(--good)}
+.explain.bad{background:transparent;border-left-color:var(--bad);color:var(--ink)} .explain.bad strong{color:var(--bad)}
+.board-tabs{gap:20px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.board-tabs button,.board-tabs button.on{background:transparent;border:0;border-radius:0;padding:6px 0 10px;margin-bottom:-1px;color:var(--muted)}
+.board-tabs button.on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+.lb{gap:0}
+.lb-row{border-radius:0;border-bottom:1px solid var(--line);padding:10px 2px}
+.lb-row.me{background:transparent;box-shadow:inset 3px 0 0 var(--accent);padding-left:10px}
+.lb-row .val{font-size:16px;font-weight:900}
+.lvls{gap:0;border-top:1px solid var(--line)}
+.lvl{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:14px 10px}
+.lvl:has(input:checked){border:0;border-bottom:1px solid var(--line);background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.rv{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px}
+.review{gap:0;border-top:1px solid var(--line)}
+.qbl{gap:0;border-top:1px solid var(--line)}
+.qbi{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px}
+select{border-radius:4px;background:transparent}
+input#nm{border-radius:4px!important;background:transparent!important}
+.theme-btn{border:0;background:transparent;padding:6px 0}
+.theme-pop{border-radius:6px}
+.seg,.seg button{border-radius:4px}
+#testbar:not(:empty){border-radius:4px}
+.hidden{display:none}
 </style>
 <script>
 (function(){var A={indigo:"#4F46E5",blue:"#2563EB",teal:"#0D9488",green:"#16A34A",orange:"#EA580C",pink:"#DB2777",violet:"#7C3AED"};
@@ -531,6 +599,77 @@ const BANK = [
 ["local", 3, "A business has two Google Business Profiles for the same location. What should you do?", "Keep one and ask support to remove or merge the other", ["Keep both, because two listings get more visibility", "Delete whichever profile has more reviews", "Change one of them to a different business category"], "Duplicates split reviews and signals, and can break Google's guidelines. One profile per real location is the rule."],
 ["ai", 3, "Your logs show requests from `ChatGPT-User`. What are they?", "Fetches a ChatGPT user asked for, not the training crawler", ["GPTBot collecting pages for training, under a different name", "Googlebot using a different user agent", "A security scanner probing for weaknesses"], "OpenAI documents separate agents for training (GPTBot), search (OAI-SearchBot) and user-initiated fetches (ChatGPT-User). Decide on each one separately."],
 ["index", 3, "Newsletter links with `?utm_source=` parameters keep getting indexed. What's the best long-term fix?", "Self-canonicals, and no UTM-tagged internal links", ["Disallow `utm_` in robots.txt and nothing else", "Stop sending the newsletter to subscribers", "Request removal of the URLs every week"], "Canonicals consolidate the variants that already exist, and clean internal linking stops new ones being discovered. A robots.txt block alone can leave UTM URLs indexed without their content."],
+/* ---- Intern level (Nov 2026): beginner questions, difficulty 0 ---- */
+["onpage", 0, "What does SEO stand for?", "Search engine optimisation", ["Search engine operations", "Site efficiency optimisation", "Search engagement outreach"], "SEO is the work of helping a site appear, and get clicked, in unpaid search results. It covers technical setup, content and links."],
+["onpage", 0, "What is a title tag?", "The clickable headline Google usually shows for your page", ["The big heading visitors see at the very top of the page itself", "The name of the HTML file stored on the server", "The text people type into the browser's address bar"], "It lives in the page's `<head>` and also shows in the browser tab. A clear, specific title helps both rankings and clicks."],
+["onpage", 0, "What is a meta description?", "A short summary Google may show under your title in results", ["A hidden list of keywords Google uses to rank the page", "The caption that appears under images in Google Images", "The first paragraph of text visitors see on the page"], "It doesn't directly change rankings, but a good one makes people more likely to click your result."],
+["onpage", 0, "In SEO, what is a keyword?", "A word or phrase people type into a search engine", ["A password that unlocks Google's ranking data", "A special HTML tag that pushes a page up in results", "A word that must appear ten times on every page"], "Understanding the exact words your audience uses is the starting point for planning pages and content."],
+["onpage", 0, "What's an H1?", "The main heading on a page, usually naming its topic", ["The first link in the site's navigation menu at the top", "The largest image near the top of the page", "A tag that hides text from search engines"], "Headings (H1, H2, H3) structure a page for readers and help search engines understand what each section covers."],
+["onpage", 0, "What does 'organic' traffic mean?", "Visitors who arrive from unpaid search results", ["Visitors who arrive by clicking paid Google Ads", "Visitors who type your web address in directly", "Visitors who come from posts on social media"], "Organic traffic is what SEO aims to grow. Paid traffic stops when you stop paying; organic visibility can keep working."],
+["onpage", 0, "How can you tell paid results from organic ones in Google?", "Paid results are marked 'Sponsored'", ["Organic results always appear above every ad", "Paid results show the page's word count", "There's no visible difference between them"], "Ads are bought; organic positions are earned. SEO only affects the organic results."],
+["onpage", 0, "Why should a page's content match what people are searching for?", "Google tries to rank pages that best answer the search", ["Google mostly looks at how many words a page contains", "Matching content only matters for paid ads", "Search engines read the images, not the text"], "If someone searches 'how to tie a tie' and lands on a shop page, they leave. Pages that fit the need tend to rank and convert."],
+["onpage", 0, "What is a URL slug?", "The readable part of a URL that names the page, like `/running-shoes`", ["The tracking code added to the end of links in email newsletters", "The domain name a business buys, such as `example.com` itself", "The small icon that appears next to the page title in browser tabs"], "Short, descriptive slugs help people (and search engines) understand a page before they even click."],
+["onpage", 0, "Which URL is friendliest for users and SEO?", "`/blog/how-to-fix-404-errors`", ["`/p/8823?ref=menu&session=1`", "`/index.php?id=8823&cat=4`", "`/BLOG/How_To-FIX__404s!!`"], "Readable, lowercase, hyphenated URLs are easy to understand, share and remember."],
+["onpage", 0, "What makes content 'helpful' in Google's eyes?", "It answers the reader's question clearly and accurately", ["It repeats the main keyword as often as possible", "It's longer than every competitor's page on the topic", "It's published again with a new date every single day"], "Google's systems reward content made for people. Write the page you'd want to find if you were searching."],
+["onpage", 0, "What's a SERP?", "The search engine results page", ["A type of server error message", "A Google ranking penalty", "A file that stores keywords"], "SERP is everyday SEO shorthand for the page of results you see after a search, including ads, maps, images and AI answers."],
+["onpage", 0, "A search for 'buy running shoes online' shows which intent?", "Transactional: the person is ready to buy", ["Informational: they want to learn shoe history", "Navigational: they want one specific website", "None, because the query is too short to tell"], "Words like 'buy', 'price' and 'deal' signal buying intent, so a product or category page is the best fit."],
+["onpage", 0, "What's a long-tail keyword?", "A longer, more specific phrase, like 'waterproof trail shoes for women'", ["A keyword whose page has an unusually long URL with many folders", "Any keyword that's more than ten characters long, including spaces", "A keyword that you can only target with paid Google Ads campaigns"], "Each long-tail phrase gets fewer searches, but together they add up, and the intent is usually much clearer."],
+["onpage", 0, "Why are long-tail keywords useful to target?", "Less competition, and a clearer idea of what people want", ["They always have the highest monthly search volume", "Google prefers pages with longer URLs and titles", "Pages can't be indexed without at least one of them"], "New or smaller sites often win long-tail searches long before they can compete for broad, popular terms."],
+["onpage", 0, "What is keyword research?", "Finding the words people use when searching for your topic", ["Counting how many times a keyword appears on a page", "Buying exclusive rights to keywords from Google", "Hiding extra keywords in the page's code for crawlers"], "Tools like Search Console, Google's autocomplete and keyword tools show real search language, which shapes what you write."],
+["onpage", 0, "In SEO, what counts as 'content'?", "Everything people read or watch on a page: text, images and video", ["Only the articles in the blog section of a website", "Only the target keywords you've chosen and placed on each page", "Only the HTML code that search engines read"], "Product descriptions, FAQs, images and videos are all content, and all of them can help a page rank."],
+["onpage", 0, "When should you update an important page?", "When information changes or the page can be improved", ["Every single hour, so Google always sees it as fresh and new", "Never; pages should stay as first published", "Only after Google sends you an email"], "Keeping key pages accurate and useful matters more than how often you touch them."],
+["onpage", 0, "About how long should a title tag be?", "Around 50–60 characters, so it isn't cut off", ["Exactly five words, no more and no less", "At least 200 characters, to fit more keywords", "As long as the article it belongs to"], "Google truncates long titles. Put the most important words first."],
+["onpage", 0, "What's 'black hat' SEO?", "Tactics that break search engine rules to manipulate rankings", ["SEO work that's done after office hours, late at night", "SEO specifically for websites that use a dark colour scheme", "A paid certification that Google gives to senior SEOs"], "Black hat tricks can work briefly, but they risk penalties that wipe out traffic. Sustainable SEO plays by the rules."],
+["onpage", 0, "Which of these is a black hat tactic?", "Hiding keywords in white text on a white background", ["Writing a clear, descriptive title tag for each page", "Adding helpful alt text to every product image", "Fixing broken links that point to deleted pages"], "Hidden text is a classic spam technique, and Google's spam policies explicitly prohibit it."],
+["crawl", 0, "What does a search engine 'crawler' do?", "Visits pages and follows links to discover content", ["Ranks pages by how many visitors each one gets", "Writes the snippets shown under each result", "Checks every page for spelling mistakes"], "Crawlers are how search engines find what's on the web. If a crawler can't reach a page, it can't rank."],
+["crawl", 0, "What is Googlebot?", "Google's crawler, which fetches web pages", ["Google's chatbot that answers searches", "A tool Google offers for building websites", "Google's form for reporting spam sites"], "You'll see Googlebot in server logs and Search Console reports. It mostly crawls as a smartphone."],
+["crawl", 0, "What is robots.txt?", "A file telling crawlers which parts of a site to avoid", ["A file listing every page you want to rank first", "A script that stops spam bots from filling in forms", "The file where a website stores its passwords"], "It sits at the root of the site (`/robots.txt`). It controls crawling, not indexing."],
+["crawl", 0, "What is an XML sitemap?", "A file listing the pages you want search engines to find", ["A page showing visitors where your office is located", "A diagram of the site's menu used by web designers", "A list of every keyword the site currently ranks for"], "Sitemaps help discovery, especially for new or large sites. They're usually at `/sitemap.xml`."],
+["index", 0, "What does it mean when a page is 'indexed'?", "Google has stored it, so it can appear in results", ["It has been added to the site's XML sitemap file", "It ranks on the first page of Google", "Its content has been translated for Google"], "Indexed doesn't mean ranking well. It means the page is eligible to show up at all."],
+["index", 0, "What's a quick way to roughly check whether Google knows about a site's pages?", "Search `site:example.com` in Google", ["Search for the company's name on social media", "Open the site's robots.txt file in a browser", "Run the site through a page speed test"], "It's only a rough sample. For accurate numbers, use Search Console's Pages report."],
+["index", 0, "What does a `noindex` tag do?", "Asks search engines to keep the page out of results", ["Stops the page from loading for any human visitors", "Removes every link from the page", "Makes the page load faster for Googlebot"], "It's useful for pages like thank-you pages or internal search results, and a common culprit when an important page goes missing."],
+["index", 0, "In simple terms, what's a canonical URL?", "The main version of a page you want Google to show", ["The newest page that was added to the site", "The page on the site that gets the most visits each month", "The homepage of the website you're working on"], "When the same content is reachable at several URLs, the canonical tells Google which one is the 'real' one."],
+["status", 0, "What does a 404 error mean?", "The page wasn't found at that address", ["The server is down for maintenance", "The page has moved to a new address", "The visitor isn't logged in to the site"], "404s happen when pages are deleted or links are mistyped. A helpful 404 page guides visitors somewhere useful."],
+["status", 0, "What is a redirect?", "Automatically sending visitors from one URL to another", ["A link from another website that points to one of yours", "A button that takes the visitor back one page", "A copy of your page published on another domain"], "Redirects keep visitors and search engines from hitting dead ends when a page moves."],
+["status", 0, "What does a 200 status code mean?", "The page loaded successfully", ["200 visitors are on the page", "The page was found but is empty", "The page redirected 200 times"], "Status codes are the server's short answer to every request. 200 means 'OK, here's the page'."],
+["status", 0, "What does a 500 error usually mean?", "Something went wrong on the website's server", ["The page was deleted on purpose by its owner", "The visitor typed the web address incorrectly", "The page is blocked by the site's robots.txt"], "5xx errors are server problems. If they keep happening, Google crawls less and pages can drop out of results."],
+["arch", 0, "What's a backlink?", "A link from another website to yours", ["A link from your homepage to a blog post", "A button that takes you back to the last page", "A link that sits in your site's footer"], "Backlinks are one of the main ways search engines judge how trusted and important a page is."],
+["arch", 0, "Why do backlinks matter?", "Links from trusted sites act like votes of confidence", ["Each backlink adds exactly ten points to your rank", "They make every page on your site load faster", "Google won't crawl a site until it has backlinks"], "Quality beats quantity: one link from a respected industry site is worth more than hundreds from spammy ones."],
+["arch", 0, "Are all backlinks good for SEO?", "No, spammy or paid links can be ignored or cause trouble", ["Yes, any link from anywhere always helps your rankings", "Yes, as long as the site has at least 100 of them", "Only links coming from social media platforms count"], "Buying links or joining link schemes breaks Google's spam policies. Earn links with content worth citing."],
+["arch", 0, "What's an internal link?", "A link from one page on your site to another page on it", ["A link from another website to one of your pages", "A link hidden in the page's code that users can't see", "A link that only logged-in staff members can click"], "Internal links help visitors move around and help Google find and understand your pages."],
+["arch", 0, "What is anchor text?", "The clickable words in a link", ["The URL the link points to", "The colour the link appears in", "The title of the linked page"], "Anchor text tells users and search engines what to expect on the other end of the link."],
+["arch", 0, "Which anchor text is most helpful?", "'technical SEO checklist'", ["'click here for more info'", "'read more about this'", "'see this page here'"], "Descriptive anchors explain the destination. 'Click here' tells nobody anything."],
+["arch", 0, "What's the SEO role of a site's main navigation menu?", "It helps users and crawlers reach your most important pages", ["It decides the order Google shows your pages in results", "It hides pages you don't want Google to crawl", "It only affects design and has no link value"], "Pages linked from the main menu are easy to find and are usually seen as important."],
+["arch", 0, "What's a broken link?", "A link pointing to a page that no longer works", ["A link that uses the wrong colour", "A link that opens in a new tab", "A link that uses very long or unclear anchor text"], "Broken links lead visitors to dead ends. Audit tools like Screaming Frog find them quickly."],
+["arch", 0, "Why fix broken links?", "They frustrate visitors and waste crawling", ["They make the website look older", "Google bans any site that has a broken link", "They halve the speed of your server"], "Fixing them keeps visitors moving and stops link value leaking into dead pages."],
+["gsc", 0, "What is Google Search Console?", "A free Google tool showing how a site performs in Search", ["A paid tool for setting up and running Google Ads", "Google's drag-and-drop website builder for businesses", "An app that tracks a brand's social media mentions"], "It shows clicks, impressions, indexing problems and more. It's the SEO's most important free tool."],
+["gsc", 0, "In Search Console, what's an 'impression'?", "Each time your page appears in someone's search results", ["Each time someone visits one of your pages", "Each time someone shares your page online", "Each time Googlebot crawls one of your pages for indexing"], "A result can get impressions without clicks. Comparing the two shows how appealing it looks."],
+["gsc", 0, "In Search Console, what counts as a 'click'?", "Someone clicking your result in Google Search", ["Someone clicking any link on your website", "Someone clicking an ad for your website", "Googlebot visiting one of your pages"], "Clicks are the visits Google Search actually sends you."],
+["gsc", 0, "What does CTR stand for?", "Click-through rate", ["Content tracking ratio", "Crawl time rate", "Customer traffic report"], "CTR is clicks divided by impressions: the share of people who saw your result and clicked it."],
+["gsc", 0, "What does 'average position' show?", "Roughly where your result appears in search results", ["Your website's overall rank among every site online", "How far down the page visitors usually scroll", "How many of your pages Google has indexed"], "Position 1 is the top organic result. Lower numbers are better."],
+["gsc", 0, "How do Search Console and Google Analytics differ?", "Search Console covers Google Search; Analytics covers on-site behaviour", ["They show exactly the same data in two different layouts", "Analytics is only for SEO, and Search Console is only for ads", "Search Console tracks social media traffic, Analytics tracks email"], "Search Console tells you how people find you in Google. Analytics tells you what they do once they arrive."],
+["gsc", 0, "How do you get access to a site's Search Console data?", "Verify ownership, or get added as a user by an owner", ["Buy a Search Console licence directly from Google", "Email Google's support team and request the data", "You don't need to; every site's data is public"], "Ask whoever owns the property to add you. Most people only need Full or Restricted access."],
+["cwv", 0, "Why does page speed matter?", "Slow pages frustrate visitors and can hurt rankings", ["Speed only matters for sites that host videos", "Google only checks speed on desktop computers", "Fast pages always rank first, whatever the content"], "Speed is part of page experience. Great content still wins, but slow pages lose visitors before they read it."],
+["cwv", 0, "Which free Google tool tests how fast a page loads?", "PageSpeed Insights", ["Google Keyword Planner", "Google Trends", "Google Business Profile"], "PageSpeed Insights shows real-user data and lab tests, plus suggestions for fixing what's slow."],
+["cwv", 0, "What are Core Web Vitals?", "Google's metrics for loading, responsiveness and visual stability", ["A list of the most valuable keywords in each industry", "A monthly report listing the broken links Google found on your site", "A public ranking of the fastest websites on the internet"], "The three metrics are LCP (loading), INP (responsiveness) and CLS (layout stability)."],
+["mobile", 0, "What makes a page 'mobile-friendly'?", "It's easy to read and use on a phone without zooming", ["It only works inside a mobile app", "It shows a separate phone number", "It hides all images and videos on small phone screens"], "Most searches happen on phones, and Google mostly looks at the mobile version of your pages."],
+["mobile", 0, "What does HTTPS mean for a website?", "The connection is encrypted and secure", ["The site is hosted on Google's servers", "The site loads twice as fast as HTTP", "The site doesn't show any adverts"], "Browsers warn visitors about non-HTTPS pages, and HTTPS is a lightweight ranking signal too."],
+["schema", 0, "What is a 'rich result'?", "A search result with extras like stars, prices or images", ["A paid advert shown at the top of the results page", "A result from one of the very largest websites", "Any result that appears on the first page of Google"], "Structured data on your page can make it eligible for these eye-catching extras."],
+["schema", 0, "What's a featured snippet?", "A highlighted answer shown near the top of some results", ["A paid, sponsored result that's marked as an advert", "A short preview clip of a video result", "A link to your site's XML sitemap file"], "Clear, direct answers to common questions give a page a better chance of being chosen."],
+["local", 0, "What is local SEO?", "Helping a business appear for searches in its area", ["Optimising websites that are hosted in your country", "Any SEO work done by an agency in your own town", "Paying for a business to rank higher on Google Maps"], "Searches like 'dentist near me' or 'plumber Cape Town' are local SEO territory."],
+["local", 0, "In local SEO, what does NAP stand for?", "Name, address and phone number", ["New articles and press releases", "Navigation and pages", "Number of active pages"], "Keeping a business's NAP identical everywhere online builds trust with customers and Google."],
+["local", 0, "Why do reviews matter for local businesses?", "They build trust and can help local rankings", ["They're only visible to the business owner", "Google ignores reviews when ranking businesses", "They replace the need for having a website"], "Encourage genuine reviews and reply to them, including the negative ones."],
+["local", 0, "Where do Google Business Profile listings appear?", "In Google Maps and local search results", ["Only on the business's own website", "Only inside social media apps", "Only in the business's Google Ads reports"], "A complete, accurate profile is often the most visible thing a local business has in Google."],
+["local", 0, "In an online shop, what's a product page?", "A page for one item, with its details and price", ["The shop's homepage with all the latest offers", "A page listing every category in the shop", "The checkout page where people pay for orders"], "Unique descriptions, good photos and accurate stock and price info make product pages stronger."],
+["local", 0, "In an online shop, what's a category page?", "A page grouping related products, like 'running shoes'", ["The page with the shop's address and contact details", "A page about one specific product and its price", "The page that shows what's in the shopping cart"], "Category pages often target the most valuable searches in ecommerce, so they deserve real attention."],
+["ai", 0, "Can AI tools like ChatGPT get facts wrong?", "Yes, so always check facts before publishing", ["No, AI answers are always checked and correct", "Only when asked about sports results", "Only in languages other than English"], "AI can state wrong facts confidently. Treat its output as a draft to verify, not a source."],
+["ai", 0, "What's a sensible way to use AI when writing SEO content?", "For ideas and drafts, with a person checking and improving them", ["Publishing hundreds of AI-written pages without reading them", "Rewording competitors' pages with AI and publishing the result", "Avoiding it completely, because Google bans all AI content"], "Google cares whether content is helpful, not whether AI was involved. Mass-produced, unchecked pages are what get sites into trouble."],
+["intl", 0, "What's a ccTLD?", "A country-code domain ending, like `.za` or `.uk`", ["A type of HTML tag used to label images on a page", "A tracking code added to the end of links", "A certification Google gives to SEO agencies"], "Country-code domains are a strong signal that a site is aimed at one country."],
+["intl", 0, "Why would a site offer pages in several languages?", "To serve people searching in different languages", ["To trick Google into ranking it higher everywhere", "Because Google requires at least two languages", "To make the site's pages load more quickly"], "Each language version can rank for searches in that language, as long as it's properly translated and linked."],
+["logs", 0, "What's an SEO audit?", "A check of a site for technical, content and link issues", ["A financial review of an SEO agency's monthly invoices", "A list of every keyword used in an industry", "A report on competitors' social media posts"], "Audits find what's holding a site back, such as broken links, missing titles, slow pages or indexing problems."],
+["logs", 0, "What does Screaming Frog do?", "Crawls a website to find SEO issues like broken links", ["Tracks your keyword rankings in Google every day", "Writes blog articles automatically for your site", "Builds backlinks to your site from other websites"], "It crawls a site like a search engine would, and lists titles, status codes, redirects and much more."],
+["logs", 0, "Why track rankings over time instead of checking once?", "Rankings move daily, so trends matter more than one check", ["Google only updates its rankings once or twice a year", "A single check is enough for any website", "Tracking rankings is against Google's rules"], "Results also vary by location and device. Look for steady trends, not single-day jumps."],
+["logs", 0, "How long does SEO usually take to show results?", "Often weeks to months", ["Usually within an hour", "Exactly one day after publishing", "Never; results only come from ads"], "SEO compounds slowly. Set expectations early, and track progress against clear goals."],
 /*BANK_END*/
 ];
 
@@ -557,14 +696,15 @@ const NEWS = [
 
 /* ---------- Levels: each sets the daily easy / medium / hard mix ---------- */
 const LEVELS = {
-  junior:{label:"Junior", mix:{1:10,2:0,3:0}, blurb:"Fundamentals, Search Console and everyday fixes"},
-  mid:   {label:"Mid-level", mix:{1:0,2:10,3:0}, blurb:"Audits, rendering, redirects, structured data and hreflang"},
-  senior:{label:"Senior", mix:{1:0,2:0,3:10}, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
+  intern:{label:"Intern", mix:{0:10,1:0,2:0,3:0}, blurb:"SEO basics: how search works, key terms and the main tools"},
+  junior:{label:"Junior SEO Specialist", mix:{1:10,2:0,3:0}, blurb:"Fundamentals, Search Console and everyday fixes"},
+  mid:   {label:"Mid-level SEO Specialist", mix:{1:0,2:10,3:0}, blurb:"Audits, rendering, redirects, structured data and hreflang"},
+  senior:{label:"Senior SEO Specialist", mix:{1:0,2:0,3:10}, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
 };
 /* Each level has its own pool: Junior = easy, Mid = medium, Senior = hard. No question appears at two levels. */
 const lvl = () => LEVELS[S.level] || LEVELS.junior;
 const inLevel = (i, L=lvl()) => QUIZABLE(i) && L.mix[BANK[i][1]] > 0;
-const mixText = L => [[1,"easy"],[2,"medium"],[3,"hard"]].filter(([d])=>L.mix[d]>0).map(([d,n])=>L.mix[d]===10?`all ${n}`:`${L.mix[d]} ${n}`).join(" · ");
+const mixText = L => [[0,"beginner"],[1,"easy"],[2,"medium"],[3,"hard"]].filter(([d])=>L.mix[d]>0).map(([d,n])=>L.mix[d]===10?`all ${n}`:`${L.mix[d]} ${n}`).join(" · ");
 /* ---------- Utilities ---------- */
 const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
 /* TEST mode: the copy at /seo-daily/test/ keeps its own progress, its own leaderboard tab and a day-skipper. */
@@ -584,8 +724,8 @@ function rng(seed){ let a=hash(seed)(); return ()=>{ a|=0; a=a+0x6D2B79F5|0; let
 function shuffle(arr,r){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function fmt(s){ return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>"); }
-const DIFF = {1:"Easy",2:"Medium",3:"Hard"}, XP = {1:10,2:20,3:30};
-const RANKS = [[0,"Intern"],[200,"Junior SEO"],[600,"SEO Specialist"],[1300,"Senior SEO"],[2500,"Technical SEO Lead"],[4500,"Crawl Whisperer"]];
+const DIFF = {0:"Beginner",1:"Easy",2:"Medium",3:"Hard"}, XP = {0:10,1:10,2:20,3:30};
+const RANKS = [[0,"Trainee"],[200,"Junior SEO"],[600,"SEO Specialist"],[1300,"Senior SEO"],[2500,"Technical SEO Lead"],[4500,"Crawl Whisperer"]];
 function rankOf(xp){ let r=RANKS[0],n=null; for(let i=0;i<RANKS.length;i++){ if(xp>=RANKS[i][0]){ r=RANKS[i]; n=RANKS[i+1]||null; } } return {r,n}; }
 function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
 
@@ -607,11 +747,12 @@ function buildDaily(key){
     return (1/(1+seen*1.5)) * (acc===null ? 1.2 : 1.6-acc) * (0.5+r());
   };
   const usedCats = {};
-  for (const d of [1,2,3]) {
+  for (const d of [0,1,2,3]) {
+    if (!(targets[d] > 0)) continue;
     let pool = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && BANK[i][1]===d && !ids.includes(i));
     pool.sort((a,b)=>weight(b)-weight(a));
     for (const id of pool) {
-      if (targets[d]<=0) break;
+      if (!(targets[d] > 0)) break;
       const c = BANK[id][0];
       if (c==="news" || (usedCats[c]||0) >= 2) continue;
       ids.push(id); usedCats[c]=(usedCats[c]||0)+1; targets[d]--;
@@ -656,7 +797,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions for ${lvl().label} SEOs${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">10 questions for ${lvl().label}s${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -691,7 +832,7 @@ ${TEST?"":`    <div class="card" style="margin-bottom:16px">
       <div class="bars">${cats.map(x=>`<div class="bar"><span>${CATS[x.c]}</span><div class="track"><div class="fill" style="width:${x.a===null?0:Math.round(x.a*100)}%;${x.a!==null&&x.a<.6?"background:var(--bad)":""}"></div></div><span class="pct">${x.a===null?"—":Math.round(x.a*100)+"%"}</span></div>`).join("")}</div>
       ${weakest?`<p class="note" style="margin-top:12px">Weakest so far: <b>${weakest}</b>. Daily quizzes lean toward it.</p>`:""}
     </div>
-    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> (${lvl().label}) · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name or level</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
+    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> (${lvl().label}) · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name or level</a> · your progress will be saved. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
   </div>
     <aside class="card news-col">
       <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Latest SEO news</div><span class="meta" style="font-size:11px">Updated ${new Date(NEWS_UPDATED+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span></div>
@@ -919,13 +1060,13 @@ function browseQuestions(){
     <div class="card"><div class="label">Levels (separate pools, no overlap)</div>
       <table class="qb"><tr><th>Level</th><th>Daily set</th><th>Pool</th><th></th></tr>${lvlRows}</table></div>
     <div class="card"><div class="label">Questions by topic and difficulty (${ids.length} total)</div>
-      <table class="qb"><tr><th>Topic</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
-      ${cats.map(c=>`<tr><td>${CATS[c]}</td>${[1,2,3].map(d=>`<td${cnt(c,d)===0?' class="zero"':""}>${cnt(c,d)}</td>`).join("")}</tr>`).join("")}
-      <tr class="tot"><td>Total</td><td>${tot(1)}</td><td>${tot(2)}</td><td>${tot(3)}</td></tr></table></div>
+      <table class="qb"><tr><th>Topic</th><th>Beginner</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
+      ${cats.map(c=>`<tr><td>${CATS[c]}</td>${[0,1,2,3].map(d=>`<td${cnt(c,d)===0?' class="zero"':""}>${cnt(c,d)}</td>`).join("")}</tr>`).join("")}
+      <tr class="tot"><td>Total</td><td>${tot(0)}</td><td>${tot(1)}</td><td>${tot(2)}</td><td>${tot(3)}</td></tr></table></div>
   </div>
   <div class="card section">
     <div class="row" style="gap:8px">
-      <select id="qbd"><option value="">All difficulties</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option></select>
+      <select id="qbd"><option value="">All difficulties</option><option value="0">Beginner</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option></select>
       <select id="qbc"><option value="">All topics</option>${cats.map(c=>`<option value="${c}">${CATS[c]}</option>`).join("")}</select>
       <input id="qbs" placeholder="Search questions…" style="flex:1;min-width:180px;font:14px var(--sans);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
     </div>
@@ -988,7 +1129,7 @@ function nameScreen(){
   VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const returning=!!S.name;
   app.innerHTML=`<div class="card"><div class="label">${returning?"Your profile":"Welcome to SEO Daily"}</div><h1>${returning?"Name and level":"What's your name?"}</h1>
-    <p class="note">Your name is how you'll appear on the team leaderboard. Your progress saves in this browser, like Wordle.</p>
+    <p class="note">Your name is how you'll appear on the team leaderboard. Your progress will be saved.</p>
     <form id="nf" style="margin-top:14px">
       <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
       <div class="label" style="margin:20px 0 10px">Your level</div>
