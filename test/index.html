@@ -656,7 +656,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions at ${lvl().label} level (${mixText(lvl())})${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from the ${BANK.filter((_,i)=>inLevel(i)).length} ${lvl().label} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">10 questions at ${lvl().label} level${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -727,7 +727,7 @@ function question(){
     <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="meta">${RUN.mode==="daily"?"Daily":"Practice"} · ${i+1} / ${RUN.ids.length}</span><button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="home()">Exit</button></div>
     <div class="progress"><div style="width:${i/RUN.ids.length*100}%"></div></div>
     <div class="card">
-      <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span><span class="tag d${q[1]}">${DIFF[q[1]]} · ${XP[q[1]]}xp</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
+      <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
       <div class="q">${fmt(q[2])}</div>
       <div class="opts">${opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${"ABCD"[j]}</span><span>${fmt(o.t)}</span></button>`).join("")}</div>
       <div id="after"></div>
@@ -992,7 +992,7 @@ function nameScreen(){
     <form id="nf" style="margin-top:14px">
       <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
       <div class="label" style="margin:20px 0 10px">Your level</div>
-      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small><em>${mixText(v)} questions · ${BANK.filter((_,i)=>inLevel(i,v)).length} in its pool</em></span></label>`).join("")}</div>
+      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small></span></label>`).join("")}</div>
       <p class="note" id="nerr" style="color:var(--bad);min-height:1.2em;margin:10px 0 0"></p>
       <div class="row" style="margin-top:8px">${returning&&LEVELS[S.level]?'<button class="btn ghost" type="button" id="ncancel">Cancel</button>':""}<button class="btn" type="submit">${returning?"Save":"Start →"}</button></div>
     </form></div>`;
