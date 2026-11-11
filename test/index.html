@@ -697,9 +697,9 @@ const NEWS = [
 /* ---------- Levels: each sets the daily easy / medium / hard mix ---------- */
 const LEVELS = {
   intern:{label:"Intern", mix:{0:10,1:0,2:0,3:0}, blurb:"SEO basics: how search works, key terms and the main tools"},
-  junior:{label:"Junior", mix:{1:10,2:0,3:0}, blurb:"Fundamentals, Search Console and everyday fixes"},
-  mid:   {label:"Mid-level", mix:{1:0,2:10,3:0}, blurb:"Audits, rendering, redirects, structured data and hreflang"},
-  senior:{label:"Senior", mix:{1:0,2:0,3:10}, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
+  junior:{label:"Junior SEO Specialist", mix:{1:10,2:0,3:0}, blurb:"Fundamentals, Search Console and everyday fixes"},
+  mid:   {label:"Mid-level SEO Specialist", mix:{1:0,2:10,3:0}, blurb:"Audits, rendering, redirects, structured data and hreflang"},
+  senior:{label:"Senior SEO Specialist", mix:{1:0,2:0,3:10}, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
 };
 /* Each level has its own pool: Junior = easy, Mid = medium, Senior = hard. No question appears at two levels. */
 const lvl = () => LEVELS[S.level] || LEVELS.junior;
@@ -797,7 +797,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions for ${lvl().label} SEOs${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">10 questions for ${lvl().label}s${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -1129,7 +1129,7 @@ function nameScreen(){
   VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const returning=!!S.name;
   app.innerHTML=`<div class="card"><div class="label">${returning?"Your profile":"Welcome to SEO Daily"}</div><h1>${returning?"Name and level":"What's your name?"}</h1>
-    <p class="note">Your name is how you'll appear on the team leaderboard. Your progress saves in this browser, like Wordle.</p>
+    <p class="note">Your name is how you'll appear on the team leaderboard.</p>
     <form id="nf" style="margin-top:14px">
       <input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
       <div class="label" style="margin:20px 0 10px">Your level</div>
