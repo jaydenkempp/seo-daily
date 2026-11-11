@@ -19,7 +19,14 @@
 }}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
-.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+.narrow{max-width:760px;margin:0 auto}
+.home-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+.news-col{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow:auto}
+@media (max-width:1000px){.home-grid{grid-template-columns:1fr}.news-col{position:static;max-height:none}}
+.opt.sel{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.confirm{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--paper)}
+.confirm span{margin-right:auto;font-size:14.5px}
 header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:26px}
 .brand{font-family:var(--serif);font-weight:700;font-size:28px;letter-spacing:-.02em}
 .brand span{color:var(--accent)}
@@ -103,7 +110,7 @@ code{font-family:var(--mono);font-size:.88em;background:var(--paper);border:1px 
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <header id="hdr">
     <div class="brand">SEO<span>Daily</span></div>
     <div class="meta" id="today"></div>
   </header>
@@ -397,7 +404,8 @@ function home(){
     <p class="note">10 questions, including 1 from recent SEO news${d.ids.some(id=>S.missed[id])?" · includes questions you missed before":""}. Picked from ${BANK.length} questions across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
-  app.innerHTML = `
+  app.className=""; document.getElementById("hdr").className="";
+  app.innerHTML = `<div class="home-grid"><div>
     <div class="card">${todayBlock}</div>
     <div class="stats">
       <div class="stat"><b>${streakLive}🔥</b><small>Day streak</small></div>
@@ -428,12 +436,14 @@ function home(){
       <div class="bars">${cats.map(x=>`<div class="bar"><span>${CATS[x.c]}</span><div class="track"><div class="fill" style="width:${x.a===null?0:Math.round(x.a*100)}%;${x.a!==null&&x.a<.6?"background:var(--bad)":""}"></div></div><span class="pct">${x.a===null?"—":Math.round(x.a*100)+"%"}</span></div>`).join("")}</div>
       ${weakest?`<p class="note" style="margin-top:12px">Weakest so far: <b>${weakest}</b>. Daily quizzes lean toward it.</p>`:""}
     </div>
-    <div class="card section">
+    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>
+  </div>
+    <aside class="card news-col">
       <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Latest SEO news</div><span class="meta" style="font-size:11px">Updated ${new Date(NEWS_UPDATED+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span></div>
-      <div class="news">${NEWS.map((n,i)=>`<a class="ni${i>=5?" more hidden":""}" href="${n[4]}" target="_blank" rel="noopener"><span class="nd">${n[0].length>7?new Date(n[0]+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"}):new Date(n[0]+"-15T12:00").toLocaleDateString(undefined,{month:"short",year:"numeric"})} · ${esc(n[1])}</span><b>${fmt(n[2])}</b><span>${fmt(n[3])}</span></a>`).join("")}</div>
-      <div class="row" style="margin-top:12px">${NEWS.length>5?`<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="document.querySelectorAll('.ni.more').forEach(e=>e.classList.toggle('hidden'));this.textContent=this.textContent.startsWith('Show')?'Show less':'Show all ${NEWS.length}'">Show all ${NEWS.length}</button>`:""}<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="startNews()">Quiz me on the news</button></div>
-    </div>
-    <p class="note" style="margin-top:18px;text-align:center">Playing as <b>${esc(S.name)}</b> · <a href="#" onclick="event.preventDefault();nameScreen()" style="color:var(--muted)">change name</a> · progress is saved in this browser. <a href="#" onclick="resetAll(event)" style="color:var(--muted)">Reset progress</a></p>`;
+      <div class="news">${NEWS.map((n,i)=>`<a class="ni${i>=8?" more hidden":""}" href="${n[4]}" target="_blank" rel="noopener"><span class="nd">${n[0].length>7?new Date(n[0]+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"}):new Date(n[0]+"-15T12:00").toLocaleDateString(undefined,{month:"short",year:"numeric"})} · ${esc(n[1])}</span><b>${fmt(n[2])}</b><span>${fmt(n[3])}</span></a>`).join("")}</div>
+      <div class="row" style="margin-top:12px">${NEWS.length>8?`<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="document.querySelectorAll('.ni.more').forEach(e=>e.classList.toggle('hidden'));this.textContent=this.textContent.startsWith('Show')?'Show less':'Show all ${NEWS.length}'">Show all ${NEWS.length}</button>`:""}<button class="btn ghost" style="padding:8px 14px;font-size:13px" onclick="startNews()">Quiz me on the news</button></div>
+    </aside>
+  </div>`;
   $("#today").textContent = new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
   if (d.done) tick();
   VIEW="home"; renderBoard();
@@ -455,7 +465,7 @@ function startPractice(){
   RUN={mode:"practice",ids,answers:[],salt:"p"+Date.now()}; question();
 }
 function question(){
-  VIEW="quiz";
+  VIEW="quiz"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const i=RUN.answers.length; if(i>=RUN.ids.length) return finish();
   const id=RUN.ids[i], q=BANK[id], opts=optionOrder(id,RUN.salt);
   const isReview = RUN.mode==="daily" && S.missed[id]!==undefined;
@@ -469,9 +479,17 @@ function question(){
       <div id="after"></div>
     </div>`;
   const btns=[...document.querySelectorAll(".opt")];
-  const pick=j=>{
+  let sel=-1;
+  const choose=j=>{
     if(btns[0].disabled) return;
-    btns.forEach(b=>b.disabled=true);
+    sel=j; btns.forEach((b,k)=>b.classList.toggle("sel",k===j));
+    $("#after").innerHTML=`<div class="confirm"><span>Lock in answer <b>${"ABCD"[j]}</b>? Are you sure?</span><button class="btn ghost" id="chg">Change</button><button class="btn" id="lock">Yes, lock it in</button></div>`;
+    $("#chg").onclick=()=>{ sel=-1; btns.forEach(b=>b.classList.remove("sel")); $("#after").innerHTML=""; };
+    $("#lock").onclick=()=>pick(sel); $("#lock").focus();
+  };
+  const pick=j=>{
+    if(btns[0].disabled||j<0) return;
+    btns.forEach(b=>{ b.disabled=true; b.classList.remove("sel"); });
     const ok=opts[j].ok;
     btns.forEach((b,k)=>{ if(opts[k].ok) b.classList.add("right"); else if(k===j) b.classList.add("wrong"); });
     record(id,ok);
@@ -481,8 +499,13 @@ function question(){
       <div class="foot"><span class="note">Press Enter to continue</span><button class="btn" id="next">${last?"See results":"Next question"} →</button></div>`;
     $("#next").onclick=question; $("#next").focus();
   };
-  btns.forEach((b,j)=>b.onclick=()=>pick(j));
-  document.onkeydown=e=>{ const n="1234abcd".indexOf(e.key.toLowerCase()); if(n>-1&&!btns[0].disabled) pick(n%4); };
+  btns.forEach((b,j)=>b.onclick=()=>choose(j));
+  document.onkeydown=e=>{
+    if(btns[0].disabled) return;
+    if(e.key==="Enter"&&sel>-1){ e.preventDefault(); pick(sel); return; }
+    if(e.key==="Escape"&&sel>-1){ $("#chg").click(); return; }
+    const n="1234abcd".indexOf(e.key.toLowerCase()); if(n>-1&&n%4<btns.length) choose(n%4);
+  };
 }
 function record(id,ok){
   const q=BANK[id], c=q[0];
@@ -505,7 +528,7 @@ function finish(){
   results();
 }
 function results(forceDaily){
-  VIEW="results";
+  VIEW="results"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const run = !forceDaily && RUN && RUN.answers.length===RUN.ids.length ? RUN : {mode:"daily",ids:S.daily.ids,answers:S.daily.answers};
   const score=run.answers.reduce((a,b)=>a+b,0), n=run.ids.length;
   const msg = score===n?"Flawless crawl. +50 XP bonus.":score>=8?"Strong work — you know your stuff.":score>=5?"Solid. Read the explanations for the misses.":"Rough one — missed questions come back for review.";
@@ -608,7 +631,7 @@ function initBoard(){
 }
 /* ---------- Name ---------- */
 function nameScreen(){
-  VIEW="name";
+  VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   app.innerHTML=`<div class="card"><div class="label">Welcome to SEO Daily</div><h1>What's your name?</h1>
     <p class="note">This is how you'll appear on the team leaderboard. Your progress saves in this browser, like Wordle.</p>
     <form id="nf" class="row" style="margin-top:14px"><input id="nm" maxlength="30" autocomplete="name" placeholder="e.g. Jayden" style="flex:1;min-width:180px;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)"><button class="btn" type="submit">Start →</button></form></div>`;
