@@ -529,7 +529,7 @@ function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.ta
 
 /* ---------- Team leaderboard (Google Sheet via Apps Script) ----------
    Paste your Apps Script web app URL between the quotes. Leave empty to hide the leaderboard. */
-const SHEET_URL = "";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwny_kai6IqjBCpYHqAcKhiFXxWcN4pnrcJFh91ezSI4r4Nl_Dw5VwwjMyEcBh4RMlY/exec";
 let BOARD=[], BOARD_STATE="loading", BOARD_TAB="week", VIEW="home", SEASON_SEEN=false;
 let writeChain=Promise.resolve(), lastPushed="", pollTimer=null;
 const num=(v,max=1e7)=>{ const n=Number(v); return Number.isFinite(n)&&n>=0 ? Math.min(n,max) : 0; };
