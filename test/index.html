@@ -117,6 +117,22 @@ code{font-family:var(--mono);font-size:.88em;background:var(--paper);border:1px 
 #testbar button{font:500 12.5px var(--sans);padding:5px 10px;border-radius:7px;border:1px solid #ffffff55;background:transparent;color:inherit;cursor:pointer}
 #testbar button:hover{background:#ffffff1f}
 #testbar span{margin-right:auto}
+.qb-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:start}
+@media (max-width:900px){.qb-grid{grid-template-columns:1fr}}
+table.qb{width:100%;border-collapse:collapse;font-size:13.5px}
+table.qb th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.qb td{padding:6px 8px;border-bottom:1px solid var(--line)}
+table.qb td:not(:first-child),table.qb th:not(:first-child){text-align:center}
+table.qb td.zero{color:var(--bad)}
+table.qb tr.tot td{font-weight:600;border-bottom:0}
+#qbn a{color:var(--accent)}
+.qbl{display:grid;gap:8px;margin-top:12px}
+.qbi{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card)}
+.qbi summary{display:flex;gap:8px;align-items:baseline;cursor:pointer;list-style:none}
+.qbi summary .tag{flex:none}
+.qbi .qq{font-size:14.5px}
+.qbi .qa{margin-top:10px;display:grid;gap:4px;font-size:14px}
+.qbi .ok{color:var(--accent)} .qbi .no{color:var(--muted)}
 .hidden{display:none}
 </style>
 </head>
@@ -487,12 +503,12 @@ function home(){
       <div class="stat"><b>${S.xp}</b><small>Total XP</small></div>
       <div class="stat"><b>${reviewCount}</b><small>To review</small></div>
     </div>
-    <div class="card" style="margin-bottom:16px">
+${TEST?"":`    <div class="card" style="margin-bottom:16px">
       <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="label" style="margin:0">Team leaderboard</div><span class="meta" style="font-size:11px" id="board-live"></span></div>
       <div class="board-tabs">${[["today","Today"],["week","This week"],["xp","All-time XP"],["streak","Streaks"]].map(([k,l])=>`<button class="${BOARD_TAB===k?"on":""}" onclick="setTab('${k}')">${l}</button>`).join("")}</div>
       <div id="board"><p class="note">Loading leaderboard…</p></div>
     </div>
-    <div class="card">
+`}    <div class="card">
       <div class="rank"><span>Rank: <b>${r[1]}</b></span><span>${n?`${n[0]-S.xp} XP to ${n[1]}`:"Max rank"}</span></div>
       <div class="progress" style="margin:0"><div style="width:${pct}%"></div></div>
       <div class="section"><div class="label">Last 7 days</div><div class="week">${days.join("")}</div></div>
@@ -633,6 +649,7 @@ function weekStartKey(k){ const [y,m,d]=k.split("-").map(Number); const dt=new D
 function recentHistory(){ const k=dateKey(), out={}; for(let i=0;i<14;i++){ const dk=addDays(k,-i); if(S.history[dk]!=null) out[dk]=S.history[dk]; } return out; }
 function newId(){ const a=new Uint8Array(12); try{ crypto.getRandomValues(a); }catch(e){ for(let i=0;i<12;i++) a[i]=Math.random()*256|0; } return Array.from(a,b=>b.toString(16).padStart(2,"0")).join(""); }
 function pushScore(){
+  if(TEST) return;
   if(!SHEET_URL||!S.pid||!S.name||!SEASON_SEEN) return;
   const row={board:TEST?"test":"", id:S.pid, name:S.name, xp:S.xp, streak:S.streak, bestStreak:S.bestStreak, lastDaily:S.lastDaily||"", recent:recentHistory(), season:S.season||""};
   const sig=JSON.stringify(row); if(sig===lastPushed) return; lastPushed=sig;
@@ -681,6 +698,7 @@ function renderBoard(){
   el.appendChild(note);
 }
 async function loadBoard(){
+  if(TEST) return;
   if(!SHEET_URL) return;
   try{
     const r=await fetch(SHEET_URL+(SHEET_URL.includes("?")?"&":"?")+(TEST?"board=test&":"")+"t="+Date.now());
@@ -700,6 +718,7 @@ async function loadBoard(){
   renderBoard();
 }
 function initBoard(){
+  if(TEST) return;
   if(!SHEET_URL){ renderBoard(); return; }
   loadBoard();
   clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden&&VIEW==="home") loadBoard(); },60000);
@@ -709,14 +728,70 @@ function initBoard(){
 function testTools(){
   const el=document.getElementById("testbar"); if(!TEST||!el) return;
   if(!document.title.startsWith("TEST")) document.title="TEST · "+document.title;
-  el.innerHTML=`<b>TEST</b><span>Your team can't see this copy. Progress and leaderboard are separate. Pretend date: <strong>${dateKey()}</strong>${DAY_OFFSET?` (+${DAY_OFFSET} day${DAY_OFFSET===1?"":"s"})`:""}</span>
-    <button onclick="testShift(1)">Skip to next day</button>${DAY_OFFSET?'<button onclick="testShift(-DAY_OFFSET)">Back to today</button>':""}<button id="twipe" onclick="testWipe(this)">Wipe test data</button>`;
+  el.innerHTML=`<b>TEST</b><span>Your team can't see this copy. Progress is separate and there's no leaderboard. Pretend date: <strong>${dateKey()}</strong>${DAY_OFFSET?` (+${DAY_OFFSET} day${DAY_OFFSET===1?"":"s"})`:""}</span>
+    <button onclick="testShift(1)">Skip to next day</button>${DAY_OFFSET?'<button onclick="testShift(-DAY_OFFSET)">Back to today</button>':""}<button onclick="browseQuestions()">Browse questions</button><button id="twipe" onclick="testWipe(this)">Wipe test data</button>`;
 }
 function testShift(n){ DAY_OFFSET=Math.max(0,DAY_OFFSET+n); try{ localStorage.setItem("seodaily-test-offset",String(DAY_OFFSET)); }catch(e){} RUN=null; testTools(); home(); }
 function testWipe(btn){
   if(btn.dataset.armed!=="1"){ btn.dataset.armed="1"; btn.textContent="Click again to wipe"; setTimeout(()=>{ if(btn.isConnected){ btn.dataset.armed=""; btn.textContent="Wipe test data"; } },4000); return; }
   try{ localStorage.removeItem(KEY); localStorage.removeItem("seodaily-test-offset"); }catch(e){}
   location.reload();
+}
+
+/* ---------- Question browser (test copy only) ---------- */
+let QB={level:"", diff:"", cat:"", q:"", sample:null};
+function browseQuestions(){
+  if(!TEST) return;
+  VIEW="browse"; RUN=null; document.onkeydown=null; app.className=""; document.getElementById("hdr").className="";
+  const ids=BANK.map((_,i)=>i).filter(QUIZABLE);
+  const cats=Object.keys(CATS);
+  const cnt=(c,d)=>ids.filter(i=>BANK[i][0]===c&&BANK[i][1]===d).length;
+  const tot=d=>ids.filter(i=>BANK[i][1]===d).length;
+  const lvlRows=Object.entries(LEVELS).map(([k,v])=>`<tr><td><b>${v.label}</b></td><td>${v.mix[1]}</td><td>${v.mix[2]}</td><td>${v.mix[3]}</td><td><button class="btn ghost" style="padding:5px 10px;font-size:12.5px" onclick="qbSample('${k}')">Sample a daily set</button></td></tr>`).join("");
+  app.innerHTML=`
+  <div class="row" style="justify-content:space-between;margin-bottom:14px"><h1 style="margin:0">Question bank</h1><button class="btn ghost" onclick="QB.sample=null;home()">Back to dashboard</button></div>
+  <div class="qb-grid">
+    <div class="card"><div class="label">Daily mix by level</div>
+      <table class="qb"><tr><th>Level</th><th>Easy</th><th>Medium</th><th>Hard</th><th></th></tr>${lvlRows}</table></div>
+    <div class="card"><div class="label">Questions by topic and difficulty (${ids.length} total)</div>
+      <table class="qb"><tr><th>Topic</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
+      ${cats.map(c=>`<tr><td>${CATS[c]}</td>${[1,2,3].map(d=>`<td${cnt(c,d)===0?' class="zero"':""}>${cnt(c,d)}</td>`).join("")}</tr>`).join("")}
+      <tr class="tot"><td>Total</td><td>${tot(1)}</td><td>${tot(2)}</td><td>${tot(3)}</td></tr></table></div>
+  </div>
+  <div class="card section">
+    <div class="row" style="gap:8px">
+      <select id="qbd"><option value="">All difficulties</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option></select>
+      <select id="qbc"><option value="">All topics</option>${cats.map(c=>`<option value="${c}">${CATS[c]}</option>`).join("")}</select>
+      <input id="qbs" placeholder="Search questions…" style="flex:1;min-width:180px;font:14px var(--sans);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
+    </div>
+    <p class="note" id="qbn" style="margin:12px 0 0"></p>
+    <div id="qbl" class="qbl"></div>
+  </div>`;
+  $("#qbd").value=QB.diff; $("#qbc").value=QB.cat; $("#qbs").value=QB.q;
+  $("#qbd").onchange=e=>{QB.diff=e.target.value;QB.sample=null;qbList();};
+  $("#qbc").onchange=e=>{QB.cat=e.target.value;QB.sample=null;qbList();};
+  $("#qbs").oninput=e=>{QB.q=e.target.value;QB.sample=null;qbList();};
+  qbList();
+}
+function qbSample(level){
+  const keep=S.level; S.level=level; const ids=buildDaily(dateKey()); S.level=keep;
+  QB.sample={level, ids}; QB.diff=""; QB.cat=""; QB.q="";
+  ["#qbd","#qbc","#qbs"].forEach(x=>$(x).value="");
+  qbList(); $("#qbn").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function qbList(){
+  let ids;
+  if(QB.sample) ids=QB.sample.ids;
+  else {
+    const q=QB.q.trim().toLowerCase();
+    ids=BANK.map((_,i)=>i).filter(i=>QUIZABLE(i)&&(!QB.diff||BANK[i][1]==+QB.diff)&&(!QB.cat||BANK[i][0]===QB.cat)&&(!q||(BANK[i][2]+" "+BANK[i][3]).toLowerCase().includes(q)))
+      .sort((a,b)=>BANK[a][1]-BANK[b][1]||BANK[a][0].localeCompare(BANK[b][0]));
+  }
+  $("#qbn").innerHTML = QB.sample
+    ? `Sample daily set for <b>${LEVELS[QB.sample.level].label}</b> on ${dateKey()} (what a new player at that level would get). <a href="#" onclick="event.preventDefault();QB.sample=null;qbList()">Show all questions</a>`
+    : `Showing ${ids.length} question${ids.length===1?"":"s"}.`;
+  $("#qbl").innerHTML=ids.map((i,n)=>{ const q=BANK[i]; return `<details class="qbi"><summary><span class="tag d${q[1]}">${DIFF[q[1]]}</span><span class="tag">${CATS[q[0]]}</span><span class="qq">${QB.sample?`${n+1}. `:""}${fmt(q[2])}</span></summary>
+    <div class="qa"><div class="ok">✓ ${fmt(q[3])}</div>${q[4].map(w=>`<div class="no">✗ ${fmt(w)}</div>`).join("")}<p class="note" style="margin:8px 0 0">${fmt(q[5])}</p></div></details>`; }).join("") || '<p class="note">No questions match.</p>';
 }
 /* ---------- Name ---------- */
 function nameScreen(){
