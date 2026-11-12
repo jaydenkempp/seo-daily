@@ -261,6 +261,9 @@ input#nm{border-radius:4px!important;background:transparent!important}
 .opt.sel .k{color:#fff!important}
 .opt.sel code{background:rgba(255,255,255,.2);color:#fff}
 @keyframes popin{from{transform:translateY(8px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+#buddy.zoom .bot,#buddy.zoom .blob{animation:none!important}
+#buddy.zoom .blob{transition:transform .12s}
+#buddy.zoom.boing .blob{transform:scale(1.28,.72)}
 #buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
 #buddy.docked .bot{width:110px;height:128px}
 #buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
@@ -1276,6 +1279,7 @@ const LINES={
   wrong1:["404: right answer not found. Only your first miss today though, {name}.","My face just broke, {name}. That's 1 wrong. I'll walk it off. Slowly. I'm a blob.","Page not found. Neither was the right answer. Just the 1 so far, {name}!","{name}, that answer has been moved permanently. To the wrong pile. 1 of them so far."],
   wrong2:["{name}, I've been redirected {wrong} times today. Please, just one right answer.","{wrong} wrong so far, {name}. My face keeps doing this. Someone call a developer.","Error number {wrong}, {name}. I'm starting to look like a broken link report.","{wrong} misses, {name}. That's not a redirect chain yet. Let's keep it that way."],
   wrong3:["{wrong} wrong today, {name}. I live on the 404 page now. I've put up curtains.","{name}, that's {wrong}. Google has started deindexing my feelings.","{wrong} wrong answers, {name}. I've made a custom 404 page with your name on it. It's very supportive.","Miss number {wrong}, {name}. I've been redirected so much I don't know where I live anymore.","{wrong}, {name}. {wrong}! My face is stuck like this now. Read the explanation and save me."],
+  zoom:["WHEEEE! Sorry {name}, correct answers give me the zoomies.","{name}, I just bounced off every edge of this page. Don't ask about my bounce rate.","That was pure 200 OK energy leaving my body. Nailed it, {name}.","I'm fine. I'm fine. I've seen the whole viewport now. Correct, {name}!","{name} got it right so I did a full site crawl. Of the walls."],
   pick:["Ooh, {letter}? Brave, {name}.","{letter}, huh? I'm not saying anything. I'm just jiggling.","{letter}! Interesting choice, {name}.","Hmm, {letter}. My left eye likes it. My right eye has questions.","Going with {letter}, {name}? I'll hold my breath. I don't have lungs.","{letter}? Bold. I respect it. I'm a bit scared, but I respect it.","{name} picked {letter}. I'm pretending I know the answer."],
   checking:["Let me check your answer… estimated time 4.2 seconds. Give or take a business day.","Checking… my Core Web Vitals aren't great, {name}. Bear with me.","Loading your answer… 12%… 13%… okay, I'm skipping the progress bar.","Hold on {name}, I'm buffering. It's a jelly thing.","I asked Google if you're right. They said \"it depends\". Checking myself.","Please hold. Your answer is important to us, {name}.","Rendering your answer… this is why nobody likes client-side JavaScript.","Hang on, {name}. Waiting for the server. The server is me. I'm slow."],
   crawl:["I crawled 8 pages with 8 legs, {name}. Efficiency.","Surprise, {name}! Legs! Googlebot is shaking.","Don't freak out, {name}. I grow legs when I get excited about crawl budget.","8 legs, 0 robots.txt rules. Watch me go, {name}.","Crawling your site for you, {name}. Found 3 broken links and a sandwich.","{name}, I'm crawling at 8 pages a second. Please don't tell my server."],
@@ -1310,7 +1314,9 @@ function buddySay(kind,vars={},anim){
   if(anim) el.classList.add(anim);
   el.classList.add("talking");
   clearTimeout(buddyTimer);
-  buddyTimer=setTimeout(()=>el.classList.remove("talking","sad","jump","party"), Math.min(9000, 2600+text.length*45));
+  if(VIEW==="quiz" && window.innerWidth>760 && kind!=="checking") return; // stays until "Next question"
+  const ms = VIEW==="quiz" ? Math.min(14000, 3500+text.length*60) : Math.min(9000, 2600+text.length*45);
+  buddyTimer=setTimeout(()=>el.classList.remove("talking","sad","jump","party"), ms);
 }
 function buddyChecking(){
   const el=buddyEl(); if(!el || !buddyOn()) return 0;
@@ -1339,9 +1345,32 @@ function buddyStroll(){
   clearTimeout(buddyWalk); buddyWalk=setTimeout(()=>{ el.classList.remove("walking"); el.style.transition=""; }, dur*1000);
 }
 function buddyPlace(scene){
+  buddyZoomStop();
   const el=buddyEl(), dock=document.getElementById("ksoDock");
   if(scene==="quiz" && dock && window.innerWidth>760){ if(el.parentNode!==dock) dock.appendChild(el); el.classList.add("docked"); }
   else { el.classList.remove("docked"); if(el.parentNode!==app.parentNode) app.parentNode.insertBefore(el, app); }
+}
+let zoomRAF=null;
+function buddyZoomStop(){ if(zoomRAF===null) return; cancelAnimationFrame(zoomRAF); zoomRAF=null; const el=buddyEl(); el.classList.remove("zoom","boing"); el.style.cssText=""; el.querySelector(".bot").style.transform=""; }
+function buddyZoomies(done){
+  const el=buddyEl();
+  if(!el || !buddyOn() || matchMedia("(prefers-reduced-motion: reduce)").matches){ done(); return; }
+  const r=el.getBoundingClientRect(), bot=el.querySelector(".bot");
+  el.classList.remove("talking","docked","peek"); el.classList.add("zoom");
+  document.body.appendChild(el);
+  let x=r.left, y=r.top, vx=(Math.random()<.5?-1:1)*(9+Math.random()*4), vy=-(10+Math.random()*4), a=0;
+  const t0=performance.now(), W=()=>window.innerWidth-el.offsetWidth, H=()=>window.innerHeight-bot.offsetHeight;
+  el.style.cssText=`position:fixed;left:${x}px;top:${y}px;right:auto;bottom:auto;transition:none;z-index:60`;
+  const boing=()=>{ el.classList.add("boing"); setTimeout(()=>el.classList.remove("boing"),140); };
+  const step=now=>{
+    if(now-t0>3600){ zoomRAF=null; el.classList.remove("zoom","boing"); el.style.cssText=""; bot.style.transform=""; buddyPlace(VIEW); el.classList.toggle("peek", VIEW==="quiz"||window.innerWidth<=760); if(VIEW!=="quiz"||window.innerWidth<=760) buddyHome(); done(); return; }
+    x+=vx; y+=vy; a+=vx*1.6;
+    if(x<0){x=0;vx=-vx;boing();} if(x>W()){x=W();vx=-vx;boing();}
+    if(y<0){y=0;vy=-vy;boing();} if(y>H()){y=H();vy=-vy;boing();}
+    el.style.left=x+"px"; el.style.top=y+"px"; bot.style.transform=`rotate(${a}deg)`;
+    zoomRAF=requestAnimationFrame(step);
+  };
+  zoomRAF=requestAnimationFrame(step);
 }
 function buddyPicked(letter){ if(window.innerWidth<=760){ clearTimeout(buddyTimer); buddyEl().classList.remove("talking"); return; } if(Math.random()<.65) buddySay("pick",{letter}); }
 function buddyScene(scene){
@@ -1375,7 +1404,7 @@ home=function(){ const r=_home.apply(this,arguments); if(VIEW!=="home") return r
 const _question=question;
 let rightRun=0;
 question=function(){ const r=_question.apply(this,arguments); if(VIEW!=="quiz") return r; buddyScene("quiz");
-  { const el=buddyEl(); if(el) el.classList.remove("sad","loading","crawler"); }
+  { const el=buddyEl(); if(el){ clearTimeout(buddyTimer); el.classList.remove("sad","loading","crawler","talking"); } }
   const i=RUN.answers.length;
   if(i===0){ rightRun=0; setTimeout(()=>buddySay("start",{}, "wave"),300); }
   else if(i===RUN.ids.length-1) setTimeout(()=>buddySay("last"),300);
@@ -1387,6 +1416,7 @@ record=function(id,ok){ const r=_record.apply(this,arguments);
   setTimeout(()=>{
     if(ok && rightRun>=3 && rightRun%3===0) buddySay("streak3",{}, "party");
     else if(ok && Math.random()<.15){ const el=buddyEl(); if(el&&buddyOn()){ el.classList.add("crawler"); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),6000); } buddySay("crawl",{}, "jump"); }
+    else if(ok && Math.random()<.25) buddyZoomies(()=>buddySay("zoom",{}, "jump"));
     else if(ok) buddySay("correct",{}, "jump");
     else buddySay(wrong<=1?"wrong1":wrong<=3?"wrong2":"wrong3",{wrong}, "sad");
   },150);
