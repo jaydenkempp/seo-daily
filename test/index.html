@@ -262,8 +262,9 @@ input#nm{border-radius:4px!important;background:transparent!important}
 .opt.sel code{background:rgba(255,255,255,.2);color:#fff}
 @keyframes popin{from{transform:translateY(8px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 #buddy.zoom .bot,#buddy.zoom .blob{animation:none!important}
-#buddy.zoom .blob{transition:transform .12s}
-#buddy.zoom.boing .blob{transform:scale(1.28,.72)}
+#buddy.zoom .blob{transition:transform .1s}
+#buddy.zoom.boing .blob{transform:scale(1.15,.87)}
+#buddy.zoom .bot{transition:filter .15s}
 .ks-anims{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .ks-cat{margin-top:16px}.ks-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.ks-h b{font-size:14.5px}.ks-h span{font-size:12px;color:var(--muted)}
 .ks-line{display:block;width:100%;text-align:left;font:500 14px/1.45 var(--sans);color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);padding:9px 8px;cursor:pointer}
@@ -1284,7 +1285,8 @@ const LINES={
   wrong1:["404: right answer not found. Only your first miss today though, {name}.","My face just broke, {name}. That's 1 wrong. I'll walk it off. Slowly. I'm a blob.","Page not found. Neither was the right answer. Just the 1 so far, {name}!","{name}, that answer has been moved permanently. To the wrong pile. 1 of them so far."],
   wrong2:["{name}, I've been redirected {wrong} times today. Please, just one right answer.","{wrong} wrong so far, {name}. My face keeps doing this. Someone call a developer.","Error number {wrong}, {name}. I'm starting to look like a broken link report.","{wrong} misses, {name}. That's not a redirect chain yet. Let's keep it that way."],
   wrong3:["{wrong} wrong today, {name}. I live on the 404 page now. I've put up curtains.","{name}, that's {wrong}. Google has started deindexing my feelings.","{wrong} wrong answers, {name}. I've made a custom 404 page with your name on it. It's very supportive.","Miss number {wrong}, {name}. I've been redirected so much I don't know where I live anymore.","{wrong}, {name}. {wrong}! My face is stuck like this now. Read the explanation and save me."],
-  zoom:["WHEEEE! Sorry {name}, correct answers give me the zoomies.","{name}, I just bounced off every edge of this page. Don't ask about my bounce rate.","That was pure 200 OK energy leaving my body. Nailed it, {name}.","I'm fine. I'm fine. I've seen the whole viewport now. Correct, {name}!","{name} got it right so I did a full site crawl. Of the walls."],
+  corner:["IT HIT THE CORNER! {name}, did you SEE that?! Nobody has ever seen that!","THE CORNER, {name}! I've waited my whole jelly life for this.","{name}, I hit the exact corner. Screenshot it. Frame it. Tell your kids."],
+  zoom:["WHEEEE! Sorry {name}, correct answers give me the zoomies.","Did you see me go full DVD screensaver, {name}? Still waiting on that corner.","{name}, I just bounced off every edge of this page. Don't ask about my bounce rate.","That was pure 200 OK energy leaving my body. Nailed it, {name}.","I'm fine. I'm fine. I've seen the whole viewport now. Correct, {name}!","{name} got it right so I did a full site crawl. Of the walls."],
   pick:["Ooh, {letter}? Brave, {name}.","{letter}, huh? I'm not saying anything. I'm just jiggling.","{letter}! Interesting choice, {name}.","Hmm, {letter}. My left eye likes it. My right eye has questions.","Going with {letter}, {name}? I'll hold my breath. I don't have lungs.","{letter}? Bold. I respect it. I'm a bit scared, but I respect it.","{name} picked {letter}. I'm pretending I know the answer."],
   checking:["Let me check your answer… estimated time 4.2 seconds. Give or take a business day.","Checking… my Core Web Vitals aren't great, {name}. Bear with me.","Loading your answer… 12%… 13%… okay, I'm skipping the progress bar.","Hold on {name}, I'm buffering. It's a jelly thing.","I asked Google if you're right. They said \"it depends\". Checking myself.","Please hold. Your answer is important to us, {name}.","Rendering your answer… this is why nobody likes client-side JavaScript.","Hang on, {name}. Waiting for the server. The server is me. I'm slow."],
   crawl:["I crawled 8 pages with 8 legs, {name}. Efficiency.","Surprise, {name}! Legs! Googlebot is shaking.","Don't freak out, {name}. I grow legs when I get excited about crawl budget.","8 legs, 0 robots.txt rules. Watch me go, {name}.","Crawling your site for you, {name}. Found 3 broken links and a sandwich.","{name}, I'm crawling at 8 pages a second. Please don't tell my server."],
@@ -1357,23 +1359,28 @@ function buddyPlace(scene){
   else { el.classList.remove("docked"); if(el.parentNode!==app.parentNode) app.parentNode.insertBefore(el, app); }
 }
 let zoomRAF=null;
-function buddyZoomStop(){ if(zoomRAF===null) return; cancelAnimationFrame(zoomRAF); zoomRAF=null; const el=buddyEl(); el.classList.remove("zoom","boing"); el.style.cssText=""; el.querySelector(".bot").style.transform=""; }
+function buddyZoomStop(){ if(zoomRAF===null) return; cancelAnimationFrame(zoomRAF); zoomRAF=null; const el=buddyEl(); el.classList.remove("zoom","boing"); el.style.cssText=""; el.querySelector(".bot").style.transform=""; el.querySelector(".bot").style.filter=""; }
 function buddyZoomies(done){
   const el=buddyEl();
-  if(!el || !buddyOn() || matchMedia("(prefers-reduced-motion: reduce)").matches){ done(); return; }
+  if(!el || !buddyOn() || matchMedia("(prefers-reduced-motion: reduce)").matches){ done(false); return; }
   const r=el.getBoundingClientRect(), bot=el.querySelector(".bot");
   el.classList.remove("talking","docked","peek"); el.classList.add("zoom");
   document.body.appendChild(el);
-  let x=r.left, y=r.top, vx=(Math.random()<.5?-1:1)*(9+Math.random()*4), vy=-(10+Math.random()*4), a=0;
+  // DVD screensaver: straight diagonal line, constant speed, new colour on every wall
+  const sp=Math.max(9, Math.min(15, window.innerWidth/110));
+  let x=r.left, y=r.top, vx=(Math.random()<.5?-1:1)*sp, vy=-sp, hue=0, hitX=-99, hitY=-99, frame=0, corner=false;
   const t0=performance.now(), W=()=>window.innerWidth-el.offsetWidth, H=()=>window.innerHeight-bot.offsetHeight;
   el.style.cssText=`position:fixed;left:${x}px;top:${y}px;right:auto;bottom:auto;transition:none;z-index:60`;
-  const boing=()=>{ el.classList.add("boing"); setTimeout(()=>el.classList.remove("boing"),140); };
+  const recolour=()=>{ hue=(hue+60+Math.floor(Math.random()*120))%360; bot.style.filter=`hue-rotate(${hue}deg)`; el.classList.add("boing"); setTimeout(()=>el.classList.remove("boing"),120); };
+  const finish=()=>{ zoomRAF=null; el.classList.remove("zoom","boing"); el.style.cssText=""; bot.style.transform=""; bot.style.filter=""; buddyPlace(VIEW); el.classList.toggle("peek", VIEW==="quiz"||window.innerWidth<=760); if(VIEW!=="quiz"||window.innerWidth<=760) buddyHome(); done(corner); };
   const step=now=>{
-    if(now-t0>3600){ zoomRAF=null; el.classList.remove("zoom","boing"); el.style.cssText=""; bot.style.transform=""; buddyPlace(VIEW); el.classList.toggle("peek", VIEW==="quiz"||window.innerWidth<=760); if(VIEW!=="quiz"||window.innerWidth<=760) buddyHome(); done(); return; }
-    x+=vx; y+=vy; a+=vx*1.6;
-    if(x<0){x=0;vx=-vx;boing();} if(x>W()){x=W();vx=-vx;boing();}
-    if(y<0){y=0;vy=-vy;boing();} if(y>H()){y=H();vy=-vy;boing();}
-    el.style.left=x+"px"; el.style.top=y+"px"; bot.style.transform=`rotate(${a}deg)`;
+    frame++;
+    if(now-t0>5000 || corner){ finish(); return; }
+    x+=vx; y+=vy;
+    if(x<=0||x>=W()){ x=Math.max(0,Math.min(W(),x)); vx=-vx; hitX=frame; recolour(); }
+    if(y<=0||y>=H()){ y=Math.max(0,Math.min(H(),y)); vy=-vy; hitY=frame; recolour(); }
+    if(Math.abs(hitX-hitY)<=2 && hitX>0){ corner=true; el.classList.add("party"); }
+    el.style.left=x+"px"; el.style.top=y+"px";
     zoomRAF=requestAnimationFrame(step);
   };
   zoomRAF=requestAnimationFrame(step);
@@ -1403,11 +1410,11 @@ function buddyScene(scene){
 const KS_GROUPS=[
   ["Dashboard",[["intro","First visit only","wave"],["greet","Normal hello","wave"],["streak","Hello when on a streak","party"],["doneToday","After finishing today's quiz","wave"],["idle","Random chatter while you wait",null],["poke","When someone clicks him","jump"]]],
   ["During the quiz",[["start","First question","wave"],["pick","Picking an answer (computer only)",null],["checking","Loading face before the answer (about 1 in 3 questions)","loading"],["last","Last question",null]]],
-  ["Right answers",[["correct","Right answer","jump"],["zoom","Right answer + bouncing round the page (about 1 in 4)","zoom"],["crawl","Grows 8 legs (random, dashboard or right answer)","crawl"],["streak3","Every 3 right in a row","party"]]],
+  ["Right answers",[["correct","Right answer","jump"],["zoom","Right answer + DVD-style bounce round the screen (about 1 in 4)","zoom"],["corner","Only if the bounce hits a corner exactly","party"],["crawl","Grows 8 legs (random, dashboard or right answer)","crawl"],["streak3","Every 3 right in a row","party"]]],
   ["Wrong answers (404 face)",[["wrong1","1st wrong answer in the quiz","sad",1],["wrong2","2nd or 3rd wrong answer","sad",3],["wrong3","4th wrong answer or more","sad",5]]],
   ["Results",[["done_great","Score 8 to 10","party"],["done_ok","Score 5 to 7","jump"],["done_low","Score 0 to 4","sad"]]]
 ];
-const KS_ANIMS=[["Wave","wave"],["Happy jump","jump"],["Party spin","party"],["404 face","sad"],["Loading face","loading"],["8 legs + walk","crawl"],["Walk","stroll"],["Bounce round the page","zoom"],["Back to normal","reset"]];
+const KS_ANIMS=[["Wave","wave"],["Happy jump","jump"],["Party spin","party"],["404 face","sad"],["Loading face","loading"],["8 legs + walk","crawl"],["Walk","stroll"],["DVD bounce","zoom"],["Back to normal","reset"]];
 function ksReset(){ const el=buddyEl(); buddyZoomStop(); clearTimeout(crawlTimer); el.classList.remove("jump","sad","party","wave","loading","crawler","walking","talking"); buddyHome(); }
 function ksAnim(a,text,vars){
   const el=buddyEl(); vars=Object.assign({score:8,wrong:3,letter:"B"},vars||{});
@@ -1418,7 +1425,7 @@ function ksAnim(a,text,vars){
   if(a==="loading"){ el.classList.add("loading"); buddySay("checking",vars); return; }
   if(a==="crawl"){ el.classList.add("crawler"); buddySay("crawl",vars); buddyStroll(); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),9000); return; }
   if(a==="stroll"){ buddyStroll(); return; }
-  if(a==="zoom"){ buddyZoomies(()=>buddySay("zoom",vars,"jump")); return; }
+  if(a==="zoom"){ buddyZoomies(c=>buddySay(c?"corner":"zoom",vars,c?"party":"jump")); return; }
   if(a==="sad"){ buddySay(vars.__text?"wrong2":"wrong2",vars,"sad"); return; }
   buddySay(a==="party"?"streak3":a==="jump"?"correct":"greet",vars,a);
 }
@@ -1469,7 +1476,7 @@ record=function(id,ok){ const r=_record.apply(this,arguments);
   setTimeout(()=>{
     if(ok && rightRun>=3 && rightRun%3===0) buddySay("streak3",{}, "party");
     else if(ok && Math.random()<.15){ const el=buddyEl(); if(el&&buddyOn()){ el.classList.add("crawler"); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),6000); } buddySay("crawl",{}, "jump"); }
-    else if(ok && Math.random()<.25) buddyZoomies(()=>buddySay("zoom",{}, "jump"));
+    else if(ok && Math.random()<.25) buddyZoomies(c=>buddySay(c?"corner":"zoom",{}, c?"party":"jump"));
     else if(ok) buddySay("correct",{}, "jump");
     else buddySay(wrong<=1?"wrong1":wrong<=3?"wrong2":"wrong3",{wrong}, "sad");
   },150);
