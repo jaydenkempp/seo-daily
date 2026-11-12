@@ -242,6 +242,43 @@ input#nm{border-radius:4px!important;background:transparent!important}
 .seg,.seg button{border-radius:4px}
 #testbar:not(:empty){border-radius:4px}
 .hidden{display:none}
+
+/* ===== Crawly the mascot ===== */
+#buddy{position:fixed;left:auto;right:24px;bottom:14px;z-index:30;width:96px;pointer-events:none;transition:left 4.5s linear,right .4s,bottom .35s ease,transform .35s ease}
+#buddy.off{display:none}
+#buddy .bot{width:96px;height:112px;pointer-events:auto;cursor:pointer;transform-origin:50% 100%;animation:bob 2.6s ease-in-out infinite}
+#buddy.face-left .bot svg{transform:scaleX(-1)}
+#buddy .eye{animation:blink 4.8s infinite;transform-origin:center;transform-box:fill-box}
+#buddy .bulb{animation:glow 1.6s ease-in-out infinite}
+#buddy .arm-r{transform-origin:62px 70px;transform-box:view-box}
+#buddy.wave .arm-r{animation:wave .45s ease-in-out 4}
+#buddy.walking .leg-l{animation:step .5s ease-in-out infinite}
+#buddy.walking .leg-r{animation:step .5s ease-in-out infinite reverse}
+#buddy.walking .bot{animation:walkbob .5s ease-in-out infinite}
+#buddy.jump .bot{animation:jump .7s cubic-bezier(.3,1.6,.5,1) 2}
+#buddy.sad .bot{animation:wobble .5s ease-in-out 3}
+#buddy.party .bot{animation:spin 1s ease-in-out 2}
+#buddy .bubble{position:absolute;bottom:118px;right:0;width:max-content;max-width:250px;background:var(--card);color:var(--ink);border:1.5px solid var(--accent);border-radius:12px 12px 4px 12px;padding:10px 13px;font-size:13.5px;font-weight:600;line-height:1.4;box-shadow:0 8px 24px rgba(15,23,42,.18);opacity:0;transform:translateY(6px) scale(.96);transition:opacity .2s,transform .2s;pointer-events:none}
+#buddy.face-left .bubble{right:auto;left:0;border-radius:12px 12px 12px 4px}
+#buddy.talking .bubble{opacity:1;transform:none;pointer-events:auto}
+#buddy .bubble b{color:var(--accent)}
+#buddy .shh{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:800 12px/20px var(--sans);cursor:pointer;padding:0}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes walkbob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes glow{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-35deg)}}
+@keyframes step{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes jump{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-34px) scale(1.05,.95)}60%{transform:translateY(0) scale(1.08,.9)}}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+@keyframes spin{0%{transform:rotate(0) translateY(0)}50%{transform:rotate(180deg) translateY(-20px)}100%{transform:rotate(360deg) translateY(0)}}
+@media (max-width:760px){#buddy{right:10px;width:70px}#buddy .bot{width:70px;height:82px}#buddy .bubble{bottom:86px;max-width:210px;font-size:13px}
+  #buddy.peek{bottom:-58px}#buddy.peek.talking{bottom:10px}}
+@media (prefers-reduced-motion:reduce){#buddy,#buddy *{animation:none!important;transition:none!important}}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px;font-weight:700}
+.switch{width:38px;height:22px;border-radius:99px;border:0;background:var(--line);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.switch.on{background:var(--accent)}.switch.on::after{left:19px}
 </style>
 <script>
 (function(){var A={indigo:"#4F46E5",blue:"#2563EB",teal:"#0D9488",green:"#16A34A",orange:"#EA580C",pink:"#DB2777",violet:"#7C3AED"};
@@ -261,10 +298,30 @@ document.documentElement.dataset.mode=m; if(A[t.accent]) document.documentElemen
         <div class="seg" id="modeSeg"><button data-m="light">Light</button><button data-m="dark">Dark</button><button data-m="auto">Auto</button></div>
         <div class="label">Accent colour</div>
         <div class="swatches" id="swatches"></div>
+        <div class="toggle-row"><span>Show Crawly</span><button class="switch" id="buddyToggle" aria-label="Show Crawly the mascot"></button></div>
       </div>
     </div>
   </header>
   <div id="testbar"></div>
+<div id="buddy" aria-live="polite"><div class="bubble" id="buddyBubble"><span id="buddyText"></span><button class="shh" id="buddyShh" aria-label="Hide Crawly" title="Hide Crawly">×</button></div><div class="bot" id="buddyBot" title="Crawly"><svg viewBox="0 0 96 112" width="100%" height="100%" aria-hidden="true">
+  <ellipse cx="48" cy="108" rx="24" ry="3.5" fill="#000" opacity=".15"/>
+  <g class="leg-l"><rect x="34" y="84" width="8" height="16" rx="4" fill="#3B4252"/><rect x="29" y="97" width="15" height="7" rx="3.5" fill="#1F2430"/></g>
+  <g class="leg-r"><rect x="54" y="84" width="8" height="16" rx="4" fill="#3B4252"/><rect x="52" y="97" width="15" height="7" rx="3.5" fill="#1F2430"/></g>
+  <rect x="30" y="66" width="36" height="24" rx="10" fill="var(--accent)"/>
+  <rect x="38" y="72" width="20" height="6" rx="3" fill="#fff" opacity=".35"/>
+  <g class="arm-l"><path d="M31 72 Q20 76 18 86" stroke="#3B4252" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="18" cy="88" r="4.5" fill="#1F2430"/></g>
+  <g class="arm-r"><path d="M65 72 Q76 70 80 62" stroke="#3B4252" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="84" cy="54" r="8" fill="#E0F2FE" stroke="#1F2430" stroke-width="3"/><circle cx="82" cy="52" r="2.5" fill="#fff"/><line x1="79" y1="60" x2="80" y2="63" stroke="#1F2430" stroke-width="4" stroke-linecap="round"/></g>
+  <line x1="48" y1="10" x2="48" y2="20" stroke="#3B4252" stroke-width="3"/><circle class="bulb" cx="48" cy="8" r="5" fill="#FACC15"/>
+  <rect x="14" y="18" width="68" height="52" rx="22" fill="var(--accent)"/>
+  <rect x="21" y="25" width="54" height="37" rx="15" fill="#151A2B"/>
+  <rect x="25" y="28" width="16" height="5" rx="2.5" fill="#fff" opacity=".18"/>
+  <g class="eye"><rect x="32" y="35" width="10" height="13" rx="5" fill="#7DF9FF"/><rect x="35" y="37" width="4" height="4" rx="2" fill="#fff"/></g>
+  <g class="eye"><rect x="54" y="35" width="10" height="13" rx="5" fill="#7DF9FF"/><rect x="57" y="37" width="4" height="4" rx="2" fill="#fff"/></g>
+  <path class="mouth" d="M41 53 Q48 58 55 53" stroke="#7DF9FF" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="24" cy="52" r="3.5" fill="#F472B6" opacity=".55"/><circle cx="72" cy="52" r="3.5" fill="#F472B6" opacity=".55"/>
+</svg></div></div>
+
   <main id="app"></main>
 </div>
 
@@ -1153,6 +1210,105 @@ function nameScreen(){
   };
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
+
+/* ---------- Crawly: the mascot ---------- */
+const BUDDY_KEY="seodaily-buddy";
+const LINES={
+  greet:["Morning {name}! I crawled the whole internet overnight. Kidding, I got stuck in a redirect loop.","Hey {name}! Ready to get indexed today?","{name}! You're back! My crawl budget is all yours.","Welcome back, {name}. I've been refreshing this page since 6am. Totally normal bot behaviour.","Oh hi {name}. I'd shake your hand but I'm mostly antenna."],
+  streak:["{streak}-day streak, {name}! That's more consistent than Google's algorithm.","{streak} days in a row! {name}, you're basically a cron job now.","{name}, a {streak}-day streak? Search Console wants to know your location."],
+  start:["Deep breath, {name}. No redirect chains in that brain today.","Let's go {name}! Fastest LCP in the office.","Ten questions, {name}. Zero soft 404s. I believe in you.","Remember {name}: read the whole question. Even Googlebot renders before it judges."],
+  pickslow:["Take your time, {name}. Googlebot is famously patient. Sometimes weeks.","Hmm… I'd lock that in. But I'm a robot with a magnifying glass, so."],
+  correct:["Nailed it, {name}! 200 OK!","{name}, that answer has stronger signals than a canonical tag.","Correct! I'd give you a backlink for that. A dofollow one.","Ranking #1 in my heart, {name}.","Big brain alert! {name} just passed Core Web Vitals.","Yes {name}! Somebody add that to the sitemap.","Correct! Even John Mueller would nod at that."],
+  wrong:["Oof. Soft 404 on that one, {name}. The explanation's worth a read.","Don't worry {name}, Google changes its mind every core update too.","That answer's been noindexed. You'll get the next one, {name}.","Close, {name}! Well… close-ish. Like a 302 that should've been a 301.","Plot twist! Read the explanation, {name}. It's juicy, I promise.","Even I got that wrong once. I'm a bot. I was embarrassed."],
+  streak3:["Three in a row, {name}! You're on a crawl spree!","{name} is on fire! Someone check the server logs!"],
+  last:["Last one, {name}! Finish strong, like a well-optimised footer.","Final question, {name}. Make it count like a canonical."],
+  done_great:["{score}/10, {name}! Somebody call Search Console, we've got a traffic spike!","{score}/10?! {name}, I'm putting you in my XML sitemap. Priority 1.0.","{name} with {score}/10! I'm doing a little crawl dance. Look at me."],
+  done_ok:["{score}/10, {name}. Solid! Read the misses and tomorrow you'll rank higher.","{score}/10! Not bad {name}. Like a page on position 4: so close to the top."],
+  done_low:["{score}/10. Every expert started as an Intern, {name}. See you tomorrow?","{score}/10, {name}. That's a soft launch. The relaunch is tomorrow.","Rough one, {name}. Even Google rolls back updates sometimes. Back tomorrow!"],
+  doneToday:["You're done for today, {name}! New questions get crawled at midnight.","{name}, today's quiz is in the bag. Try Practice mode if you're bored. I am. I'm always bored."],
+  idle:["I'm just going to crawl around here for a bit…","Psst, {name}. The news column has fresh tea.","Fun fact: I can't execute JavaScript. Kidding. Mostly.","Did you know? I've never once been blocked by robots.txt. I'm a rebel.","{name}, if you need me I'll be over here checking for broken links.","Is it just me or is this page loading really fast today?","I tried to rank for 'best robot ever'. Position 47. Rude."],
+  poke:["Hey! That tickles, {name}!","Beep boop. That's robot for 'stop poking me'.","Ow! I'm a bot, not a button, {name}.","Do that again and I'll noindex you. Just kidding. I love you."]
+};
+let buddyTimer=null, buddyIdle=null, buddyWalk=null, lastLine={};
+function buddyOn(){ try{ return localStorage.getItem(BUDDY_KEY)!=="off"; }catch(e){ return true; } }
+function buddyEl(){ return document.getElementById("buddy"); }
+function pickLine(kind,vars){
+  const list=LINES[kind]||LINES.idle; let i, tries=0;
+  do { i=Math.floor(Math.random()*list.length); } while(list.length>1 && i===lastLine[kind] && tries++<5);
+  lastLine[kind]=i;
+  return list[i].replace(/\{(\w+)\}/g,(_,k)=> vars[k]!=null ? vars[k] : "");
+}
+function buddySay(kind,vars={},anim){
+  const el=buddyEl(); if(!el || !buddyOn()) return;
+  const name=(S.name||"friend").split(" ")[0];
+  const text=pickLine(kind,Object.assign({name, streak:S.streak},vars));
+  const t=document.getElementById("buddyText"); t.textContent="";
+  // bold the player's name (set safely as text nodes)
+  text.split(name).forEach((part,i,arr)=>{ t.appendChild(document.createTextNode(part)); if(i<arr.length-1){ const b=document.createElement("b"); b.textContent=name; t.appendChild(b); } });
+  el.classList.remove("jump","sad","party","wave"); void el.offsetWidth;
+  if(anim) el.classList.add(anim);
+  el.classList.add("talking");
+  clearTimeout(buddyTimer);
+  buddyTimer=setTimeout(()=>el.classList.remove("talking"), Math.min(9000, 2600+text.length*45));
+}
+function buddyStopWalk(){ const el=buddyEl(); if(!el) return; clearTimeout(buddyWalk); el.classList.remove("walking"); }
+function buddyHome(){ const el=buddyEl(); if(!el) return; buddyStopWalk(); el.style.transition="none"; el.style.left=""; el.style.right=window.innerWidth<=760?"10px":"24px"; el.classList.remove("face-left"); void el.offsetWidth; el.style.transition=""; }
+function buddyStroll(){
+  const el=buddyEl(); if(!el || !buddyOn() || VIEW!=="home" || window.innerWidth<=760 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const w=el.offsetWidth, cur=el.getBoundingClientRect().left, target=Math.round(20+Math.random()*(window.innerWidth-w-40));
+  el.style.right="auto"; el.style.left=cur+"px"; void el.offsetWidth;
+  el.classList.toggle("face-left", target<cur); el.classList.add("walking");
+  const dur=Math.max(1.5,Math.abs(target-cur)/120); el.style.transition=`left ${dur}s linear`; el.style.left=target+"px";
+  clearTimeout(buddyWalk); buddyWalk=setTimeout(()=>{ el.classList.remove("walking"); el.style.transition=""; }, dur*1000);
+}
+function buddyScene(scene){
+  const el=buddyEl(); if(!el) return;
+  el.classList.toggle("off", !buddyOn());
+  el.classList.toggle("peek", scene==="quiz" || window.innerWidth<=760);
+  clearInterval(buddyIdle);
+  if(scene!=="home"){ buddyHome(); return; }
+  buddyIdle=setInterval(()=>{ if(document.hidden||VIEW!=="home") return; if(Math.random()<.55) buddyStroll(); else buddySay("idle"); }, 16000);
+}
+(function initBuddy(){
+  const el=buddyEl(); if(!el) return;
+  document.getElementById("buddyBot").onclick=()=>buddySay("poke",{}, "jump");
+  document.getElementById("buddyShh").onclick=e=>{ e.stopPropagation(); el.classList.remove("talking"); };
+  const tg=document.getElementById("buddyToggle");
+  const sync=()=>{ tg.classList.toggle("on",buddyOn()); el.classList.toggle("off",!buddyOn()); };
+  tg.onclick=()=>{ try{ localStorage.setItem(BUDDY_KEY, buddyOn()?"off":"on"); }catch(e){} sync(); if(buddyOn()) buddySay("greet",{}, "wave"); };
+  sync();
+  window.addEventListener("resize",()=>{ if(VIEW!=="home") buddyHome(); });
+})();
+// Hook Crawly into the existing screens
+const _home=home;
+home=function(){ const r=_home.apply(this,arguments); if(VIEW!=="home") return r; buddyScene("home");
+  const d=S.daily, k=dateKey();
+  setTimeout(()=>{ if(VIEW!=="home") return;
+    if(d && d.date===k && d.done) buddySay("doneToday",{}, "wave");
+    else if(S.streak>=2 && (S.lastDaily===addDays(k,-1))) buddySay("streak",{}, "party");
+    else buddySay("greet",{}, "wave"); }, 700);
+  return r; };
+const _question=question;
+let rightRun=0;
+question=function(){ const r=_question.apply(this,arguments); if(VIEW!=="quiz") return r; buddyScene("quiz");
+  const i=RUN.answers.length;
+  if(i===0){ rightRun=0; setTimeout(()=>buddySay("start",{}, "wave"),300); }
+  else if(i===RUN.ids.length-1) setTimeout(()=>buddySay("last"),300);
+  return r; };
+const _record=record;
+record=function(id,ok){ const r=_record.apply(this,arguments);
+  rightRun = ok ? rightRun+1 : 0;
+  setTimeout(()=>{ if(ok && rightRun>=3 && rightRun%3===0) buddySay("streak3",{}, "party"); else if(ok) buddySay("correct",{}, "jump"); else buddySay("wrong",{}, "sad"); },150);
+  return r; };
+const _results=results;
+results=function(){ const r=_results.apply(this,arguments); buddyScene("results");
+  const run=RUN && RUN.answers.length===RUN.ids.length ? RUN : (S.daily||{answers:[]});
+  const score=(run.answers||[]).reduce((a,b)=>a+b,0);
+  setTimeout(()=>buddySay(score>=8?"done_great":score>=5?"done_ok":"done_low",{score}, score>=8?"party":score>=5?"jump":"sad"),400);
+  return r; };
+const _nameScreen=nameScreen;
+nameScreen=function(){ const r=_nameScreen.apply(this,arguments); buddyScene("name"); return r; };
+
 testTools();
 home();
 initBoard();
