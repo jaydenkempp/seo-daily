@@ -269,6 +269,13 @@ input#nm{border-radius:4px!important;background:transparent!important}
 .ks-cat{margin-top:16px}.ks-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.ks-h b{font-size:14.5px}.ks-h span{font-size:12px;color:var(--muted)}
 .ks-line{display:block;width:100%;text-align:left;font:500 14px/1.45 var(--sans);color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);padding:9px 8px;cursor:pointer}
 .ks-line:hover{background:var(--accent-soft)}
+.ks-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.ks-edit{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.ks-edit textarea{flex:1;font:500 14px/1.45 var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
+.ks-edit textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+.ks-edit .btn{padding:7px 12px;font-size:13px}
+.ks-x{border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;padding:6px;cursor:pointer}.ks-x:hover{color:#dc2626}
+.ks-badge{font-style:normal;font-size:11px;font-weight:700;color:#fff;background:#FF5CA8;border-radius:6px;padding:1px 6px;margin-left:6px}
 #buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
 #buddy.docked .bot{width:110px;height:128px}
 #buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
@@ -1300,6 +1307,9 @@ const LINES={
   idle:["I'm just going to wobble over here for a bit…","Psst, {name}. The news column has fresh tea.","Fun fact: if you put me in the fridge I go a bit firmer. Please don't.","{name}, if you need me I'll be over here being round.","Is it hot in here or am I just melting again?","I tried to stand up straight once. Never again.","Does this light make me look shiny? It does, doesn't it."],
   poke:["Hey! That tickles, {name}!","Boing! Do it again! No wait, don't.","Ow! I'm a blob, not a stress ball, {name}.","You poked a dent in me. It'll pop back. Probably."]
 };
+/* Test only: your edited lines (saved in this browser) replace the originals */
+const LINES_ORIG=JSON.parse(JSON.stringify(LINES)), KS_EDIT_KEY="seodaily-kso-lines";
+if(TEST){ try{ const o=JSON.parse(localStorage.getItem(KS_EDIT_KEY)||"{}"); for(const k in o) if(LINES[k] && Array.isArray(o[k]) && o[k].length) LINES[k]=o[k]; }catch(e){} }
 let buddyTimer=null, buddyIdle=null, buddyWalk=null, lastLine={};
 function buddyOn(){ try{ return localStorage.getItem(BUDDY_KEY)!=="off"; }catch(e){ return true; } }
 const BUDDY=document.getElementById("buddy");
@@ -1435,20 +1445,49 @@ function ksSay(kind,i){
   if(anim==="none"){ ksReset(); buddySay(kind,Object.assign({score:8,wrong:3,letter:"B",__text:text},vars)); return; }
   ksAnim(anim,text,vars);
 }
+let KS_EDIT=false;
+const KS_VARS={streak:["name","streak"],pick:["name","letter"],wrong1:["name","wrong"],wrong2:["name","wrong"],wrong3:["name","wrong"],done_great:["name","score"],done_ok:["name","score"],done_low:["name","score"]};
+function ksEdits(){ const o={}; for(const k in LINES) if(JSON.stringify(LINES[k])!==JSON.stringify(LINES_ORIG[k])) o[k]=LINES[k]; return o; }
+function ksStore(){ try{ localStorage.setItem(KS_EDIT_KEY, JSON.stringify(ksEdits())); }catch(e){} const n=Object.keys(ksEdits()).length; const st=document.getElementById("ksStatus"); if(st) st.textContent = n ? `Saved in this browser · ${n} group${n===1?"":"s"} changed` : "No changes yet"; }
+function ksEditLine(k,i,v){ LINES[k][i]=v; ksStore(); }
+function ksTidy(k){ const n=LINES[k].length; LINES[k]=LINES[k].map(t=>t.trim()).filter(Boolean); if(!LINES[k].length) LINES[k]=[...LINES_ORIG[k]]; ksStore(); if(LINES[k].length!==n) ksoStudio(); }
+function ksAdd(k){ LINES[k].push("New line, {name}!"); ksStore(); ksoStudio(); setTimeout(()=>{ const t=document.querySelectorAll(`[data-k="${k}"]`); const last=t[t.length-1]; if(last){ last.focus(); last.select(); } },50); }
+function ksDel(k,i){ if(LINES[k].length<=1){ alert("Each group needs at least one line."); return; } LINES[k].splice(i,1); ksStore(); ksoStudio(); }
+function ksResetGroup(k){ LINES[k]=[...LINES_ORIG[k]]; ksStore(); ksoStudio(); }
+function ksResetAll(btn){ if(btn.dataset.armed!=="1"){ btn.dataset.armed="1"; btn.textContent="Click again to undo every edit"; setTimeout(()=>{ btn.dataset.armed=""; btn.textContent="Undo all edits"; },4000); return; } for(const k in LINES) LINES[k]=[...LINES_ORIG[k]]; ksStore(); ksoStudio(); }
+function ksCopy(btn){
+  const o=ksEdits(); if(!Object.keys(o).length){ btn.textContent="Nothing changed yet"; setTimeout(()=>btn.textContent="Copy changes for Claude",2500); return; }
+  const txt="Publish these K-SO line changes (each group replaces the original):\n"+JSON.stringify(o,null,1);
+  const done=()=>{ btn.textContent="Copied. Paste it to Claude"; setTimeout(()=>btn.textContent="Copy changes for Claude",3500); };
+  (navigator.clipboard ? navigator.clipboard.writeText(txt).then(done) : Promise.reject()).catch(()=>{ const t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); done(); });
+}
 function ksoStudio(){
   if(!TEST) return;
   VIEW="kso"; RUN=null; document.onkeydown=null; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const total=KS_GROUPS.reduce((n,g)=>n+g[1].reduce((m,c)=>m+LINES[c[0]].length,0),0);
+  const sample=t=>esc(t.replace(/\{(\w+)\}/g,(_,v)=>({name:(S.name||"friend").split(" ")[0],streak:5,score:8,wrong:"#",letter:"B"})[v]??""));
+  const edited=k=>JSON.stringify(LINES[k])!==JSON.stringify(LINES_ORIG[k]);
+  const lineRow=(k,t,i)=> KS_EDIT
+    ? `<div class="ks-edit"><textarea rows="2" data-k="${k}" oninput="ksEditLine('${k}',${i},this.value)" onblur="ksTidy('${k}')">${esc(t)}</textarea><button class="btn ghost" title="Hear it" onclick="ksSay('${k}',${i})">Play</button><button class="ks-x" title="Delete line" onclick="ksDel('${k}',${i})">&times;</button></div>`
+    : `<button class="ks-line" onclick="ksSay('${k}',${i})">${sample(t)}</button>`;
   app.innerHTML=`
   <div class="row" style="justify-content:space-between;margin-bottom:6px"><h1 style="margin:0">Meet K-SO</h1><button class="btn ghost" onclick="ksReset();home()">Back to dashboard</button></div>
-  <p class="note" style="margin:0 0 18px">Click any animation or line and K-SO acts it out in the bottom-right corner. Lines use your name, a 5-day streak, a score of 8 and answer B as examples. ${total} lines in total.</p>
+  <p class="note" style="margin:0 0 14px">${KS_EDIT
+    ? `Type straight into any line. Use <code>{name}</code> for the player's first name, plus the extras listed on each group. Edits save as you type and only show on this test copy, in this browser. When you're happy, click <b>Copy changes for Claude</b> and paste them to me to make them live.`
+    : `Click any animation or line and K-SO acts it out in the bottom-right corner. Lines use your name, a 5-day streak, a score of 8 and answer B as examples. ${total} lines in total.`}</p>
+  <div class="ks-bar">
+    <button class="btn${KS_EDIT?" ghost":""}" onclick="KS_EDIT=!KS_EDIT;ksoStudio()">${KS_EDIT?"Done editing":"Edit lines"}</button>
+    ${KS_EDIT?`<button class="btn" onclick="ksCopy(this)">Copy changes for Claude</button><button class="btn ghost" onclick="ksResetAll(this)">Undo all edits</button>`:""}
+    <span class="note" id="ksStatus" style="margin:0"></span>
+  </div>
   <div class="card section"><div class="label">Animations</div>
     <div class="ks-anims">${KS_ANIMS.map(([l,a])=>`<button class="btn ghost" onclick="ksAnim('${a}')">${l}</button>`).join("")}</div></div>
   ${KS_GROUPS.map(([title,cats])=>`<div class="card section"><div class="label">${title}</div>
-    ${cats.map(([k,desc])=>`<div class="ks-cat"><div class="ks-h"><b>${desc}</b><span>${LINES[k].length} lines</span></div>
-      ${LINES[k].map((t,i)=>`<button class="ks-line" onclick="ksSay('${k}',${i})">${esc(t.replace(/\{(\w+)\}/g,(_,v)=>({name:(S.name||"friend").split(" ")[0],streak:5,score:8,wrong:"#",letter:"B"})[v]??""))}</button>`).join("")}</div>`).join("")}</div>`).join("")}`;
-  buddyScene("kso"); window.scrollTo(0,0);
-  setTimeout(()=>buddySay("intro",{}, "wave"),300);
+    ${cats.map(([k,desc])=>`<div class="ks-cat"><div class="ks-h"><b>${desc}${edited(k)?' <em class="ks-badge">edited</em>':""}</b><span>${KS_EDIT?(KS_VARS[k]||["name"]).map(v=>`<code>{${v}}</code>`).join(" "):`${LINES[k].length} lines`}</span></div>
+      ${LINES[k].map((t,i)=>lineRow(k,t,i)).join("")}
+      ${KS_EDIT?`<div class="row" style="gap:8px;margin-top:8px"><button class="btn ghost" onclick="ksAdd('${k}')">+ Add line</button>${edited(k)?`<button class="btn ghost" onclick="ksResetGroup('${k}')">Undo edits to this group</button>`:""}</div>`:""}</div>`).join("")}</div>`).join("")}`;
+  buddyScene("kso"); ksStore();
+  if(!KS_EDIT){ window.scrollTo(0,0); setTimeout(()=>buddySay("intro",{}, "wave"),300); }
 }
 
 // Hook K-SO into the existing screens
