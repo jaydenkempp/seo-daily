@@ -243,18 +243,24 @@ input#nm{border-radius:4px!important;background:transparent!important}
 #testbar:not(:empty){border-radius:4px}
 .hidden{display:none}
 
-/* ===== Crawly the mascot ===== */
+/* ===== Bloop the mascot ===== */
 #buddy{position:fixed;left:auto;right:24px;bottom:14px;z-index:30;width:96px;pointer-events:none;transition:left 4.5s linear,right .4s,bottom .35s ease,transform .35s ease}
 #buddy.off{display:none}
 #buddy .bot{width:96px;height:112px;pointer-events:auto;cursor:pointer;transform-origin:50% 100%;animation:bob 2.6s ease-in-out infinite}
 #buddy.face-left .bot svg{transform:scaleX(-1)}
 #buddy .eye{animation:blink 4.8s infinite;transform-origin:center;transform-box:fill-box}
-#buddy .bulb{animation:glow 1.6s ease-in-out infinite}
-#buddy .arm-r{transform-origin:62px 70px;transform-box:view-box}
+#buddy .blob{transform-origin:48px 106px;transform-box:view-box;animation:squish 1.8s ease-in-out infinite}
+#buddy .arm-l{transform-origin:20px 88px;transform-box:view-box;animation:flap 2.4s ease-in-out infinite}
+#buddy .arm-r{transform-origin:76px 88px;transform-box:view-box;animation:flap 2.4s ease-in-out infinite reverse}
+#buddy .m-wow,#buddy .m-sad{display:none}
+#buddy.jump .m-happy,#buddy.party .m-happy{display:none}
+#buddy.jump .m-wow,#buddy.party .m-wow{display:inline}
+#buddy.sad .m-happy{display:none}#buddy.sad .m-sad{display:inline}
+#buddy.sad .blob{animation:deflate 1.6s ease-in-out 1 forwards}
 #buddy.wave .arm-r{animation:wave .45s ease-in-out 4}
-#buddy.walking .leg-l{animation:step .5s ease-in-out infinite}
-#buddy.walking .leg-r{animation:step .5s ease-in-out infinite reverse}
-#buddy.walking .bot{animation:walkbob .5s ease-in-out infinite}
+#buddy.wave .arm-l{animation:none}
+#buddy.walking .bot{animation:hop .55s ease-in-out infinite}
+#buddy.walking .blob{animation:hopsquish .55s ease-in-out infinite}
 #buddy.jump .bot{animation:jump .7s cubic-bezier(.3,1.6,.5,1) 2}
 #buddy.sad .bot{animation:wobble .5s ease-in-out 3}
 #buddy.party .bot{animation:spin 1s ease-in-out 2}
@@ -266,8 +272,12 @@ input#nm{border-radius:4px!important;background:transparent!important}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes walkbob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
 @keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
-@keyframes glow{0%,100%{opacity:1}50%{opacity:.35}}
-@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-35deg)}}
+@keyframes squish{0%,100%{transform:scale(1,1)}40%{transform:scale(1.06,.93)}70%{transform:scale(.96,1.05)}}
+@keyframes flap{0%,100%{transform:rotate(0)}50%{transform:rotate(12deg)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes hopsquish{0%,100%{transform:scale(1.14,.86)}50%{transform:scale(.9,1.12)}}
+@keyframes deflate{0%{transform:scale(1,1)}30%{transform:scale(1.18,.72)}100%{transform:scale(1.1,.82)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-40deg)}}
 @keyframes step{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes jump{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-34px) scale(1.05,.95)}60%{transform:translateY(0) scale(1.08,.9)}}
 @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
@@ -298,28 +308,26 @@ document.documentElement.dataset.mode=m; if(A[t.accent]) document.documentElemen
         <div class="seg" id="modeSeg"><button data-m="light">Light</button><button data-m="dark">Dark</button><button data-m="auto">Auto</button></div>
         <div class="label">Accent colour</div>
         <div class="swatches" id="swatches"></div>
-        <div class="toggle-row"><span>Show Crawly</span><button class="switch" id="buddyToggle" aria-label="Show Crawly the mascot"></button></div>
+        <div class="toggle-row"><span>Show Bloop</span><button class="switch" id="buddyToggle" aria-label="Show Bloop the mascot"></button></div>
       </div>
     </div>
   </header>
   <div id="testbar"></div>
-<div id="buddy" aria-live="polite"><div class="bubble" id="buddyBubble"><span id="buddyText"></span><button class="shh" id="buddyShh" aria-label="Hide Crawly" title="Hide Crawly">×</button></div><div class="bot" id="buddyBot" title="Crawly"><svg viewBox="0 0 96 112" width="100%" height="100%" aria-hidden="true">
-  <ellipse cx="48" cy="108" rx="24" ry="3.5" fill="#000" opacity=".15"/>
-  <g class="leg-l"><rect x="34" y="84" width="8" height="16" rx="4" fill="#3B4252"/><rect x="29" y="97" width="15" height="7" rx="3.5" fill="#1F2430"/></g>
-  <g class="leg-r"><rect x="54" y="84" width="8" height="16" rx="4" fill="#3B4252"/><rect x="52" y="97" width="15" height="7" rx="3.5" fill="#1F2430"/></g>
-  <rect x="30" y="66" width="36" height="24" rx="10" fill="var(--accent)"/>
-  <rect x="38" y="72" width="20" height="6" rx="3" fill="#fff" opacity=".35"/>
-  <g class="arm-l"><path d="M31 72 Q20 76 18 86" stroke="#3B4252" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="18" cy="88" r="4.5" fill="#1F2430"/></g>
-  <g class="arm-r"><path d="M65 72 Q76 70 80 62" stroke="#3B4252" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <circle cx="84" cy="54" r="8" fill="#E0F2FE" stroke="#1F2430" stroke-width="3"/><circle cx="82" cy="52" r="2.5" fill="#fff"/><line x1="79" y1="60" x2="80" y2="63" stroke="#1F2430" stroke-width="4" stroke-linecap="round"/></g>
-  <line x1="48" y1="10" x2="48" y2="20" stroke="#3B4252" stroke-width="3"/><circle class="bulb" cx="48" cy="8" r="5" fill="#FACC15"/>
-  <rect x="14" y="18" width="68" height="52" rx="22" fill="var(--accent)"/>
-  <rect x="21" y="25" width="54" height="37" rx="15" fill="#151A2B"/>
-  <rect x="25" y="28" width="16" height="5" rx="2.5" fill="#fff" opacity=".18"/>
-  <g class="eye"><rect x="32" y="35" width="10" height="13" rx="5" fill="#7DF9FF"/><rect x="35" y="37" width="4" height="4" rx="2" fill="#fff"/></g>
-  <g class="eye"><rect x="54" y="35" width="10" height="13" rx="5" fill="#7DF9FF"/><rect x="57" y="37" width="4" height="4" rx="2" fill="#fff"/></g>
-  <path class="mouth" d="M41 53 Q48 58 55 53" stroke="#7DF9FF" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <circle cx="24" cy="52" r="3.5" fill="#F472B6" opacity=".55"/><circle cx="72" cy="52" r="3.5" fill="#F472B6" opacity=".55"/>
+<div id="buddy" aria-live="polite"><div class="bubble" id="buddyBubble"><span id="buddyText"></span><button class="shh" id="buddyShh" aria-label="Hide Bloop" title="Hide Bloop">×</button></div><div class="bot" id="buddyBot" title="Bloop"><svg viewBox="0 0 96 112" width="100%" height="100%" aria-hidden="true">
+  <ellipse class="shadow" cx="48" cy="108" rx="30" ry="4" fill="#000" opacity=".15"/>
+  <g class="blob">
+    <g class="arm-l"><path d="M20 88 Q6 80 9 66" stroke="#FF5CA8" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+    <g class="arm-r"><path d="M76 88 Q90 80 87 66" stroke="#FF5CA8" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+    <path d="M14 104 C4 64 22 22 48 20 C74 18 94 62 82 104 Q48 110 14 104 Z" fill="#FF5CA8"/>
+    <path d="M22 100 Q48 106 76 100" stroke="#E0408A" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/>
+    <ellipse cx="32" cy="38" rx="8" ry="4.5" fill="#fff" opacity=".5" transform="rotate(-30 32 38)"/>
+    <g class="eye"><circle cx="36" cy="58" r="14" fill="#fff"/><circle cx="39" cy="61" r="6.5" fill="#111"/><circle cx="41.5" cy="58" r="2.2" fill="#fff"/></g>
+    <g class="eye"><circle cx="64" cy="55" r="10" fill="#fff"/><circle cx="62.5" cy="57.5" r="4.6" fill="#111"/><circle cx="64" cy="55.5" r="1.6" fill="#fff"/></g>
+    <circle cx="24" cy="74" r="4" fill="#FF9AC9"/><circle cx="74" cy="72" r="4" fill="#FF9AC9"/>
+    <g class="m-happy"><path d="M38 78 Q50 90 62 77 Z" fill="#7A1240" stroke="#7A1240" stroke-width="3" stroke-linejoin="round"/><path d="M45 83 Q50 89 56 83" fill="#FF9AC9"/></g>
+    <g class="m-wow"><ellipse cx="50" cy="82" rx="6" ry="7.5" fill="#7A1240"/><ellipse cx="50" cy="85" rx="3.5" ry="3" fill="#FF9AC9"/></g>
+    <g class="m-sad"><path d="M40 86 Q50 77 60 86" stroke="#7A1240" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M26 64 q3 6 0 9 q-3 -3 0 -9" fill="#60A5FA"/></g>
+  </g>
 </svg></div></div>
 
   <main id="app"></main>
@@ -1211,23 +1219,23 @@ function nameScreen(){
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
 
-/* ---------- Crawly: the mascot ---------- */
+/* ---------- Bloop: the mascot ---------- */
 const BUDDY_KEY="seodaily-buddy";
 const LINES={
-  greet:["Morning {name}! I crawled the whole internet overnight. Kidding, I got stuck in a redirect loop.","Hey {name}! Ready to get indexed today?","{name}! You're back! My crawl budget is all yours.","Welcome back, {name}. I've been refreshing this page since 6am. Totally normal bot behaviour.","Oh hi {name}. I'd shake your hand but I'm mostly antenna."],
-  streak:["{streak}-day streak, {name}! That's more consistent than Google's algorithm.","{streak} days in a row! {name}, you're basically a cron job now.","{name}, a {streak}-day streak? Search Console wants to know your location."],
-  start:["Deep breath, {name}. No redirect chains in that brain today.","Let's go {name}! Fastest LCP in the office.","Ten questions, {name}. Zero soft 404s. I believe in you.","Remember {name}: read the whole question. Even Googlebot renders before it judges."],
-  pickslow:["Take your time, {name}. Googlebot is famously patient. Sometimes weeks.","Hmm… I'd lock that in. But I'm a robot with a magnifying glass, so."],
-  correct:["Nailed it, {name}! 200 OK!","{name}, that answer has stronger signals than a canonical tag.","Correct! I'd give you a backlink for that. A dofollow one.","Ranking #1 in my heart, {name}.","Big brain alert! {name} just passed Core Web Vitals.","Yes {name}! Somebody add that to the sitemap.","Correct! Even John Mueller would nod at that."],
-  wrong:["Oof. Soft 404 on that one, {name}. The explanation's worth a read.","Don't worry {name}, Google changes its mind every core update too.","That answer's been noindexed. You'll get the next one, {name}.","Close, {name}! Well… close-ish. Like a 302 that should've been a 301.","Plot twist! Read the explanation, {name}. It's juicy, I promise.","Even I got that wrong once. I'm a bot. I was embarrassed."],
-  streak3:["Three in a row, {name}! You're on a crawl spree!","{name} is on fire! Someone check the server logs!"],
-  last:["Last one, {name}! Finish strong, like a well-optimised footer.","Final question, {name}. Make it count like a canonical."],
-  done_great:["{score}/10, {name}! Somebody call Search Console, we've got a traffic spike!","{score}/10?! {name}, I'm putting you in my XML sitemap. Priority 1.0.","{name} with {score}/10! I'm doing a little crawl dance. Look at me."],
-  done_ok:["{score}/10, {name}. Solid! Read the misses and tomorrow you'll rank higher.","{score}/10! Not bad {name}. Like a page on position 4: so close to the top."],
-  done_low:["{score}/10. Every expert started as an Intern, {name}. See you tomorrow?","{score}/10, {name}. That's a soft launch. The relaunch is tomorrow.","Rough one, {name}. Even Google rolls back updates sometimes. Back tomorrow!"],
-  doneToday:["You're done for today, {name}! New questions get crawled at midnight.","{name}, today's quiz is in the bag. Try Practice mode if you're bored. I am. I'm always bored."],
-  idle:["I'm just going to crawl around here for a bit…","Psst, {name}. The news column has fresh tea.","Fun fact: I can't execute JavaScript. Kidding. Mostly.","Did you know? I've never once been blocked by robots.txt. I'm a rebel.","{name}, if you need me I'll be over here checking for broken links.","Is it just me or is this page loading really fast today?","I tried to rank for 'best robot ever'. Position 47. Rude."],
-  poke:["Hey! That tickles, {name}!","Beep boop. That's robot for 'stop poking me'.","Ow! I'm a bot, not a button, {name}.","Do that again and I'll noindex you. Just kidding. I love you."]
+  greet:["{name}!! You came back! I was starting to think you only liked me for my squishiness.","Hi {name}! I'm Bloop. I'm 94% jelly and 6% confidence.","Morning {name}! I've been wobbling with excitement since 6am.","{name}! Quick, act natural. I just woke up and I'm still a bit runny.","Oh hi {name}. Don't mind me, I'm just holding my shape."],
+  streak:["{streak} days in a row, {name}?! I'm so proud I could jiggle.","{streak}-day streak! {name}, you're more consistent than my texture.","{name}, {streak} days straight. I'd hug you but I'd leave a mark."],
+  start:["Deep breath, {name}. Be the blob. Flow through the questions.","Let's go {name}! I've stretched. I'm ready. Mostly sideways.","Ten questions, {name}. You've got this. I've got nothing, I'm a blob.","Read every option, {name}. I skipped reading once and fell off a table."],
+  pickslow:["Take your time, {name}. I once took three hours to slide off a sofa.","Hmm… I'd lock that in. But I'm a blob, so."],
+  correct:["CORRECT?! {name} I'm vibrating. I'm literally vibrating.","Yes {name}! I just bounced so high I saw the ceiling.","Nailed it, {name}! *happy wobbling noises*","Big brain energy, {name}. Mine's just jelly in there.","{name}, that was so good I briefly became solid.","Correct! Someone hold me, I'm overflowing.","That's it, {name}! Ten out of ten jiggles."],
+  wrong:["Oof. I've gone flat. Read the explanation, {name}, then I'll re-inflate.","It's fine {name}. I once tried to be a pancake. Mistakes happen.","Nope! But that's how you learn, {name}. That's how I learned not to sit near the heater.","Wrong one, {name}. I'm not sad. This is just my face. And my body.","Close-ish, {name}! Like me trying to fit through a door.","Don't worry {name}, I've made worse choices. I'm made of gelatine."],
+  streak3:["Three in a row, {name}! I'm bouncing off the walls! Literally! Help!","{name} is on fire! Please don't come closer, I'll melt!"],
+  last:["Last one, {name}! Finish strong. Firm. Unlike me.","Final question, {name}. I'm holding my breath. I don't have lungs, but still."],
+  done_great:["{score}/10, {name}! I'm doing the wobble dance! Nobody look!","{score}/10?! {name}, I'm so happy I've doubled in size.","{name} with {score}/10! This is the best day of my jelly life."],
+  done_ok:["{score}/10, {name}. Solid! Which is more than I can say for myself.","{score}/10! Nice {name}. Read the misses and tomorrow we bounce higher."],
+  done_low:["{score}/10. Every expert started somewhere, {name}. I started as a spill.","{score}/10, {name}. Shake it off. I shake everything off. Constantly.","Rough one, {name}. Same time tomorrow? I'll be here. I can't really leave."],
+  doneToday:["You're done for today, {name}! New questions drop at midnight. I'll be here, jiggling.","{name}, today's quiz is in the bag. Try Practice mode? I'll cheer. Wetly."],
+  idle:["I'm just going to wobble over here for a bit…","Psst, {name}. The news column has fresh tea.","Fun fact: if you put me in the fridge I go a bit firmer. Please don't.","{name}, if you need me I'll be over here being round.","Is it hot in here or am I just melting again?","I tried to stand up straight once. Never again.","Does this light make me look shiny? It does, doesn't it."],
+  poke:["Hey! That tickles, {name}!","Boing! Do it again! No wait, don't.","Ow! I'm a blob, not a stress ball, {name}.","You poked a dent in me. It'll pop back. Probably."]
 };
 let buddyTimer=null, buddyIdle=null, buddyWalk=null, lastLine={};
 function buddyOn(){ try{ return localStorage.getItem(BUDDY_KEY)!=="off"; }catch(e){ return true; } }
@@ -1249,7 +1257,7 @@ function buddySay(kind,vars={},anim){
   if(anim) el.classList.add(anim);
   el.classList.add("talking");
   clearTimeout(buddyTimer);
-  buddyTimer=setTimeout(()=>el.classList.remove("talking"), Math.min(9000, 2600+text.length*45));
+  buddyTimer=setTimeout(()=>el.classList.remove("talking","sad","jump","party"), Math.min(9000, 2600+text.length*45));
 }
 function buddyStopWalk(){ const el=buddyEl(); if(!el) return; clearTimeout(buddyWalk); el.classList.remove("walking"); }
 function buddyHome(){ const el=buddyEl(); if(!el) return; buddyStopWalk(); el.style.transition="none"; el.style.left=""; el.style.right=window.innerWidth<=760?"10px":"24px"; el.classList.remove("face-left"); void el.offsetWidth; el.style.transition=""; }
@@ -1279,7 +1287,7 @@ function buddyScene(scene){
   sync();
   window.addEventListener("resize",()=>{ if(VIEW!=="home") buddyHome(); });
 })();
-// Hook Crawly into the existing screens
+// Hook Bloop into the existing screens
 const _home=home;
 home=function(){ const r=_home.apply(this,arguments); if(VIEW!=="home") return r; buddyScene("home");
   const d=S.daily, k=dateKey();
