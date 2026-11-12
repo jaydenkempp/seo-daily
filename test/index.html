@@ -1290,11 +1290,15 @@ function buddySay(kind,vars={},anim){
 }
 function buddyChecking(){
   const el=buddyEl(); if(!el || !buddyOn()) return 0;
+  // only now and then, never twice in a row, never on the first question
+  const n=RUN?RUN.answers.length:0;
+  if(n===0 || lastCheckAt===n-1 || Math.random()>.3) return 0;
+  lastCheckAt=n;
   el.classList.remove("sad","jump","party","wave","crawler"); el.classList.add("loading");
   buddySay("checking");
   return matchMedia("(prefers-reduced-motion: reduce)").matches ? 900 : 2200;
 }
-let crawlTimer=null;
+let crawlTimer=null, lastCheckAt=-5;
 function buddyCrawl(){
   const el=buddyEl(); if(!el || !buddyOn()) return;
   el.classList.add("crawler"); buddySay("crawl",{}, null); buddyStroll();
