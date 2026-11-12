@@ -276,6 +276,12 @@ input#nm{border-radius:4px!important;background:transparent!important}
 .ks-edit .btn{padding:7px 12px;font-size:13px}
 .ks-x{border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;padding:6px;cursor:pointer}.ks-x:hover{color:#dc2626}
 .ks-badge{font-style:normal;font-size:11px;font-weight:700;color:#fff;background:#FF5CA8;border-radius:6px;padding:1px 6px;margin-left:6px}
+#buddy.leaving{animation:ksLeave 1.6s ease-in forwards}
+#buddy.leaving .bot{animation:hop .4s ease-in-out infinite!important}
+#buddy.gone{visibility:hidden}
+#buddy.rollin .bot{animation:ksRoll 1.5s cubic-bezier(.25,.8,.35,1) 1!important}
+@keyframes ksLeave{0%{transform:none}12%{transform:translate(14px,-16px)}100%{transform:translateX(-130vw)}}
+@keyframes ksRoll{0%{transform:translateX(-130vw) rotate(-1080deg)}78%{transform:translateX(12px) rotate(12deg)}90%{transform:translateX(-4px) rotate(-4deg)}100%{transform:none}}
 #buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
 #buddy.docked .bot{width:110px;height:128px}
 #buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
@@ -1069,7 +1075,7 @@ function copyScore(s,n,mode){
   try{ navigator.clipboard.writeText(txt).then(()=>{$("#cp").textContent="Copied!"},()=>{$("#cp").textContent="Copy blocked"}); }catch(e){ $("#cp").textContent="Copy blocked"; }
 }
 let resetArmed=false;
-function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
+function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso,ksoQuit:S.ksoQuit}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
 
 /* ---------- Team leaderboard (Google Sheet via Apps Script) ----------
    Paste your Apps Script web app URL between the quotes. Leave empty to hide the leaderboard. */
@@ -1141,7 +1147,7 @@ async function loadBoard(){
     const season=typeof j.season==="string"?j.season.slice(0,64):"";
     if(!SEASON_SEEN){ SEASON_SEEN=true;
       if((S.season||"")!==season){
-        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso}; if(RUN&&RUN.mode==="daily") RUN=null; }
+        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso,ksoQuit:S.ksoQuit}; if(RUN&&RUN.mode==="daily") RUN=null; }
         S.season=season; save(); if(VIEW==="home") home();
       }
       pushScore();
@@ -1283,32 +1289,34 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.dail
 /* ---------- K-SO: the mascot ---------- */
 const BUDDY_KEY="seodaily-buddy";
 const LINES={
-  intro:["Hi {name}! I'm K-SO. I'm 94% jelly and 6% confidence, and I'll be cheering you on every day. Mostly by wobbling.","Oh! A new face! Hi {name}, I'm K-SO. I live here. I react to your answers. Sometimes I grow legs. Don't worry about it.","Welcome {name}! I'm K-SO, your quiz buddy. Ten questions a day, and I'll be right here being squishy about every one."],
-  greet:["{name}!! You came back! I was starting to think you only liked me for my squishiness.","Hi {name}! Still 94% jelly, 6% confidence. Let's do this.","Morning {name}! I've been wobbling with excitement since 6am.","{name}! Quick, act natural. I just woke up and I'm still a bit runny.","Oh hi {name}. Don't mind me, I'm just holding my shape."],
-  streak:["{streak} days in a row, {name}?! I'm so proud I could jiggle.","{streak}-day streak! {name}, you're more consistent than my texture.","{name}, {streak} days straight. I'd hug you but I'd leave a mark."],
-  start:["Deep breath, {name}. Be the blob. Flow through the questions.","Let's go {name}! I've stretched. I'm ready. Mostly sideways.","Ten questions, {name}. You've got this. I've got nothing, I'm a blob.","Read every option, {name}. I skipped reading once and fell off a table."],
+  intro:["Hi {name}! I'm K-SO. I'm 94% jelly and 6% confidence, and I'll be cheering you on every day. Well, only if you visit every day.","Oh! A new face! Hi {name}, I'm K-SO. I live here. I react to your answers. Sometimes I grow legs. Don't worry about it. You'll see.","Welcome {name}! I'm K-SO, your quiz buddy. Ten questions a day, and I'll be right here judging your answer to every one."],
+  greet:["{name}!! You came back! I was starting to think you only liked me for my squishiness.","Hi {name}! Still 94% jelly, 6% confidence. Let's do this.","Morning {name}! I've been wobbling with excitement since 8am.","{name}! Quick, act natural. I just woke up and I'm still a bit runny.","Oh hi {name}. Don't mind me, I'm just holding my shape."],
+  streak:["{streak} days in a row, {name}?! I'm so proud I could jiggle.","{streak}-day streak! {name}, you're more consistent than my ex. Should I call them?","{name}, {streak} days straight. Gold stars for you."],
+  start:["Deep breath, {name}. Be the blob. Flow through the questions.","Let's go {name}! I've stretched. I'm ready. Mostly sideways.","Ten questions, {name}. You've got this. I don't. I'm just here to support you.","Read every option, {name}. I tried reading once. I'm not doing that again."],
   pickslow:["Take your time, {name}. I once took three hours to slide off a sofa.","Hmm… I'd lock that in. But I'm a blob, so."],
-  correct:["CORRECT?! {name} I'm vibrating. I'm literally vibrating.","Yes {name}! I just bounced so high I saw the ceiling.","Nailed it, {name}! *happy wobbling noises*","Big brain energy, {name}. Mine's just jelly in there.","{name}, that was so good I briefly became solid.","Correct! Someone hold me, I'm overflowing.","That's it, {name}! Ten out of ten jiggles."],
+  correct:["CORRECT?! {name} I'm vibrating. I'm literally vibrating.","Yes {name}! I just bounced so high I saw the ceiling.","Nailed it, {name}! *happy wobbling noises*","Big brain energy, {name}. Mine's just jelly in there.","{name}, that was so good I briefly became solid.","That's it, {name}! Ten out of ten jiggles."],
   wrong1:["404: right answer not found. Only your first miss today though, {name}.","My face just broke, {name}. That's 1 wrong. I'll walk it off. Slowly. I'm a blob.","Page not found. Neither was the right answer. Just the 1 so far, {name}!","{name}, that answer has been moved permanently. To the wrong pile. 1 of them so far."],
-  wrong2:["{name}, I've been redirected {wrong} times today. Please, just one right answer.","{wrong} wrong so far, {name}. My face keeps doing this. Someone call a developer.","Error number {wrong}, {name}. I'm starting to look like a broken link report.","{wrong} misses, {name}. That's not a redirect chain yet. Let's keep it that way."],
+  wrong2:["{name}, I've been redirected {wrong} times today. Please, just get one right answer.","{wrong} wrong so far, {name}. My face keeps doing this. Someone call a developer.","Error number {wrong}, {name}. I'm starting to look like a broken link report.","{wrong} misses, {name}. That's not a redirect chain yet. Let's keep it that way."],
   wrong3:["{wrong} wrong today, {name}. I live on the 404 page now. I've put up curtains.","{name}, that's {wrong}. Google has started deindexing my feelings.","{wrong} wrong answers, {name}. I've made a custom 404 page with your name on it. It's very supportive.","Miss number {wrong}, {name}. I've been redirected so much I don't know where I live anymore.","{wrong}, {name}. {wrong}! My face is stuck like this now. Read the explanation and save me."],
   corner:["IT HIT THE CORNER! {name}, did you SEE that?! Nobody has ever seen that!","THE CORNER, {name}! I've waited my whole jelly life for this.","{name}, I hit the exact corner. Screenshot it. Frame it. Tell your kids."],
   zoom:["WHEEEE! Sorry {name}, correct answers give me the zoomies.","Did you see me go full DVD screensaver, {name}? Still waiting on that corner.","{name}, I just bounced off every edge of this page. Don't ask about my bounce rate.","That was pure 200 OK energy leaving my body. Nailed it, {name}.","I'm fine. I'm fine. I've seen the whole viewport now. Correct, {name}!","{name} got it right so I did a full site crawl. Of the walls."],
-  pick:["Ooh, {letter}? Brave, {name}.","{letter}, huh? I'm not saying anything. I'm just jiggling.","{letter}! Interesting choice, {name}.","Hmm, {letter}. My left eye likes it. My right eye has questions.","Going with {letter}, {name}? I'll hold my breath. I don't have lungs.","{letter}? Bold. I respect it. I'm a bit scared, but I respect it.","{name} picked {letter}. I'm pretending I know the answer."],
+  leave:["Correct! You don't need me anymore."],
+  back:["Nevermind, I'm back. I was told I had to get back to work."],
+  pick:["Ooh, {letter}? Brave, {name}.","{letter}, huh? I'm not saying anything. I'm just observing.","{letter}! Interesting choice, {name}.","Hmm, {letter}. My left eye likes it. My right eye has questions.","Going with {letter}, {name}? I'll hold my breath (I don't have lungs).","{letter}? Bold. I respect it. I'm a bit scared, but I respect it.","{name} picked {letter}. I'm pretending I know the answer."],
   checking:["Let me check your answer… estimated time 4.2 seconds. Give or take a business day.","Checking… my Core Web Vitals aren't great, {name}. Bear with me.","Loading your answer… 12%… 13%… okay, I'm skipping the progress bar.","Hold on {name}, I'm buffering. It's a jelly thing.","I asked Google if you're right. They said \"it depends\". Checking myself.","Please hold. Your answer is important to us, {name}.","Rendering your answer… this is why nobody likes client-side JavaScript.","Hang on, {name}. Waiting for the server. The server is me. I'm slow."],
-  crawl:["I crawled 8 pages with 8 legs, {name}. Efficiency.","Surprise, {name}! Legs! Googlebot is shaking.","Don't freak out, {name}. I grow legs when I get excited about crawl budget.","8 legs, 0 robots.txt rules. Watch me go, {name}.","Crawling your site for you, {name}. Found 3 broken links and a sandwich.","{name}, I'm crawling at 8 pages a second. Please don't tell my server."],
+  crawl:["I crawled 8 pages with 8 legs, {name}. Efficiency.","Surprise, {name}! Legs! Googlebot is shaking.","8 legs, 0 robots.txt rules. Watch me go, {name}.","Crawling your site for you, {name}. Found 3 broken links and a sandwich.","{name}, I'm crawling at 8 pages a second. Please don't tell my server."],
   wrong:["Oof. I've gone flat. Read the explanation, {name}, then I'll re-inflate.","It's fine {name}. I once tried to be a pancake. Mistakes happen.","Nope! But that's how you learn, {name}. That's how I learned not to sit near the heater.","Wrong one, {name}. I'm not sad. This is just my face. And my body.","Close-ish, {name}! Like me trying to fit through a door.","Don't worry {name}, I've made worse choices. I'm made of gelatine."],
   streak3:["Three in a row, {name}! I'm bouncing off the walls! Literally! Help!","{name} is on fire! Please don't come closer, I'll melt!"],
   last:["Last one, {name}! Finish strong. Firm. Unlike me.","Final question, {name}. I'm holding my breath. I don't have lungs, but still."],
   done_great:["{score}/10, {name}! I'm doing the wobble dance! Nobody look!","{score}/10?! {name}, I'm so happy I've doubled in size.","{name} with {score}/10! This is the best day of my jelly life."],
   done_ok:["{score}/10, {name}. Solid! Which is more than I can say for myself.","{score}/10! Nice {name}. Read the misses and tomorrow we bounce higher."],
   done_low:["{score}/10. Every expert started somewhere, {name}. I started as a spill.","{score}/10, {name}. Shake it off. I shake everything off. Constantly.","Rough one, {name}. Same time tomorrow? I'll be here. I can't really leave."],
-  doneToday:["You're done for today, {name}! New questions drop at midnight. I'll be here, jiggling.","{name}, today's quiz is in the bag. Try Practice mode? I'll cheer. Wetly."],
+  doneToday:["You're done for today, {name}! New questions drop tomorrow. I'll be here, waiting…","{name}, today's quiz is complete. Try Practice mode? I'll cheer."],
   idle:["I'm just going to wobble over here for a bit…","Psst, {name}. The news column has fresh tea.","Fun fact: if you put me in the fridge I go a bit firmer. Please don't.","{name}, if you need me I'll be over here being round.","Is it hot in here or am I just melting again?","I tried to stand up straight once. Never again.","Does this light make me look shiny? It does, doesn't it."],
   poke:["Hey! That tickles, {name}!","Boing! Do it again! No wait, don't.","Ow! I'm a blob, not a stress ball, {name}.","You poked a dent in me. It'll pop back. Probably."]
 };
 /* Test only: your edited lines (saved in this browser) replace the originals */
-const LINES_ORIG=JSON.parse(JSON.stringify(LINES)), KS_EDIT_KEY="seodaily-kso-lines";
+const LINES_ORIG=JSON.parse(JSON.stringify(LINES)), KS_EDIT_KEY="seodaily-kso-lines-v2";
 if(TEST){ try{ const o=JSON.parse(localStorage.getItem(KS_EDIT_KEY)||"{}"); for(const k in o) if(LINES[k] && Array.isArray(o[k]) && o[k].length) LINES[k]=o[k]; }catch(e){} }
 let buddyTimer=null, buddyIdle=null, buddyWalk=null, lastLine={};
 function buddyOn(){ try{ return localStorage.getItem(BUDDY_KEY)!=="off"; }catch(e){ return true; } }
@@ -1322,6 +1330,7 @@ function pickLine(kind,vars){
 }
 function buddySay(kind,vars={},anim){
   const el=buddyEl(); if(!el || !buddyOn()) return;
+  if(ksoAway && kind!=="leave" && kind!=="back" && el.classList.contains("gone")) return;
   const name=(S.name||"friend").split(" ")[0];
   const v=Object.assign({name, streak:S.streak},vars);
   const text=v.__text ? v.__text.replace(/\{(\w+)\}/g,(_,k)=> v[k]!=null ? v[k] : "") : pickLine(kind,v);
@@ -1337,7 +1346,7 @@ function buddySay(kind,vars={},anim){
   buddyTimer=setTimeout(()=>el.classList.remove("talking","sad","jump","party"), ms);
 }
 function buddyChecking(){
-  const el=buddyEl(); if(!el || !buddyOn()) return 0;
+  const el=buddyEl(); if(!el || !buddyOn() || ksoAway) return 0;
   // only now and then, never twice in a row, never on the first question
   const n=RUN?RUN.answers.length:0;
   if(n===0 || lastCheckAt===n-1 || Math.random()>.3) return 0;
@@ -1364,6 +1373,7 @@ function buddyStroll(){
 }
 function buddyPlace(scene){
   buddyZoomStop();
+  if(scene!=="quiz" && ksoAway){ ksoAway=0; buddyEl().classList.remove("leaving","gone","rollin"); }
   const el=buddyEl(), dock=document.getElementById("ksoDock");
   if(scene==="quiz" && dock && window.innerWidth>760){ if(el.parentNode!==dock) dock.appendChild(el); el.classList.add("docked"); }
   else { el.classList.remove("docked"); if(el.parentNode!==app.parentNode) app.parentNode.insertBefore(el, app); }
@@ -1395,7 +1405,19 @@ function buddyZoomies(done){
   };
   zoomRAF=requestAnimationFrame(step);
 }
-function buddyPicked(letter){ if(window.innerWidth<=760){ clearTimeout(buddyTimer); buddyEl().classList.remove("talking"); return; } if(Math.random()<.65) buddySay("pick",{letter}); }
+let ksoAway=0;
+function buddyQuit(){
+  const el=buddyEl(); if(!el||!buddyOn()) return false;
+  buddySay("leave",{}, "wave"); ksoAway=1;
+  setTimeout(()=>{ if(!ksoAway) return; el.classList.remove("talking","wave"); el.classList.add("leaving");
+    setTimeout(()=>{ if(!ksoAway) return; el.classList.remove("leaving"); el.classList.add("gone"); },1600); },2600);
+  return true;
+}
+function buddyBack(){
+  const el=buddyEl(); ksoAway=0; el.classList.remove("leaving","gone"); el.classList.add("rollin");
+  setTimeout(()=>{ el.classList.remove("rollin"); buddySay("back",{}, "jump"); },1500);
+}
+function buddyPicked(letter){ if(ksoAway) return; if(window.innerWidth<=760){ clearTimeout(buddyTimer); buddyEl().classList.remove("talking"); return; } if(Math.random()<.65) buddySay("pick",{letter}); }
 function buddyScene(scene){
   const el=buddyEl(); if(!el) return;
   buddyPlace(scene);
@@ -1421,11 +1443,12 @@ const KS_GROUPS=[
   ["Dashboard",[["intro","First visit only","wave"],["greet","Normal hello","wave"],["streak","Hello when on a streak","party"],["doneToday","After finishing today's quiz","wave"],["idle","Random chatter while you wait",null],["poke","When someone clicks him","jump"]]],
   ["During the quiz",[["start","First question","wave"],["pick","Picking an answer (computer only)",null],["checking","Loading face before the answer (about 1 in 3 questions)","loading"],["last","Last question",null]]],
   ["Right answers",[["correct","Right answer","jump"],["zoom","Right answer + DVD-style bounce round the screen (about 1 in 4)","zoom"],["corner","Only if the bounce hits a corner exactly","party"],["crawl","Grows 8 legs (random, dashboard or right answer)","crawl"],["streak3","Every 3 right in a row","party"]]],
+  ["Rare: K-SO quits (once, on someone's first quiz)",[["leave","He says this, then hops off the screen","quit"],["back","Rolls back in after sitting out a question","back"]]],
   ["Wrong answers (404 face)",[["wrong1","1st wrong answer in the quiz","sad",1],["wrong2","2nd or 3rd wrong answer","sad",3],["wrong3","4th wrong answer or more","sad",5]]],
   ["Results",[["done_great","Score 8 to 10","party"],["done_ok","Score 5 to 7","jump"],["done_low","Score 0 to 4","sad"]]]
 ];
-const KS_ANIMS=[["Wave","wave"],["Happy jump","jump"],["Party spin","party"],["404 face","sad"],["Loading face","loading"],["8 legs + walk","crawl"],["Walk","stroll"],["DVD bounce","zoom"],["Back to normal","reset"]];
-function ksReset(){ const el=buddyEl(); buddyZoomStop(); clearTimeout(crawlTimer); el.classList.remove("jump","sad","party","wave","loading","crawler","walking","talking"); buddyHome(); }
+const KS_ANIMS=[["Wave","wave"],["Happy jump","jump"],["Party spin","party"],["404 face","sad"],["Loading face","loading"],["8 legs + walk","crawl"],["Walk","stroll"],["DVD bounce","zoom"],["Quit and come back","quit"],["Back to normal","reset"]];
+function ksReset(){ const el=buddyEl(); buddyZoomStop(); clearTimeout(crawlTimer); ksoAway=0; el.classList.remove("jump","sad","party","wave","loading","crawler","walking","talking","leaving","gone","rollin"); buddyHome(); }
 function ksAnim(a,text,vars){
   const el=buddyEl(); vars=Object.assign({score:8,wrong:3,letter:"B"},vars||{});
   if(text) vars.__text=text;
@@ -1435,6 +1458,9 @@ function ksAnim(a,text,vars){
   if(a==="loading"){ el.classList.add("loading"); buddySay("checking",vars); return; }
   if(a==="crawl"){ el.classList.add("crawler"); buddySay("crawl",vars); buddyStroll(); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),9000); return; }
   if(a==="stroll"){ buddyStroll(); return; }
+  if(a==="quit"||a==="back"){ ksoAway=0; el.classList.remove("leaving","gone","rollin");
+    if(a==="back"){ el.classList.add("gone"); ksoAway=1; buddyBack(); return; }
+    buddyQuit(); setTimeout(()=>{ if(ksoAway) buddyBack(); },6000); return; }
   if(a==="zoom"){ buddyZoomies(c=>buddySay(c?"corner":"zoom",vars,c?"party":"jump")); return; }
   if(a==="sad"){ buddySay(vars.__text?"wrong2":"wrong2",vars,"sad"); return; }
   buddySay(a==="party"?"streak3":a==="jump"?"correct":"greet",vars,a);
@@ -1512,7 +1538,10 @@ const _record=record;
 record=function(id,ok){ const r=_record.apply(this,arguments);
   rightRun = ok ? rightRun+1 : 0;
   const wrong=(RUN&&RUN.answers?RUN.answers.filter(a=>!a).length:0)+(ok?0:1);
+  const qi=RUN&&RUN.answers ? RUN.answers.length : 0;
   setTimeout(()=>{
+    if(ksoAway){ if(buddyEl().classList.contains("gone")) buddyBack(); else ksoAway=0; return; }
+    if(ok && !S.ksoQuit && qi>=1 && qi<=6 && buddyOn()){ S.ksoQuit=dateKey(); save(); buddyQuit(); return; }
     if(ok && rightRun>=3 && rightRun%3===0) buddySay("streak3",{}, "party");
     else if(ok && Math.random()<.15){ const el=buddyEl(); if(el&&buddyOn()){ el.classList.add("crawler"); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),6000); } buddySay("crawl",{}, "jump"); }
     else if(ok && Math.random()<.25) buddyZoomies(c=>buddySay(c?"corner":"zoom",{}, c?"party":"jump"));
