@@ -245,7 +245,7 @@ input#nm{border-radius:4px!important;background:transparent!important}
 #testbar:not(:empty){border-radius:4px}
 .hidden{display:none}
 
-/* ===== Quiz layout A: K-so sidekick column + louder lock-in ===== */
+/* ===== Quiz layout A: K-SO sidekick column + louder lock-in ===== */
 @media (min-width:761px){.narrow.qwide{max-width:960px}
   .qwrap{display:grid;grid-template-columns:170px minmax(0,1fr);gap:26px;align-items:start}
   .kso-dock{position:sticky;top:24px;min-height:300px}}
@@ -267,7 +267,7 @@ input#nm{border-radius:4px!important;background:transparent!important}
 #buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
 #buddy.docked .bot{width:110px;height:128px}
 #buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
-/* ===== K-so the mascot ===== */
+/* ===== K-SO the mascot ===== */
 #buddy{position:fixed;left:auto;right:24px;bottom:14px;z-index:30;width:96px;pointer-events:none;transition:left 4.5s linear,right .4s,bottom .35s ease,transform .35s ease}
 #buddy.off{display:none}
 #buddy .bot{width:96px;height:112px;pointer-events:auto;cursor:pointer;transform-origin:50% 100%;animation:bob 2.6s ease-in-out infinite}
@@ -344,12 +344,12 @@ document.documentElement.dataset.mode=m; if(A[t.accent]) document.documentElemen
         <div class="seg" id="modeSeg"><button data-m="light">Light</button><button data-m="dark">Dark</button><button data-m="auto">Auto</button></div>
         <div class="label">Accent colour</div>
         <div class="swatches" id="swatches"></div>
-        <div class="toggle-row"><span>Show K-so</span><button class="switch" id="buddyToggle" aria-label="Show K-so the mascot"></button></div>
+        <div class="toggle-row"><span>Show K-SO</span><button class="switch" id="buddyToggle" aria-label="Show K-SO the mascot"></button></div>
       </div>
     </div>
   </header>
   <div id="testbar"></div>
-<div id="buddy" aria-live="polite"><div class="bubble" id="buddyBubble"><span id="buddyText"></span><button class="shh" id="buddyShh" aria-label="Hide K-so" title="Hide K-so">×</button></div><div class="bot" id="buddyBot" title="K-so"><svg viewBox="0 0 96 112" width="100%" height="100%" aria-hidden="true">
+<div id="buddy" aria-live="polite"><div class="bubble" id="buddyBubble"><span id="buddyText"></span><button class="shh" id="buddyShh" aria-label="Hide K-SO" title="Hide K-SO">×</button></div><div class="bot" id="buddyBot" title="K-SO"><svg viewBox="0 0 96 112" width="100%" height="100%" aria-hidden="true">
   <ellipse class="shadow" cx="48" cy="108" rx="30" ry="4" fill="#000" opacity=".15"/>
   <g class="legs" stroke="#FF5CA8" stroke-width="6" fill="none" stroke-linecap="round">
     <g class="lg-a"><path d="M24 70 Q6 58 0 72"/><path d="M20 84 Q2 82 -2 98"/></g><g class="lg-b"><path d="M22 96 Q8 102 6 112"/><path d="M32 102 Q24 108 24 114"/></g>
@@ -1057,7 +1057,7 @@ function copyScore(s,n,mode){
   try{ navigator.clipboard.writeText(txt).then(()=>{$("#cp").textContent="Copied!"},()=>{$("#cp").textContent="Copy blocked"}); }catch(e){ $("#cp").textContent="Copy blocked"; }
 }
 let resetArmed=false;
-function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
+function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
 
 /* ---------- Team leaderboard (Google Sheet via Apps Script) ----------
    Paste your Apps Script web app URL between the quotes. Leave empty to hide the leaderboard. */
@@ -1129,7 +1129,7 @@ async function loadBoard(){
     const season=typeof j.season==="string"?j.season.slice(0,64):"";
     if(!SEASON_SEEN){ SEASON_SEEN=true;
       if((S.season||"")!==season){
-        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level}; if(RUN&&RUN.mode==="daily") RUN=null; }
+        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso}; if(RUN&&RUN.mode==="daily") RUN=null; }
         S.season=season; save(); if(VIEW==="home") home();
       }
       pushScore();
@@ -1268,10 +1268,11 @@ function nameScreen(){
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
 
-/* ---------- K-so: the mascot ---------- */
+/* ---------- K-SO: the mascot ---------- */
 const BUDDY_KEY="seodaily-buddy";
 const LINES={
-  greet:["{name}!! You came back! I was starting to think you only liked me for my squishiness.","Hi {name}! I'm K-so. I'm 94% jelly and 6% confidence.","Morning {name}! I've been wobbling with excitement since 6am.","{name}! Quick, act natural. I just woke up and I'm still a bit runny.","Oh hi {name}. Don't mind me, I'm just holding my shape."],
+  intro:["Hi {name}! I'm K-SO. I'm 94% jelly and 6% confidence, and I'll be cheering you on every day. Mostly by wobbling.","Oh! A new face! Hi {name}, I'm K-SO. I live here. I react to your answers. Sometimes I grow legs. Don't worry about it.","Welcome {name}! I'm K-SO, your quiz buddy. Ten questions a day, and I'll be right here being squishy about every one."],
+  greet:["{name}!! You came back! I was starting to think you only liked me for my squishiness.","Hi {name}! Still 94% jelly, 6% confidence. Let's do this.","Morning {name}! I've been wobbling with excitement since 6am.","{name}! Quick, act natural. I just woke up and I'm still a bit runny.","Oh hi {name}. Don't mind me, I'm just holding my shape."],
   streak:["{streak} days in a row, {name}?! I'm so proud I could jiggle.","{streak}-day streak! {name}, you're more consistent than my texture.","{name}, {streak} days straight. I'd hug you but I'd leave a mark."],
   start:["Deep breath, {name}. Be the blob. Flow through the questions.","Let's go {name}! I've stretched. I'm ready. Mostly sideways.","Ten questions, {name}. You've got this. I've got nothing, I'm a blob.","Read every option, {name}. I skipped reading once and fell off a table."],
   pickslow:["Take your time, {name}. I once took three hours to slide off a sofa.","Hmm… I'd lock that in. But I'm a blob, so."],
@@ -1392,12 +1393,13 @@ function buddyScene(scene){
   sync();
   window.addEventListener("resize",()=>{ buddyPlace(VIEW); if(VIEW!=="home") buddyHome(); });
 })();
-// Hook K-so into the existing screens
+// Hook K-SO into the existing screens
 const _home=home;
 home=function(){ const r=_home.apply(this,arguments); if(VIEW!=="home") return r; buddyScene("home");
   const d=S.daily, k=dateKey();
   setTimeout(()=>{ if(VIEW!=="home") return;
-    if(d && d.date===k && d.done) buddySay("doneToday",{}, "wave");
+    if(!S.metKso && buddyOn()){ S.metKso=k; save(); buddySay("intro",{}, "wave"); }
+    else if(d && d.date===k && d.done) buddySay("doneToday",{}, "wave");
     else if(S.streak>=2 && (S.lastDaily===addDays(k,-1))) buddySay("streak",{}, "party");
     else buddySay("greet",{}, "wave"); }, 700);
   return r; };

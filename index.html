@@ -244,6 +244,87 @@ input#nm{border-radius:4px!important;background:transparent!important}
 .seg,.seg button{border-radius:4px}
 #testbar:not(:empty){border-radius:4px}
 .hidden{display:none}
+
+/* ===== Quiz layout A: K-SO sidekick column + louder lock-in ===== */
+@media (min-width:761px){.narrow.qwide{max-width:960px}
+  .qwrap{display:grid;grid-template-columns:170px minmax(0,1fr);gap:26px;align-items:start}
+  .kso-dock{position:sticky;top:24px;min-height:300px}}
+@media (max-width:760px){.kso-dock{display:none}}
+.confirm{background:var(--accent-soft)!important;border:1.5px solid var(--accent);border-radius:14px!important;padding:14px 16px!important;margin-top:18px!important;animation:popin .22s cubic-bezier(.3,1.5,.5,1)}
+.confirm span{font-size:17px!important;font-weight:800!important;color:var(--ink)!important;display:flex;flex-direction:column;gap:2px}
+.confirm span b{color:#FF5CA8}
+.confirm em{font-style:normal}
+.confirm small{font-size:12.5px;font-weight:600;color:var(--muted)}
+.lockbtn{background:#FF5CA8!important;border-color:#FF5CA8!important;color:#fff!important;padding:12px 22px;font-size:15px}
+.lockbtn:hover{background:#F0408F!important}
+.opt.sel{background:var(--accent)!important;color:#fff!important;box-shadow:none!important;border-radius:10px}
+.opt.sel .k{color:#fff!important}
+.opt.sel code{background:rgba(255,255,255,.2);color:#fff}
+@keyframes popin{from{transform:translateY(8px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+#buddy.zoom .bot,#buddy.zoom .blob{animation:none!important}
+#buddy.zoom .blob{transition:transform .12s}
+#buddy.zoom.boing .blob{transform:scale(1.28,.72)}
+#buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
+#buddy.docked .bot{width:110px;height:128px}
+#buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
+/* ===== K-SO the mascot ===== */
+#buddy{position:fixed;left:auto;right:24px;bottom:14px;z-index:30;width:96px;pointer-events:none;transition:left 4.5s linear,right .4s,bottom .35s ease,transform .35s ease}
+#buddy.off{display:none}
+#buddy .bot{width:96px;height:112px;pointer-events:auto;cursor:pointer;transform-origin:50% 100%;animation:bob 2.6s ease-in-out infinite}
+#buddy.face-left .bot svg{transform:scaleX(-1)}
+#buddy .bot svg{overflow:visible}
+#buddy .eye{animation:blink 4.8s infinite;transform-origin:center;transform-box:fill-box}
+#buddy .blob{transform-origin:48px 106px;transform-box:view-box;animation:squish 1.8s ease-in-out infinite}
+#buddy .arm-l{transform-origin:20px 88px;transform-box:view-box;animation:flap 2.4s ease-in-out infinite}
+#buddy .arm-r{transform-origin:76px 88px;transform-box:view-box;animation:flap 2.4s ease-in-out infinite reverse}
+#buddy .m-wow,#buddy .m-sad,#buddy .f404,#buddy .f-load,#buddy .legs{display:none}
+#buddy.sad .eyes{display:none}#buddy.sad .f404{display:inline}
+#buddy.loading .eyes,#buddy.loading .m-happy,#buddy.loading .m-wow,#buddy.loading .m-sad{display:none!important}#buddy.loading .f-load{display:inline}
+#buddy .spinner{animation:spin2 .9s linear infinite;transform-origin:50px 58px;transform-box:view-box}
+#buddy.loading .blob{animation:squish 1.8s ease-in-out infinite}
+#buddy.crawler .legs{display:inline}#buddy.crawler .arm-l,#buddy.crawler .arm-r{display:none}
+#buddy.crawler .lg-a{animation:scuttle .28s ease-in-out infinite alternate;transform-origin:48px 80px;transform-box:view-box}
+#buddy.crawler .lg-b{animation:scuttle .28s ease-in-out infinite alternate-reverse;transform-origin:48px 80px;transform-box:view-box}
+#buddy.crawler.walking .bot{animation:walkbob .3s ease-in-out infinite}#buddy.crawler.walking .blob{animation:none}
+@keyframes spin2{to{transform:rotate(360deg)}}
+@keyframes scuttle{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+#buddy.jump .m-happy,#buddy.party .m-happy{display:none}
+#buddy.jump .m-wow,#buddy.party .m-wow{display:inline}
+#buddy.sad .m-happy{display:none}#buddy.sad .m-sad{display:inline}
+#buddy.sad .blob{animation:deflate 1.6s ease-in-out 1 forwards}
+.checking{margin-top:16px;padding-top:14px;font-size:14.5px;font-weight:700;color:var(--muted)}
+#buddy.wave .arm-r{animation:wave .45s ease-in-out 4}
+#buddy.wave .arm-l{animation:none}
+#buddy.walking .bot{animation:hop .55s ease-in-out infinite}
+#buddy.walking .blob{animation:hopsquish .55s ease-in-out infinite}
+#buddy.jump .bot{animation:jump .7s cubic-bezier(.3,1.6,.5,1) 2}
+#buddy.sad .bot{animation:wobble .5s ease-in-out 3}
+#buddy.party .bot{animation:spin 1s ease-in-out 2}
+#buddy .bubble{position:absolute;bottom:118px;right:0;width:max-content;max-width:250px;background:var(--card);color:var(--ink);border:1.5px solid var(--accent);border-radius:12px 12px 4px 12px;padding:10px 13px;font-size:13.5px;font-weight:600;line-height:1.4;box-shadow:0 8px 24px rgba(15,23,42,.18);opacity:0;transform:translateY(6px) scale(.96);transition:opacity .2s,transform .2s;pointer-events:none}
+#buddy.face-left .bubble{right:auto;left:0;border-radius:12px 12px 12px 4px}
+#buddy.talking .bubble{opacity:1;transform:none;pointer-events:auto}
+#buddy .bubble b{color:var(--accent)}
+#buddy .shh{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:800 12px/20px var(--sans);cursor:pointer;padding:0}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes walkbob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes squish{0%,100%{transform:scale(1,1)}40%{transform:scale(1.06,.93)}70%{transform:scale(.96,1.05)}}
+@keyframes flap{0%,100%{transform:rotate(0)}50%{transform:rotate(12deg)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes hopsquish{0%,100%{transform:scale(1.14,.86)}50%{transform:scale(.9,1.12)}}
+@keyframes deflate{0%{transform:scale(1,1)}30%{transform:scale(1.18,.72)}100%{transform:scale(1.1,.82)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-40deg)}}
+@keyframes step{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes jump{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-34px) scale(1.05,.95)}60%{transform:translateY(0) scale(1.08,.9)}}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+@keyframes spin{0%{transform:rotate(0) translateY(0)}50%{transform:rotate(180deg) translateY(-20px)}100%{transform:rotate(360deg) translateY(0)}}
+@media (max-width:760px){#buddy{right:10px;width:70px}#buddy .bot{width:70px;height:82px}#buddy .bubble{bottom:86px;max-width:210px;font-size:13px}
+  #buddy.peek{bottom:-58px}#buddy.peek.talking{bottom:10px}}
+@media (prefers-reduced-motion:reduce){#buddy,#buddy *{animation:none!important;transition:none!important}}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px;font-weight:700}
+.switch{width:38px;height:22px;border-radius:99px;border:0;background:var(--line);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.switch.on{background:var(--accent)}.switch.on::after{left:19px}
 </style>
 <script>
 (function(){var A={indigo:"#4F46E5",blue:"#2563EB",teal:"#0D9488",green:"#16A34A",orange:"#EA580C",pink:"#DB2777",violet:"#7C3AED"};
@@ -263,10 +344,34 @@ document.documentElement.dataset.mode=m; if(A[t.accent]) document.documentElemen
         <div class="seg" id="modeSeg"><button data-m="light">Light</button><button data-m="dark">Dark</button><button data-m="auto">Auto</button></div>
         <div class="label">Accent colour</div>
         <div class="swatches" id="swatches"></div>
+        <div class="toggle-row"><span>Show K-SO</span><button class="switch" id="buddyToggle" aria-label="Show K-SO the mascot"></button></div>
       </div>
     </div>
   </header>
   <div id="testbar"></div>
+<div id="buddy" aria-live="polite"><div class="bubble" id="buddyBubble"><span id="buddyText"></span><button class="shh" id="buddyShh" aria-label="Hide K-SO" title="Hide K-SO">×</button></div><div class="bot" id="buddyBot" title="K-SO"><svg viewBox="0 0 96 112" width="100%" height="100%" aria-hidden="true">
+  <ellipse class="shadow" cx="48" cy="108" rx="30" ry="4" fill="#000" opacity=".15"/>
+  <g class="legs" stroke="#FF5CA8" stroke-width="6" fill="none" stroke-linecap="round">
+    <g class="lg-a"><path d="M24 70 Q6 58 0 72"/><path d="M20 84 Q2 82 -2 98"/></g><g class="lg-b"><path d="M22 96 Q8 102 6 112"/><path d="M32 102 Q24 108 24 114"/></g>
+    <g class="lg-b"><path d="M72 70 Q90 58 96 72"/><path d="M76 84 Q94 82 98 98"/></g><g class="lg-a"><path d="M74 96 Q88 102 90 112"/><path d="M64 102 Q72 108 72 114"/></g>
+  </g>
+  <g class="blob">
+    <g class="arm-l"><path d="M20 88 Q6 80 9 66" stroke="#FF5CA8" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+    <g class="arm-r"><path d="M76 88 Q90 80 87 66" stroke="#FF5CA8" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+    <path d="M14 104 C4 64 22 22 48 20 C74 18 94 62 82 104 Q48 110 14 104 Z" fill="#FF5CA8"/>
+    <path d="M22 100 Q48 106 76 100" stroke="#E0408A" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/>
+    <ellipse cx="32" cy="38" rx="8" ry="4.5" fill="#fff" opacity=".5" transform="rotate(-30 32 38)"/>
+    <g class="eyes"><g class="eye"><circle cx="36" cy="58" r="14" fill="#fff"/><circle cx="39" cy="61" r="6.5" fill="#111"/><circle cx="41.5" cy="58" r="2.2" fill="#fff"/></g>
+    <g class="eye"><circle cx="64" cy="55" r="10" fill="#fff"/><circle cx="62.5" cy="57.5" r="4.6" fill="#111"/><circle cx="64" cy="55.5" r="1.6" fill="#fff"/></g></g>
+    <circle cx="24" cy="74" r="4" fill="#FF9AC9"/><circle cx="74" cy="72" r="4" fill="#FF9AC9"/>
+    <g class="m-happy"><path d="M38 78 Q50 90 62 77 Z" fill="#7A1240" stroke="#7A1240" stroke-width="3" stroke-linejoin="round"/><path d="M44 82 Q50 98 57 82 Z" fill="#FF9AC9" stroke="#E0408A" stroke-width="1.5" stroke-linejoin="round"/><path d="M50.5 84 V90" stroke="#E0408A" stroke-width="1.2" stroke-linecap="round"/></g>
+    <g class="m-wow"><ellipse cx="50" cy="82" rx="6" ry="7.5" fill="#7A1240"/><ellipse cx="50" cy="85" rx="3.5" ry="3" fill="#FF9AC9"/></g>
+    <g class="f404"><rect x="17" y="46" width="64" height="24" rx="12" fill="#fff"/><text x="49" y="66" text-anchor="middle" font-family="Montserrat,system-ui,sans-serif" font-size="21" font-weight="900" fill="#7A1240" letter-spacing="1">404</text></g>
+    <g class="f-load"><circle cx="50" cy="58" r="15" fill="#fff"/><circle cx="50" cy="58" r="10" fill="none" stroke="#FFD1E6" stroke-width="4"/><path class="spinner" d="M50 48 A10 10 0 0 1 60 58" fill="none" stroke="#7A1240" stroke-width="4" stroke-linecap="round"/><path d="M42 84 H58" stroke="#7A1240" stroke-width="3.5" stroke-linecap="round"/></g>
+    <g class="m-sad"><path d="M40 86 Q50 77 60 86" stroke="#7A1240" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M26 64 q3 6 0 9 q-3 -3 0 -9" fill="#60A5FA"/></g>
+  </g>
+</svg></div></div>
+
   <main id="app"></main>
 </div>
 
@@ -862,31 +967,38 @@ function startPractice(){
   RUN={mode:"practice",ids,answers:[],salt:"p"+Date.now()}; question();
 }
 function question(){
-  VIEW="quiz"; app.className="narrow"; document.getElementById("hdr").className="narrow";
+  VIEW="quiz"; app.className="narrow qwide"; document.getElementById("hdr").className="narrow qwide";
   const i=RUN.answers.length; if(i>=RUN.ids.length) return finish();
   const id=RUN.ids[i], q=BANK[id], opts=optionOrder(id,RUN.salt);
   const isReview = RUN.mode==="daily" && S.missed[id]!==undefined;
   app.innerHTML=`
     <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="meta">${RUN.mode==="daily"?"Daily":"Practice"} · ${i+1} / ${RUN.ids.length}</span><button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="home()">Exit</button></div>
     <div class="progress"><div style="width:${i/RUN.ids.length*100}%"></div></div>
-    <div class="card">
+    <div class="qwrap"><div class="kso-dock" id="ksoDock"></div><div class="card qmain">
       <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
       <div class="q">${fmt(q[2])}</div>
       <div class="opts">${opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${"ABCD"[j]}</span><span>${fmt(o.t)}</span></button>`).join("")}</div>
       <div id="after"></div>
-    </div>`;
+    </div></div>`;
   const btns=[...document.querySelectorAll(".opt")];
   let sel=-1;
   const choose=j=>{
     if(btns[0].disabled) return;
     sel=j; btns.forEach((b,k)=>b.classList.toggle("sel",k===j));
-    $("#after").innerHTML=`<div class="confirm"><span>Lock in answer <b>${"ABCD"[j]}</b>? Are you sure?</span><button class="btn ghost" id="chg">Change</button><button class="btn" id="lock">Yes, lock it in</button></div>`;
+    $("#after").innerHTML=`<div class="confirm"><span><em>Lock in <b>${"ABCD"[j]}</b>?</em><small>No take-backs once it's in.</small></span><button class="btn ghost" id="chg">Change</button><button class="btn lockbtn" id="lock">Lock it in</button></div>`;
+    if(typeof buddyPicked==="function") buddyPicked("ABCD"[j]);
     $("#chg").onclick=()=>{ sel=-1; btns.forEach(b=>b.classList.remove("sel")); $("#after").innerHTML=""; };
     $("#lock").onclick=()=>pick(sel); $("#lock").focus();
   };
   const pick=j=>{
     if(btns[0].disabled||j<0) return;
-    btns.forEach(b=>{ b.disabled=true; b.classList.remove("sel"); });
+    btns.forEach(b=>b.disabled=true);
+    const wait = typeof buddyChecking==="function" ? buddyChecking() : 0;
+    if(wait){ $("#after").innerHTML=`<div class="checking">Checking your answer…</div>`; setTimeout(()=>reveal(j), wait); }
+    else reveal(j);
+  };
+  const reveal=j=>{
+    btns.forEach(b=>b.classList.remove("sel"));
     const ok=opts[j].ok;
     btns.forEach((b,k)=>{ if(opts[k].ok) b.classList.add("right"); else if(k===j) b.classList.add("wrong"); });
     record(id,ok);
@@ -945,7 +1057,7 @@ function copyScore(s,n,mode){
   try{ navigator.clipboard.writeText(txt).then(()=>{$("#cp").textContent="Copied!"},()=>{$("#cp").textContent="Copy blocked"}); }catch(e){ $("#cp").textContent="Copy blocked"; }
 }
 let resetArmed=false;
-function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
+function resetAll(e){ e.preventDefault(); if(!resetArmed){ resetArmed=true; e.target.textContent="Click again to confirm reset"; setTimeout(()=>{resetArmed=false; if(e.target) e.target.textContent="Reset progress";},4000); return; } S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,season:S.season,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso}; save(); lastPushed=""; pushScore(); resetArmed=false; home(); }
 
 /* ---------- Team leaderboard (Google Sheet via Apps Script) ----------
    Paste your Apps Script web app URL between the quotes. Leave empty to hide the leaderboard. */
@@ -1017,7 +1129,7 @@ async function loadBoard(){
     const season=typeof j.season==="string"?j.season.slice(0,64):"";
     if(!SEASON_SEEN){ SEASON_SEEN=true;
       if((S.season||"")!==season){
-        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level}; if(RUN&&RUN.mode==="daily") RUN=null; }
+        if(S.season!==undefined||season!==""){ /* a reset happened since this browser last synced: wipe */ S={xp:0,streak:0,bestStreak:0,lastDaily:null,history:{},cat:{},seen:{},missed:{},daily:null,name:S.name,pid:S.pid,level:S.level,metKso:S.metKso}; if(RUN&&RUN.mode==="daily") RUN=null; }
         S.season=season; save(); if(VIEW==="home") home();
       }
       pushScore();
@@ -1155,6 +1267,171 @@ function nameScreen(){
   };
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.daily && S.daily.date!==dateKey() && (!RUN||RUN.mode!=="practice")) home(); });
+
+/* ---------- K-SO: the mascot ---------- */
+const BUDDY_KEY="seodaily-buddy";
+const LINES={
+  intro:["Hi {name}! I'm K-SO. I'm 94% jelly and 6% confidence, and I'll be cheering you on every day. Mostly by wobbling.","Oh! A new face! Hi {name}, I'm K-SO. I live here. I react to your answers. Sometimes I grow legs. Don't worry about it.","Welcome {name}! I'm K-SO, your quiz buddy. Ten questions a day, and I'll be right here being squishy about every one."],
+  greet:["{name}!! You came back! I was starting to think you only liked me for my squishiness.","Hi {name}! Still 94% jelly, 6% confidence. Let's do this.","Morning {name}! I've been wobbling with excitement since 6am.","{name}! Quick, act natural. I just woke up and I'm still a bit runny.","Oh hi {name}. Don't mind me, I'm just holding my shape."],
+  streak:["{streak} days in a row, {name}?! I'm so proud I could jiggle.","{streak}-day streak! {name}, you're more consistent than my texture.","{name}, {streak} days straight. I'd hug you but I'd leave a mark."],
+  start:["Deep breath, {name}. Be the blob. Flow through the questions.","Let's go {name}! I've stretched. I'm ready. Mostly sideways.","Ten questions, {name}. You've got this. I've got nothing, I'm a blob.","Read every option, {name}. I skipped reading once and fell off a table."],
+  pickslow:["Take your time, {name}. I once took three hours to slide off a sofa.","Hmm… I'd lock that in. But I'm a blob, so."],
+  correct:["CORRECT?! {name} I'm vibrating. I'm literally vibrating.","Yes {name}! I just bounced so high I saw the ceiling.","Nailed it, {name}! *happy wobbling noises*","Big brain energy, {name}. Mine's just jelly in there.","{name}, that was so good I briefly became solid.","Correct! Someone hold me, I'm overflowing.","That's it, {name}! Ten out of ten jiggles."],
+  wrong1:["404: right answer not found. Only your first miss today though, {name}.","My face just broke, {name}. That's 1 wrong. I'll walk it off. Slowly. I'm a blob.","Page not found. Neither was the right answer. Just the 1 so far, {name}!","{name}, that answer has been moved permanently. To the wrong pile. 1 of them so far."],
+  wrong2:["{name}, I've been redirected {wrong} times today. Please, just one right answer.","{wrong} wrong so far, {name}. My face keeps doing this. Someone call a developer.","Error number {wrong}, {name}. I'm starting to look like a broken link report.","{wrong} misses, {name}. That's not a redirect chain yet. Let's keep it that way."],
+  wrong3:["{wrong} wrong today, {name}. I live on the 404 page now. I've put up curtains.","{name}, that's {wrong}. Google has started deindexing my feelings.","{wrong} wrong answers, {name}. I've made a custom 404 page with your name on it. It's very supportive.","Miss number {wrong}, {name}. I've been redirected so much I don't know where I live anymore.","{wrong}, {name}. {wrong}! My face is stuck like this now. Read the explanation and save me."],
+  zoom:["WHEEEE! Sorry {name}, correct answers give me the zoomies.","{name}, I just bounced off every edge of this page. Don't ask about my bounce rate.","That was pure 200 OK energy leaving my body. Nailed it, {name}.","I'm fine. I'm fine. I've seen the whole viewport now. Correct, {name}!","{name} got it right so I did a full site crawl. Of the walls."],
+  pick:["Ooh, {letter}? Brave, {name}.","{letter}, huh? I'm not saying anything. I'm just jiggling.","{letter}! Interesting choice, {name}.","Hmm, {letter}. My left eye likes it. My right eye has questions.","Going with {letter}, {name}? I'll hold my breath. I don't have lungs.","{letter}? Bold. I respect it. I'm a bit scared, but I respect it.","{name} picked {letter}. I'm pretending I know the answer."],
+  checking:["Let me check your answer… estimated time 4.2 seconds. Give or take a business day.","Checking… my Core Web Vitals aren't great, {name}. Bear with me.","Loading your answer… 12%… 13%… okay, I'm skipping the progress bar.","Hold on {name}, I'm buffering. It's a jelly thing.","I asked Google if you're right. They said \"it depends\". Checking myself.","Please hold. Your answer is important to us, {name}.","Rendering your answer… this is why nobody likes client-side JavaScript.","Hang on, {name}. Waiting for the server. The server is me. I'm slow."],
+  crawl:["I crawled 8 pages with 8 legs, {name}. Efficiency.","Surprise, {name}! Legs! Googlebot is shaking.","Don't freak out, {name}. I grow legs when I get excited about crawl budget.","8 legs, 0 robots.txt rules. Watch me go, {name}.","Crawling your site for you, {name}. Found 3 broken links and a sandwich.","{name}, I'm crawling at 8 pages a second. Please don't tell my server."],
+  wrong:["Oof. I've gone flat. Read the explanation, {name}, then I'll re-inflate.","It's fine {name}. I once tried to be a pancake. Mistakes happen.","Nope! But that's how you learn, {name}. That's how I learned not to sit near the heater.","Wrong one, {name}. I'm not sad. This is just my face. And my body.","Close-ish, {name}! Like me trying to fit through a door.","Don't worry {name}, I've made worse choices. I'm made of gelatine."],
+  streak3:["Three in a row, {name}! I'm bouncing off the walls! Literally! Help!","{name} is on fire! Please don't come closer, I'll melt!"],
+  last:["Last one, {name}! Finish strong. Firm. Unlike me.","Final question, {name}. I'm holding my breath. I don't have lungs, but still."],
+  done_great:["{score}/10, {name}! I'm doing the wobble dance! Nobody look!","{score}/10?! {name}, I'm so happy I've doubled in size.","{name} with {score}/10! This is the best day of my jelly life."],
+  done_ok:["{score}/10, {name}. Solid! Which is more than I can say for myself.","{score}/10! Nice {name}. Read the misses and tomorrow we bounce higher."],
+  done_low:["{score}/10. Every expert started somewhere, {name}. I started as a spill.","{score}/10, {name}. Shake it off. I shake everything off. Constantly.","Rough one, {name}. Same time tomorrow? I'll be here. I can't really leave."],
+  doneToday:["You're done for today, {name}! New questions drop at midnight. I'll be here, jiggling.","{name}, today's quiz is in the bag. Try Practice mode? I'll cheer. Wetly."],
+  idle:["I'm just going to wobble over here for a bit…","Psst, {name}. The news column has fresh tea.","Fun fact: if you put me in the fridge I go a bit firmer. Please don't.","{name}, if you need me I'll be over here being round.","Is it hot in here or am I just melting again?","I tried to stand up straight once. Never again.","Does this light make me look shiny? It does, doesn't it."],
+  poke:["Hey! That tickles, {name}!","Boing! Do it again! No wait, don't.","Ow! I'm a blob, not a stress ball, {name}.","You poked a dent in me. It'll pop back. Probably."]
+};
+let buddyTimer=null, buddyIdle=null, buddyWalk=null, lastLine={};
+function buddyOn(){ try{ return localStorage.getItem(BUDDY_KEY)!=="off"; }catch(e){ return true; } }
+const BUDDY=document.getElementById("buddy");
+function buddyEl(){ return BUDDY; }
+function pickLine(kind,vars){
+  const list=LINES[kind]||LINES.idle; let i, tries=0;
+  do { i=Math.floor(Math.random()*list.length); } while(list.length>1 && i===lastLine[kind] && tries++<5);
+  lastLine[kind]=i;
+  return list[i].replace(/\{(\w+)\}/g,(_,k)=> vars[k]!=null ? vars[k] : "");
+}
+function buddySay(kind,vars={},anim){
+  const el=buddyEl(); if(!el || !buddyOn()) return;
+  const name=(S.name||"friend").split(" ")[0];
+  const text=pickLine(kind,Object.assign({name, streak:S.streak},vars));
+  const t=el.querySelector("#buddyText"); t.textContent="";
+  // bold the player's name (set safely as text nodes)
+  text.split(name).forEach((part,i,arr)=>{ t.appendChild(document.createTextNode(part)); if(i<arr.length-1){ const b=document.createElement("b"); b.textContent=name; t.appendChild(b); } });
+  el.classList.remove("jump","sad","party","wave"); if(kind!=="checking") el.classList.remove("loading"); void el.offsetWidth;
+  if(anim) el.classList.add(anim);
+  el.classList.add("talking");
+  clearTimeout(buddyTimer);
+  if(VIEW==="quiz" && window.innerWidth>760 && kind!=="checking") return; // stays until "Next question"
+  const ms = VIEW==="quiz" ? Math.min(14000, 3500+text.length*60) : Math.min(9000, 2600+text.length*45);
+  buddyTimer=setTimeout(()=>el.classList.remove("talking","sad","jump","party"), ms);
+}
+function buddyChecking(){
+  const el=buddyEl(); if(!el || !buddyOn()) return 0;
+  // only now and then, never twice in a row, never on the first question
+  const n=RUN?RUN.answers.length:0;
+  if(n===0 || lastCheckAt===n-1 || Math.random()>.3) return 0;
+  lastCheckAt=n;
+  el.classList.remove("sad","jump","party","wave","crawler"); el.classList.add("loading");
+  buddySay("checking");
+  return matchMedia("(prefers-reduced-motion: reduce)").matches ? 900 : 2200;
+}
+let crawlTimer=null, lastCheckAt=-5;
+function buddyCrawl(){
+  const el=buddyEl(); if(!el || !buddyOn()) return;
+  el.classList.add("crawler"); buddySay("crawl",{}, null); buddyStroll();
+  clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"), 9000);
+}
+function buddyStopWalk(){ const el=buddyEl(); if(!el) return; clearTimeout(buddyWalk); el.classList.remove("walking"); }
+function buddyHome(){ const el=buddyEl(); if(!el) return; buddyStopWalk(); el.style.transition="none"; el.style.left=""; el.style.right=window.innerWidth<=760?"10px":"24px"; el.classList.remove("face-left"); void el.offsetWidth; el.style.transition=""; }
+function buddyStroll(){
+  const el=buddyEl(); if(!el || !buddyOn() || VIEW!=="home" || window.innerWidth<=760 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const w=el.offsetWidth, cur=el.getBoundingClientRect().left, target=Math.round(20+Math.random()*(window.innerWidth-w-40));
+  el.style.right="auto"; el.style.left=cur+"px"; void el.offsetWidth;
+  el.classList.toggle("face-left", target<cur); el.classList.add("walking");
+  const dur=Math.max(1.5,Math.abs(target-cur)/120); el.style.transition=`left ${dur}s linear`; el.style.left=target+"px";
+  clearTimeout(buddyWalk); buddyWalk=setTimeout(()=>{ el.classList.remove("walking"); el.style.transition=""; }, dur*1000);
+}
+function buddyPlace(scene){
+  buddyZoomStop();
+  const el=buddyEl(), dock=document.getElementById("ksoDock");
+  if(scene==="quiz" && dock && window.innerWidth>760){ if(el.parentNode!==dock) dock.appendChild(el); el.classList.add("docked"); }
+  else { el.classList.remove("docked"); if(el.parentNode!==app.parentNode) app.parentNode.insertBefore(el, app); }
+}
+let zoomRAF=null;
+function buddyZoomStop(){ if(zoomRAF===null) return; cancelAnimationFrame(zoomRAF); zoomRAF=null; const el=buddyEl(); el.classList.remove("zoom","boing"); el.style.cssText=""; el.querySelector(".bot").style.transform=""; }
+function buddyZoomies(done){
+  const el=buddyEl();
+  if(!el || !buddyOn() || matchMedia("(prefers-reduced-motion: reduce)").matches){ done(); return; }
+  const r=el.getBoundingClientRect(), bot=el.querySelector(".bot");
+  el.classList.remove("talking","docked","peek"); el.classList.add("zoom");
+  document.body.appendChild(el);
+  let x=r.left, y=r.top, vx=(Math.random()<.5?-1:1)*(9+Math.random()*4), vy=-(10+Math.random()*4), a=0;
+  const t0=performance.now(), W=()=>window.innerWidth-el.offsetWidth, H=()=>window.innerHeight-bot.offsetHeight;
+  el.style.cssText=`position:fixed;left:${x}px;top:${y}px;right:auto;bottom:auto;transition:none;z-index:60`;
+  const boing=()=>{ el.classList.add("boing"); setTimeout(()=>el.classList.remove("boing"),140); };
+  const step=now=>{
+    if(now-t0>3600){ zoomRAF=null; el.classList.remove("zoom","boing"); el.style.cssText=""; bot.style.transform=""; buddyPlace(VIEW); el.classList.toggle("peek", VIEW==="quiz"||window.innerWidth<=760); if(VIEW!=="quiz"||window.innerWidth<=760) buddyHome(); done(); return; }
+    x+=vx; y+=vy; a+=vx*1.6;
+    if(x<0){x=0;vx=-vx;boing();} if(x>W()){x=W();vx=-vx;boing();}
+    if(y<0){y=0;vy=-vy;boing();} if(y>H()){y=H();vy=-vy;boing();}
+    el.style.left=x+"px"; el.style.top=y+"px"; bot.style.transform=`rotate(${a}deg)`;
+    zoomRAF=requestAnimationFrame(step);
+  };
+  zoomRAF=requestAnimationFrame(step);
+}
+function buddyPicked(letter){ if(window.innerWidth<=760){ clearTimeout(buddyTimer); buddyEl().classList.remove("talking"); return; } if(Math.random()<.65) buddySay("pick",{letter}); }
+function buddyScene(scene){
+  const el=buddyEl(); if(!el) return;
+  buddyPlace(scene);
+  el.classList.toggle("off", !buddyOn());
+  el.classList.toggle("peek", scene==="quiz" || window.innerWidth<=760);
+  clearInterval(buddyIdle);
+  if(scene!=="home"){ buddyHome(); return; }
+  buddyIdle=setInterval(()=>{ if(document.hidden||VIEW!=="home") return; const r=Math.random(); if(r<.18) buddyCrawl(); else if(r<.6) buddyStroll(); else buddySay("idle"); }, 16000);
+}
+(function initBuddy(){
+  const el=buddyEl(); if(!el) return;
+  document.getElementById("buddyBot").onclick=()=>buddySay("poke",{}, "jump");
+  document.getElementById("buddyShh").onclick=e=>{ e.stopPropagation(); el.classList.remove("talking"); };
+  const tg=document.getElementById("buddyToggle");
+  const sync=()=>{ tg.classList.toggle("on",buddyOn()); el.classList.toggle("off",!buddyOn()); };
+  tg.onclick=()=>{ try{ localStorage.setItem(BUDDY_KEY, buddyOn()?"off":"on"); }catch(e){} sync(); if(buddyOn()) buddySay("greet",{}, "wave"); };
+  sync();
+  window.addEventListener("resize",()=>{ buddyPlace(VIEW); if(VIEW!=="home") buddyHome(); });
+})();
+// Hook K-SO into the existing screens
+const _home=home;
+home=function(){ const r=_home.apply(this,arguments); if(VIEW!=="home") return r; buddyScene("home");
+  const d=S.daily, k=dateKey();
+  setTimeout(()=>{ if(VIEW!=="home") return;
+    if(!S.metKso && buddyOn()){ S.metKso=k; save(); buddySay("intro",{}, "wave"); }
+    else if(d && d.date===k && d.done) buddySay("doneToday",{}, "wave");
+    else if(S.streak>=2 && (S.lastDaily===addDays(k,-1))) buddySay("streak",{}, "party");
+    else buddySay("greet",{}, "wave"); }, 700);
+  return r; };
+const _question=question;
+let rightRun=0;
+question=function(){ const r=_question.apply(this,arguments); if(VIEW!=="quiz") return r; buddyScene("quiz");
+  { const el=buddyEl(); if(el){ clearTimeout(buddyTimer); el.classList.remove("sad","loading","crawler","talking"); } }
+  const i=RUN.answers.length;
+  if(i===0){ rightRun=0; setTimeout(()=>buddySay("start",{}, "wave"),300); }
+  else if(i===RUN.ids.length-1) setTimeout(()=>buddySay("last"),300);
+  return r; };
+const _record=record;
+record=function(id,ok){ const r=_record.apply(this,arguments);
+  rightRun = ok ? rightRun+1 : 0;
+  const wrong=(RUN&&RUN.answers?RUN.answers.filter(a=>!a).length:0)+(ok?0:1);
+  setTimeout(()=>{
+    if(ok && rightRun>=3 && rightRun%3===0) buddySay("streak3",{}, "party");
+    else if(ok && Math.random()<.15){ const el=buddyEl(); if(el&&buddyOn()){ el.classList.add("crawler"); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),6000); } buddySay("crawl",{}, "jump"); }
+    else if(ok && Math.random()<.25) buddyZoomies(()=>buddySay("zoom",{}, "jump"));
+    else if(ok) buddySay("correct",{}, "jump");
+    else buddySay(wrong<=1?"wrong1":wrong<=3?"wrong2":"wrong3",{wrong}, "sad");
+  },150);
+  return r; };
+const _results=results;
+results=function(){ const r=_results.apply(this,arguments); buddyScene("results");
+  const run=RUN && RUN.answers.length===RUN.ids.length ? RUN : (S.daily||{answers:[]});
+  const score=(run.answers||[]).reduce((a,b)=>a+b,0);
+  setTimeout(()=>buddySay(score>=8?"done_great":score>=5?"done_ok":"done_low",{score}, score>=8?"party":score>=5?"jump":"sad"),400);
+  return r; };
+const _nameScreen=nameScreen;
+nameScreen=function(){ const r=_nameScreen.apply(this,arguments); buddyScene("name"); return r; };
+
 testTools();
 home();
 initBoard();
