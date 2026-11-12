@@ -1414,8 +1414,8 @@ function buddyQuit(){
   return true;
 }
 function buddyBack(){
-  const el=buddyEl(); ksoAway=0; el.classList.remove("leaving","gone"); el.classList.add("rollin");
-  setTimeout(()=>{ el.classList.remove("rollin"); buddySay("back",{}, "jump"); },1500);
+  const el=buddyEl(); ksoAway=3; el.classList.remove("leaving","gone"); el.classList.add("rollin");
+  setTimeout(()=>{ el.classList.remove("rollin"); ksoAway=0; buddySay("back",{}, "jump"); },1500);
 }
 function buddyPicked(letter){ if(ksoAway) return; if(window.innerWidth<=760){ clearTimeout(buddyTimer); buddyEl().classList.remove("talking"); return; } if(Math.random()<.65) buddySay("pick",{letter}); }
 function buddyScene(scene){
@@ -1530,6 +1530,7 @@ const _question=question;
 let rightRun=0;
 question=function(){ const r=_question.apply(this,arguments); if(VIEW!=="quiz") return r; buddyScene("quiz");
   { const el=buddyEl(); if(el){ clearTimeout(buddyTimer); el.classList.remove("sad","loading","crawler","talking"); } }
+  if(ksoAway===2){ setTimeout(()=>{ if(ksoAway===2 && VIEW==="quiz") buddyBack(); },600); return r; }
   const i=RUN.answers.length;
   if(i===0){ rightRun=0; setTimeout(()=>buddySay("start",{}, "wave"),300); }
   else if(i===RUN.ids.length-1) setTimeout(()=>buddySay("last"),300);
@@ -1540,7 +1541,7 @@ record=function(id,ok){ const r=_record.apply(this,arguments);
   const wrong=(RUN&&RUN.answers?RUN.answers.filter(a=>!a).length:0)+(ok?0:1);
   const qi=RUN&&RUN.answers ? RUN.answers.length : 0;
   setTimeout(()=>{
-    if(ksoAway){ if(buddyEl().classList.contains("gone")) buddyBack(); else ksoAway=0; return; }
+    if(ksoAway){ if(ksoAway<3) ksoAway=2; return; }
     if(ok && !S.ksoQuit && qi>=1 && qi<=6 && buddyOn()){ S.ksoQuit=dateKey(); save(); buddyQuit(); return; }
     if(ok && rightRun>=3 && rightRun%3===0) buddySay("streak3",{}, "party");
     else if(ok && Math.random()<.15){ const el=buddyEl(); if(el&&buddyOn()){ el.classList.add("crawler"); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),6000); } buddySay("crawl",{}, "jump"); }
