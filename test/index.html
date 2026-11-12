@@ -264,6 +264,10 @@ input#nm{border-radius:4px!important;background:transparent!important}
 #buddy.zoom .bot,#buddy.zoom .blob{animation:none!important}
 #buddy.zoom .blob{transition:transform .12s}
 #buddy.zoom.boing .blob{transform:scale(1.28,.72)}
+.ks-anims{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ks-cat{margin-top:16px}.ks-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.ks-h b{font-size:14.5px}.ks-h span{font-size:12px;color:var(--muted)}
+.ks-line{display:block;width:100%;text-align:left;font:500 14px/1.45 var(--sans);color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);padding:9px 8px;cursor:pointer}
+.ks-line:hover{background:var(--accent-soft)}
 #buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
 #buddy.docked .bot{width:110px;height:128px}
 #buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
@@ -1149,7 +1153,7 @@ function testTools(){
   const el=document.getElementById("testbar"); if(!TEST||!el) return;
   if(!document.title.startsWith("TEST")) document.title="TEST · "+document.title;
   el.innerHTML=`<b>TEST</b><span>Your team can't see this copy. Progress is separate and there's no leaderboard. Pretend date: <strong>${dateKey()}</strong>${DAY_OFFSET?` (+${DAY_OFFSET} day${DAY_OFFSET===1?"":"s"})`:""}</span>
-    <button onclick="testShift(1)">Skip to next day</button>${DAY_OFFSET?'<button onclick="testShift(-DAY_OFFSET)">Back to today</button>':""}<button onclick="browseQuestions()">Browse questions</button><button id="twipe" onclick="testWipe(this)">Wipe test data</button>`;
+    <button onclick="testShift(1)">Skip to next day</button>${DAY_OFFSET?'<button onclick="testShift(-DAY_OFFSET)">Back to today</button>':""}<button onclick="browseQuestions()">Browse questions</button><button onclick="ksoStudio()">Meet K-SO</button><button id="twipe" onclick="testWipe(this)">Wipe test data</button>`;
 }
 function testShift(n){ DAY_OFFSET=Math.max(0,DAY_OFFSET+n); try{ localStorage.setItem("seodaily-test-offset",String(DAY_OFFSET)); }catch(e){} RUN=null; testTools(); home(); }
 function testWipe(btn){
@@ -1307,7 +1311,8 @@ function pickLine(kind,vars){
 function buddySay(kind,vars={},anim){
   const el=buddyEl(); if(!el || !buddyOn()) return;
   const name=(S.name||"friend").split(" ")[0];
-  const text=pickLine(kind,Object.assign({name, streak:S.streak},vars));
+  const v=Object.assign({name, streak:S.streak},vars);
+  const text=v.__text ? v.__text.replace(/\{(\w+)\}/g,(_,k)=> v[k]!=null ? v[k] : "") : pickLine(kind,v);
   const t=el.querySelector("#buddyText"); t.textContent="";
   // bold the player's name (set safely as text nodes)
   text.split(name).forEach((part,i,arr)=>{ t.appendChild(document.createTextNode(part)); if(i<arr.length-1){ const b=document.createElement("b"); b.textContent=name; t.appendChild(b); } });
@@ -1315,7 +1320,7 @@ function buddySay(kind,vars={},anim){
   if(anim) el.classList.add(anim);
   el.classList.add("talking");
   clearTimeout(buddyTimer);
-  if(VIEW==="quiz" && window.innerWidth>760 && kind!=="checking") return; // stays until "Next question"
+  if((VIEW==="quiz" && window.innerWidth>760 && kind!=="checking") || VIEW==="kso") return; // stays until "Next question"
   const ms = VIEW==="quiz" ? Math.min(14000, 3500+text.length*60) : Math.min(9000, 2600+text.length*45);
   buddyTimer=setTimeout(()=>el.classList.remove("talking","sad","jump","party"), ms);
 }
@@ -1338,7 +1343,7 @@ function buddyCrawl(){
 function buddyStopWalk(){ const el=buddyEl(); if(!el) return; clearTimeout(buddyWalk); el.classList.remove("walking"); }
 function buddyHome(){ const el=buddyEl(); if(!el) return; buddyStopWalk(); el.style.transition="none"; el.style.left=""; el.style.right=window.innerWidth<=760?"10px":"24px"; el.classList.remove("face-left"); void el.offsetWidth; el.style.transition=""; }
 function buddyStroll(){
-  const el=buddyEl(); if(!el || !buddyOn() || VIEW!=="home" || window.innerWidth<=760 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const el=buddyEl(); if(!el || !buddyOn() || (VIEW!=="home" && VIEW!=="kso") || window.innerWidth<=760 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const w=el.offsetWidth, cur=el.getBoundingClientRect().left, target=Math.round(20+Math.random()*(window.innerWidth-w-40));
   el.style.right="auto"; el.style.left=cur+"px"; void el.offsetWidth;
   el.classList.toggle("face-left", target<cur); el.classList.add("walking");
@@ -1393,6 +1398,52 @@ function buddyScene(scene){
   sync();
   window.addEventListener("resize",()=>{ buddyPlace(VIEW); if(VIEW!=="home") buddyHome(); });
 })();
+
+/* ---------- Test only: K-SO studio (review every animation and line) ---------- */
+const KS_GROUPS=[
+  ["Dashboard",[["intro","First visit only","wave"],["greet","Normal hello","wave"],["streak","Hello when on a streak","party"],["doneToday","After finishing today's quiz","wave"],["idle","Random chatter while you wait",null],["poke","When someone clicks him","jump"]]],
+  ["During the quiz",[["start","First question","wave"],["pick","Picking an answer (computer only)",null],["checking","Loading face before the answer (about 1 in 3 questions)","loading"],["last","Last question",null]]],
+  ["Right answers",[["correct","Right answer","jump"],["zoom","Right answer + bouncing round the page (about 1 in 4)","zoom"],["crawl","Grows 8 legs (random, dashboard or right answer)","crawl"],["streak3","Every 3 right in a row","party"]]],
+  ["Wrong answers (404 face)",[["wrong1","1st wrong answer in the quiz","sad",1],["wrong2","2nd or 3rd wrong answer","sad",3],["wrong3","4th wrong answer or more","sad",5]]],
+  ["Results",[["done_great","Score 8 to 10","party"],["done_ok","Score 5 to 7","jump"],["done_low","Score 0 to 4","sad"]]]
+];
+const KS_ANIMS=[["Wave","wave"],["Happy jump","jump"],["Party spin","party"],["404 face","sad"],["Loading face","loading"],["8 legs + walk","crawl"],["Walk","stroll"],["Bounce round the page","zoom"],["Back to normal","reset"]];
+function ksReset(){ const el=buddyEl(); buddyZoomStop(); clearTimeout(crawlTimer); el.classList.remove("jump","sad","party","wave","loading","crawler","walking","talking"); buddyHome(); }
+function ksAnim(a,text,vars){
+  const el=buddyEl(); vars=Object.assign({score:8,wrong:3,letter:"B"},vars||{});
+  if(text) vars.__text=text;
+  if(!buddyOn()){ try{ localStorage.setItem(BUDDY_KEY,"on"); }catch(e){} el.classList.remove("off"); }
+  ksReset();
+  if(a==="reset") return;
+  if(a==="loading"){ el.classList.add("loading"); buddySay("checking",vars); return; }
+  if(a==="crawl"){ el.classList.add("crawler"); buddySay("crawl",vars); buddyStroll(); clearTimeout(crawlTimer); crawlTimer=setTimeout(()=>el.classList.remove("crawler"),9000); return; }
+  if(a==="stroll"){ buddyStroll(); return; }
+  if(a==="zoom"){ buddyZoomies(()=>buddySay("zoom",vars,"jump")); return; }
+  if(a==="sad"){ buddySay(vars.__text?"wrong2":"wrong2",vars,"sad"); return; }
+  buddySay(a==="party"?"streak3":a==="jump"?"correct":"greet",vars,a);
+}
+function ksSay(kind,i){
+  const g=KS_GROUPS.flatMap(x=>x[1]).find(x=>x[0]===kind), anim=g[2]||"none";
+  const text=LINES[kind][i], vars={wrong:g[3]||3};
+  if(anim==="none"){ ksReset(); buddySay(kind,Object.assign({score:8,wrong:3,letter:"B",__text:text},vars)); return; }
+  ksAnim(anim,text,vars);
+}
+function ksoStudio(){
+  if(!TEST) return;
+  VIEW="kso"; RUN=null; document.onkeydown=null; app.className="narrow"; document.getElementById("hdr").className="narrow";
+  const total=KS_GROUPS.reduce((n,g)=>n+g[1].reduce((m,c)=>m+LINES[c[0]].length,0),0);
+  app.innerHTML=`
+  <div class="row" style="justify-content:space-between;margin-bottom:6px"><h1 style="margin:0">Meet K-SO</h1><button class="btn ghost" onclick="ksReset();home()">Back to dashboard</button></div>
+  <p class="note" style="margin:0 0 18px">Click any animation or line and K-SO acts it out in the bottom-right corner. Lines use your name, a 5-day streak, a score of 8 and answer B as examples. ${total} lines in total.</p>
+  <div class="card section"><div class="label">Animations</div>
+    <div class="ks-anims">${KS_ANIMS.map(([l,a])=>`<button class="btn ghost" onclick="ksAnim('${a}')">${l}</button>`).join("")}</div></div>
+  ${KS_GROUPS.map(([title,cats])=>`<div class="card section"><div class="label">${title}</div>
+    ${cats.map(([k,desc])=>`<div class="ks-cat"><div class="ks-h"><b>${desc}</b><span>${LINES[k].length} lines</span></div>
+      ${LINES[k].map((t,i)=>`<button class="ks-line" onclick="ksSay('${k}',${i})">${esc(t.replace(/\{(\w+)\}/g,(_,v)=>({name:(S.name||"friend").split(" ")[0],streak:5,score:8,wrong:"#",letter:"B"})[v]??""))}</button>`).join("")}</div>`).join("")}</div>`).join("")}`;
+  buddyScene("kso"); window.scrollTo(0,0);
+  setTimeout(()=>buddySay("intro",{}, "wave"),300);
+}
+
 // Hook K-SO into the existing screens
 const _home=home;
 home=function(){ const r=_home.apply(this,arguments); if(VIEW!=="home") return r; buddyScene("home");
