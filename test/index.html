@@ -236,6 +236,8 @@ input:focus,select:focus{outline:none;border-color:var(--accent)!important;box-s
 .qbl{gap:0;border-top:1px solid var(--line)}
 .qbi{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px}
 select{border-radius:4px;background:transparent}
+select option{background:var(--card);color:var(--ink)}
+html{color-scheme:light}html[data-mode="dark"]{color-scheme:dark}
 input#nm{border-radius:4px!important;background:transparent!important}
 .theme-btn{border:0;background:transparent;padding:6px 0}
 .theme-pop{border-radius:6px}
@@ -243,6 +245,25 @@ input#nm{border-radius:4px!important;background:transparent!important}
 #testbar:not(:empty){border-radius:4px}
 .hidden{display:none}
 
+/* ===== Quiz layout A: K-so sidekick column + louder lock-in ===== */
+@media (min-width:761px){.narrow.qwide{max-width:960px}
+  .qwrap{display:grid;grid-template-columns:170px minmax(0,1fr);gap:26px;align-items:start}
+  .kso-dock{position:sticky;top:24px;min-height:300px}}
+@media (max-width:760px){.kso-dock{display:none}}
+.confirm{background:var(--accent-soft)!important;border:1.5px solid var(--accent);border-radius:14px!important;padding:14px 16px!important;margin-top:18px!important;animation:popin .22s cubic-bezier(.3,1.5,.5,1)}
+.confirm span{font-size:17px!important;font-weight:800!important;color:var(--ink)!important;display:flex;flex-direction:column;gap:2px}
+.confirm span b{color:#FF5CA8}
+.confirm em{font-style:normal}
+.confirm small{font-size:12.5px;font-weight:600;color:var(--muted)}
+.lockbtn{background:#FF5CA8!important;border-color:#FF5CA8!important;color:#fff!important;padding:12px 22px;font-size:15px}
+.lockbtn:hover{background:#F0408F!important}
+.opt.sel{background:var(--accent)!important;color:#fff!important;box-shadow:none!important;border-radius:10px}
+.opt.sel .k{color:#fff!important}
+.opt.sel code{background:rgba(255,255,255,.2);color:#fff}
+@keyframes popin{from{transform:translateY(8px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+#buddy.docked{position:absolute;left:30px!important;right:auto!important;bottom:auto;top:170px;width:110px;transition:none}
+#buddy.docked .bot{width:110px;height:128px}
+#buddy.docked .bubble{bottom:136px;right:auto;left:-30px;width:170px;max-width:170px;font-size:12.5px;border-radius:12px 12px 12px 4px}
 /* ===== K-so the mascot ===== */
 #buddy{position:fixed;left:auto;right:24px;bottom:14px;z-index:30;width:96px;pointer-events:none;transition:left 4.5s linear,right .4s,bottom .35s ease,transform .35s ease}
 #buddy.off{display:none}
@@ -943,25 +964,26 @@ function startPractice(){
   RUN={mode:"practice",ids,answers:[],salt:"p"+Date.now()}; question();
 }
 function question(){
-  VIEW="quiz"; app.className="narrow"; document.getElementById("hdr").className="narrow";
+  VIEW="quiz"; app.className="narrow qwide"; document.getElementById("hdr").className="narrow qwide";
   const i=RUN.answers.length; if(i>=RUN.ids.length) return finish();
   const id=RUN.ids[i], q=BANK[id], opts=optionOrder(id,RUN.salt);
   const isReview = RUN.mode==="daily" && S.missed[id]!==undefined;
   app.innerHTML=`
     <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="meta">${RUN.mode==="daily"?"Daily":"Practice"} · ${i+1} / ${RUN.ids.length}</span><button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="home()">Exit</button></div>
     <div class="progress"><div style="width:${i/RUN.ids.length*100}%"></div></div>
-    <div class="card">
+    <div class="qwrap"><div class="kso-dock" id="ksoDock"></div><div class="card qmain">
       <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
       <div class="q">${fmt(q[2])}</div>
       <div class="opts">${opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${"ABCD"[j]}</span><span>${fmt(o.t)}</span></button>`).join("")}</div>
       <div id="after"></div>
-    </div>`;
+    </div></div>`;
   const btns=[...document.querySelectorAll(".opt")];
   let sel=-1;
   const choose=j=>{
     if(btns[0].disabled) return;
     sel=j; btns.forEach((b,k)=>b.classList.toggle("sel",k===j));
-    $("#after").innerHTML=`<div class="confirm"><span>Lock in answer <b>${"ABCD"[j]}</b>? Are you sure?</span><button class="btn ghost" id="chg">Change</button><button class="btn" id="lock">Yes, lock it in</button></div>`;
+    $("#after").innerHTML=`<div class="confirm"><span><em>Lock in <b>${"ABCD"[j]}</b>?</em><small>No take-backs once it's in.</small></span><button class="btn ghost" id="chg">Change</button><button class="btn lockbtn" id="lock">Lock it in</button></div>`;
+    if(typeof buddyPicked==="function") buddyPicked("ABCD"[j]);
     $("#chg").onclick=()=>{ sel=-1; btns.forEach(b=>b.classList.remove("sel")); $("#after").innerHTML=""; };
     $("#lock").onclick=()=>pick(sel); $("#lock").focus();
   };
@@ -1254,6 +1276,7 @@ const LINES={
   wrong1:["404: right answer not found. Only your first miss today though, {name}.","My face just broke, {name}. That's 1 wrong. I'll walk it off. Slowly. I'm a blob.","Page not found. Neither was the right answer. Just the 1 so far, {name}!","{name}, that answer has been moved permanently. To the wrong pile. 1 of them so far."],
   wrong2:["{name}, I've been redirected {wrong} times today. Please, just one right answer.","{wrong} wrong so far, {name}. My face keeps doing this. Someone call a developer.","Error number {wrong}, {name}. I'm starting to look like a broken link report.","{wrong} misses, {name}. That's not a redirect chain yet. Let's keep it that way."],
   wrong3:["{wrong} wrong today, {name}. I live on the 404 page now. I've put up curtains.","{name}, that's {wrong}. Google has started deindexing my feelings.","{wrong} wrong answers, {name}. I've made a custom 404 page with your name on it. It's very supportive.","Miss number {wrong}, {name}. I've been redirected so much I don't know where I live anymore.","{wrong}, {name}. {wrong}! My face is stuck like this now. Read the explanation and save me."],
+  pick:["Ooh, {letter}? Brave, {name}.","{letter}, huh? I'm not saying anything. I'm just jiggling.","{letter}! Interesting choice, {name}.","Hmm, {letter}. My left eye likes it. My right eye has questions.","Going with {letter}, {name}? I'll hold my breath. I don't have lungs.","{letter}? Bold. I respect it. I'm a bit scared, but I respect it.","{name} picked {letter}. I'm pretending I know the answer."],
   checking:["Let me check your answer… estimated time 4.2 seconds. Give or take a business day.","Checking… my Core Web Vitals aren't great, {name}. Bear with me.","Loading your answer… 12%… 13%… okay, I'm skipping the progress bar.","Hold on {name}, I'm buffering. It's a jelly thing.","I asked Google if you're right. They said \"it depends\". Checking myself.","Please hold. Your answer is important to us, {name}.","Rendering your answer… this is why nobody likes client-side JavaScript.","Hang on, {name}. Waiting for the server. The server is me. I'm slow."],
   crawl:["I crawled 8 pages with 8 legs, {name}. Efficiency.","Surprise, {name}! Legs! Googlebot is shaking.","Don't freak out, {name}. I grow legs when I get excited about crawl budget.","8 legs, 0 robots.txt rules. Watch me go, {name}.","Crawling your site for you, {name}. Found 3 broken links and a sandwich.","{name}, I'm crawling at 8 pages a second. Please don't tell my server."],
   wrong:["Oof. I've gone flat. Read the explanation, {name}, then I'll re-inflate.","It's fine {name}. I once tried to be a pancake. Mistakes happen.","Nope! But that's how you learn, {name}. That's how I learned not to sit near the heater.","Wrong one, {name}. I'm not sad. This is just my face. And my body.","Close-ish, {name}! Like me trying to fit through a door.","Don't worry {name}, I've made worse choices. I'm made of gelatine."],
@@ -1268,7 +1291,8 @@ const LINES={
 };
 let buddyTimer=null, buddyIdle=null, buddyWalk=null, lastLine={};
 function buddyOn(){ try{ return localStorage.getItem(BUDDY_KEY)!=="off"; }catch(e){ return true; } }
-function buddyEl(){ return document.getElementById("buddy"); }
+const BUDDY=document.getElementById("buddy");
+function buddyEl(){ return BUDDY; }
 function pickLine(kind,vars){
   const list=LINES[kind]||LINES.idle; let i, tries=0;
   do { i=Math.floor(Math.random()*list.length); } while(list.length>1 && i===lastLine[kind] && tries++<5);
@@ -1279,7 +1303,7 @@ function buddySay(kind,vars={},anim){
   const el=buddyEl(); if(!el || !buddyOn()) return;
   const name=(S.name||"friend").split(" ")[0];
   const text=pickLine(kind,Object.assign({name, streak:S.streak},vars));
-  const t=document.getElementById("buddyText"); t.textContent="";
+  const t=el.querySelector("#buddyText"); t.textContent="";
   // bold the player's name (set safely as text nodes)
   text.split(name).forEach((part,i,arr)=>{ t.appendChild(document.createTextNode(part)); if(i<arr.length-1){ const b=document.createElement("b"); b.textContent=name; t.appendChild(b); } });
   el.classList.remove("jump","sad","party","wave"); if(kind!=="checking") el.classList.remove("loading"); void el.offsetWidth;
@@ -1314,8 +1338,15 @@ function buddyStroll(){
   const dur=Math.max(1.5,Math.abs(target-cur)/120); el.style.transition=`left ${dur}s linear`; el.style.left=target+"px";
   clearTimeout(buddyWalk); buddyWalk=setTimeout(()=>{ el.classList.remove("walking"); el.style.transition=""; }, dur*1000);
 }
+function buddyPlace(scene){
+  const el=buddyEl(), dock=document.getElementById("ksoDock");
+  if(scene==="quiz" && dock && window.innerWidth>760){ if(el.parentNode!==dock) dock.appendChild(el); el.classList.add("docked"); }
+  else { el.classList.remove("docked"); if(el.parentNode!==app.parentNode) app.parentNode.insertBefore(el, app); }
+}
+function buddyPicked(letter){ if(window.innerWidth<=760){ clearTimeout(buddyTimer); buddyEl().classList.remove("talking"); return; } if(Math.random()<.65) buddySay("pick",{letter}); }
 function buddyScene(scene){
   const el=buddyEl(); if(!el) return;
+  buddyPlace(scene);
   el.classList.toggle("off", !buddyOn());
   el.classList.toggle("peek", scene==="quiz" || window.innerWidth<=760);
   clearInterval(buddyIdle);
@@ -1330,7 +1361,7 @@ function buddyScene(scene){
   const sync=()=>{ tg.classList.toggle("on",buddyOn()); el.classList.toggle("off",!buddyOn()); };
   tg.onclick=()=>{ try{ localStorage.setItem(BUDDY_KEY, buddyOn()?"off":"on"); }catch(e){} sync(); if(buddyOn()) buddySay("greet",{}, "wave"); };
   sync();
-  window.addEventListener("resize",()=>{ if(VIEW!=="home") buddyHome(); });
+  window.addEventListener("resize",()=>{ buddyPlace(VIEW); if(VIEW!=="home") buddyHome(); });
 })();
 // Hook K-so into the existing screens
 const _home=home;
