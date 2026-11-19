@@ -832,7 +832,10 @@ const LEVEL_ORDER = ["intern","junior","mid","senior"];
    so every level can earn the same 130 XP a day. Seniors' stretch questions are 3 more hard ones. */
 const DAILY_BASE = 7, DAILY_STRETCH = 3, XP_BASE = 10, XP_STRETCH = 20, DAILY_MAX = DAILY_BASE*XP_BASE + DAILY_STRETCH*XP_STRETCH;
 /* Promotion: over your last 10 dailies at your level, average 8/10+ and 2/3+ stretch questions right. */
-const PROMO_DAYS = 10, PROMO_AVG = 8, PROMO_STRETCH = 2;
+const PROMO_DAYS = 10, PROMO_AVG = 8;
+const shortLabel = k => LEVELS[k].label.replace(/ SEO Specialist$/,"").replace(/-level$/,"");
+/* One plain sentence about the next level, used on the dashboard and results screen. */
+const promoLine = p => `Next level: <b>${shortLabel(p.next)}</b>. Average ${PROMO_AVG}/10 or more over ${PROMO_DAYS} daily quizzes to move up.` + (p.n ? ` So far: ${p.n} played, average ${p.avg.toFixed(1)}.` : "");
 const lvl = () => LEVELS[S.level] || LEVELS.junior;
 const baseDiff = L => +Object.keys(L.mix).find(d => L.mix[d] > 0);
 const inLevel = (i, L=lvl()) => QUIZABLE(i) && L.mix[BANK[i][1]] > 0;
@@ -906,7 +909,7 @@ function promoStatus(){
   const log = S.log || {};
   const days = Object.keys(log).filter(k => log[k].lv === S.level).sort().slice(-PROMO_DAYS);
   const n = days.length, avg = n ? days.reduce((a,k)=>a+log[k].s,0)/n : 0, st = n ? days.reduce((a,k)=>a+log[k].st,0)/n : 0;
-  return { next:L.next, n, avg, st, ready: n >= PROMO_DAYS && avg >= PROMO_AVG && st >= PROMO_STRETCH };
+  return { next:L.next, n, avg, st, ready: n >= PROMO_DAYS && avg >= PROMO_AVG };
 }
 function optionOrder(id, salt){
   const q = BANK[id]; const opts = [q[3], ...q[4]];
@@ -956,7 +959,7 @@ ${TEST?"":`    <div class="card" style="margin-bottom:16px">
 `}    <div class="card">
       <div class="rank"><span>XP rank: <b>${r[1]}</b></span><span>${n?`${n[0]-S.xp} XP to ${n[1]}`:"Top XP rank"}</span></div>
       <div class="progress" style="margin:0"><div style="width:${pct}%"></div></div>
-      ${(()=>{ const p=promoStatus(); return p?`<p class="note" style="margin-top:12px">Next level: <b>${LEVELS[p.next].label}</b>. Last ${p.n}/${PROMO_DAYS} dailies at your level · average ${p.avg.toFixed(1)}/10 (need ${PROMO_AVG}) · stretch ${p.st.toFixed(1)}/3 (need ${PROMO_STRETCH}).</p>`:`<p class="note" style="margin-top:12px">You're at the top level. Keep the streak going.</p>`; })()}
+      ${(()=>{ const p=promoStatus(); return p?`<p class="note" style="margin-top:12px">${promoLine(p)}</p>`:`<p class="note" style="margin-top:12px">You're at the top level. Keep the streak going.</p>`; })()}
       <div class="section"><div class="label">Last 7 days</div><div class="week">${days.join("")}</div></div>
     </div>
     <div class="card section">
@@ -1088,8 +1091,8 @@ function results(forceDaily){
       <div class="label">${run.mode==="daily"?"Daily results":"Practice results"}</div>
       <div class="big">${score}<span style="font-size:24px;color:var(--muted)">/${n}</span></div>
       <p style="margin-top:8px">${msg}${run.mode==="daily"?` <b>+${dayXP} XP</b> of ${DAILY_MAX} possible.`:" Practice doesn't earn XP."}</p>
-      ${run.mode==="daily"&&PROMOTED&&LEVELS[PROMOTED]?`<div class="explain" style="margin-top:12px"><strong>🎉 Promoted to ${LEVELS[PROMOTED].label}!</strong>Over your last ${PROMO_DAYS} dailies you averaged ${PROMO_AVG}/10 or better and got at least ${PROMO_STRETCH} of 3 stretch questions right. From tomorrow your quiz moves up a level.</div>`:""}
-      ${run.mode==="daily"&&!PROMOTED&&p?`<p class="note">Promotion to ${LEVELS[p.next].label}: ${p.n}/${PROMO_DAYS} dailies · average ${p.avg.toFixed(1)}/10 (need ${PROMO_AVG}) · stretch ${p.st.toFixed(1)}/3 (need ${PROMO_STRETCH})</p>`:""}
+      ${run.mode==="daily"&&PROMOTED&&LEVELS[PROMOTED]?`<div class="explain" style="margin-top:12px"><strong>🎉 Promoted to ${LEVELS[PROMOTED].label}!</strong>You averaged ${PROMO_AVG}/10 or better over your last ${PROMO_DAYS} daily quizzes. From tomorrow your quiz moves up a level.</div>`:""}
+      ${run.mode==="daily"&&!PROMOTED&&p?`<p class="note">${promoLine(p)}</p>`:""}
       ${run.mode==="daily"?`<p class="note">Streak: ${S.streak} day${S.streak===1?"":"s"} 🔥 · Come back tomorrow for a new set.</p>`:""}
       <div class="row" style="margin-top:14px"><button class="btn" onclick="home()">Back to dashboard</button><button class="btn ghost" onclick="copyScore(${score},${n},'${run.mode}')" id="cp">Copy score</button></div>
     </div>
