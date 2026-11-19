@@ -803,15 +803,22 @@ const NEWS = [
 
 /* ---------- Levels: each sets the daily easy / medium / hard mix ---------- */
 const LEVELS = {
-  intern:{label:"Intern", mix:{0:10,1:0,2:0,3:0}, blurb:"SEO basics: how search works, key terms and the main tools"},
-  junior:{label:"Junior SEO Specialist", mix:{1:10,2:0,3:0}, blurb:"Fundamentals, Search Console and everyday fixes"},
-  mid:   {label:"Mid-level SEO Specialist", mix:{1:0,2:10,3:0}, blurb:"Audits, rendering, redirects, structured data and hreflang"},
-  senior:{label:"Senior SEO Specialist", mix:{1:0,2:0,3:10}, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
+  intern:{label:"Intern", mix:{0:10,1:0,2:0,3:0}, up:1, next:"junior", blurb:"SEO basics: how search works, key terms and the main tools"},
+  junior:{label:"Junior SEO Specialist", mix:{1:10,2:0,3:0}, up:2, next:"mid", blurb:"Fundamentals, Search Console and everyday fixes"},
+  mid:   {label:"Mid-level SEO Specialist", mix:{1:0,2:10,3:0}, up:3, next:"senior", blurb:"Audits, rendering, redirects, structured data and hreflang"},
+  senior:{label:"Senior SEO Specialist", mix:{1:0,2:0,3:10}, up:3, next:null, blurb:"Edge cases, crawl budget, JS SEO, migrations and data quirks"}
 };
-/* Each level has its own pool: Junior = easy, Mid = medium, Senior = hard. No question appears at two levels. */
+const LEVEL_ORDER = ["intern","junior","mid","senior"];
+/* Each level has its own pool: Junior = easy, Mid = medium, Senior = hard. No question appears at two levels.
+   Daily set = 7 at-level questions (10 XP each) + 3 stretch questions from the next level up (20 XP each),
+   so every level can earn the same 130 XP a day. Seniors' stretch questions are 3 more hard ones. */
+const DAILY_BASE = 7, DAILY_STRETCH = 3, XP_BASE = 10, XP_STRETCH = 20, DAILY_MAX = DAILY_BASE*XP_BASE + DAILY_STRETCH*XP_STRETCH;
+/* Promotion: over your last 10 dailies at your level, average 8/10+ and 2/3+ stretch questions right. */
+const PROMO_DAYS = 10, PROMO_AVG = 8, PROMO_STRETCH = 2;
 const lvl = () => LEVELS[S.level] || LEVELS.junior;
+const baseDiff = L => +Object.keys(L.mix).find(d => L.mix[d] > 0);
 const inLevel = (i, L=lvl()) => QUIZABLE(i) && L.mix[BANK[i][1]] > 0;
-const mixText = L => [[0,"beginner"],[1,"easy"],[2,"medium"],[3,"hard"]].filter(([d])=>L.mix[d]>0).map(([d,n])=>L.mix[d]===10?`all ${n}`:`${L.mix[d]} ${n}`).join(" · ");
+const mixText = L => { const n=["beginner","easy","medium","hard"]; return `${DAILY_BASE} ${n[baseDiff(L)]} + ${DAILY_STRETCH} ${n[L.up]} stretch`; };
 /* ---------- Utilities ---------- */
 const QUIZABLE = i => !!(BANK[i] && CATS[BANK[i][0]]);   // news questions are excluded from all quizzes
 /* TEST mode: the copy at /seo-daily/test/ keeps its own progress, its own leaderboard tab and a day-skipper. */
@@ -837,44 +844,50 @@ function rankOf(xp){ let r=RANKS[0],n=null; for(let i=0;i<RANKS.length;i++){ if(
 function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
 
 /* ---------- Daily set generation ----------
-   10 questions: up to 2 you previously missed (spaced review), weighted toward your weakest
-   categories and least-seen questions, with a 5 easy / 4 medium / 1 hard mix. */
+   7 at-level questions (up to 2 you previously missed, as spaced review) + 3 stretch questions
+   from the next level up, weighted toward your weakest categories and least-seen questions. */
 function buildDaily(key){
   const r = rng("crawldaily|"+key+"|"+(S.level||"junior"));
-  const ids = [];
+  const L = lvl(), base = baseDiff(L), ids = [];
   const review = Object.keys(S.missed).map(Number).filter(id => S.missed[id] < key && inLevel(id));
-  const targets = {...lvl().mix};
-  for (const id of shuffle(review, r)) {
-    if (ids.length >= 2) break;
-    const d = BANK[id][1];
-    if (targets[d] > 0) { ids.push(id); targets[d]--; }
-  }
+  for (const id of shuffle(review, r)) { if (ids.length >= 2) break; ids.push(id); }
+  const w = {};
   const weight = id => {
-    const c = BANK[id][0], acc = catAcc(c), seen = S.seen[id]||0;
-    return (1/(1+seen*1.5)) * (acc===null ? 1.2 : 1.6-acc) * (0.5+r());
+    if (w[id] === undefined) { const acc = catAcc(BANK[id][0]), seen = S.seen[id]||0; w[id] = (1/(1+seen*1.5)) * (acc===null ? 1.2 : 1.6-acc) * (0.5+r()); }
+    return w[id];
   };
   const usedCats = {};
-  for (const d of [0,1,2,3]) {
-    if (!(targets[d] > 0)) continue;
-    let pool = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && BANK[i][1]===d && !ids.includes(i));
-    pool.sort((a,b)=>weight(b)-weight(a));
-    for (const id of pool) {
-      if (!(targets[d] > 0)) break;
-      const c = BANK[id][0];
-      if (c==="news" || (usedCats[c]||0) >= 2) continue;
-      ids.push(id); usedCats[c]=(usedCats[c]||0)+1; targets[d]--;
+  ids.forEach(id => { const c = BANK[id][0]; usedCats[c] = (usedCats[c]||0)+1; });
+  const take = (d, n) => {
+    const got = [];
+    const pool = BANK.map((_,i)=>i).filter(i => QUIZABLE(i) && BANK[i][1]===d && !ids.includes(i)).sort((a,b)=>weight(b)-weight(a));
+    for (const id of pool) {            // max 2 per topic where possible
+      if (got.length >= n) break;
+      const c = BANK[id][0]; if ((usedCats[c]||0) >= 2) continue;
+      got.push(id); ids.push(id); usedCats[c] = (usedCats[c]||0)+1;
     }
-  }
-  if (ids.length < 10) {
-    const rest = BANK.map((_,i)=>i).filter(i => inLevel(i) && !ids.includes(i)).sort((a,b)=>weight(b)-weight(a));
-    for (const id of rest) { if (ids.length >= 10) break; ids.push(id); }
-  }
-  return shuffle(ids, r).sort((a,b)=>BANK[a][1]-BANK[b][1]);
+    for (const id of pool) { if (got.length >= n) break; if (!ids.includes(id)) { got.push(id); ids.push(id); } }
+    return got;
+  };
+  const core = ids.slice().concat(take(base, DAILY_BASE - ids.length));
+  const stretch = take(L.up, DAILY_STRETCH);
+  return { ids: shuffle(core, r).concat(shuffle(stretch, r)), stretch };
 }
 function ensureDaily(){
   const k = dateKey();
-  if (!S.daily || S.daily.date !== k || (!S.daily.answers.length && !S.daily.ids.every(i=>inLevel(i)))) { S.daily = { date:k, ids:buildDaily(k), answers:[], done:false }; save(); }
+  const stale = S.daily && !S.daily.answers.length && !S.daily.done && (!S.daily.stretch || S.daily.level !== S.level);
+  if (!S.daily || S.daily.date !== k || stale) { const b = buildDaily(k); S.daily = { date:k, level:S.level, ids:b.ids, stretch:b.stretch, answers:[], done:false }; save(); }
   return S.daily;
+}
+const isStretch = id => !!(S.daily && S.daily.stretch && S.daily.stretch.includes(id));
+const dailyXP = id => isStretch(id) ? XP_STRETCH : XP_BASE;
+/* Promotion check: the last PROMO_DAYS dailies played at your current level. */
+function promoStatus(){
+  const L = lvl(); if (!L.next) return null;
+  const log = S.log || {};
+  const days = Object.keys(log).filter(k => log[k].lv === S.level).sort().slice(-PROMO_DAYS);
+  const n = days.length, avg = n ? days.reduce((a,k)=>a+log[k].s,0)/n : 0, st = n ? days.reduce((a,k)=>a+log[k].st,0)/n : 0;
+  return { next:L.next, n, avg, st, ready: n >= PROMO_DAYS && avg >= PROMO_AVG && st >= PROMO_STRETCH };
 }
 function optionOrder(id, salt){
   const q = BANK[id]; const opts = [q[3], ...q[4]];
@@ -904,7 +917,7 @@ function home(){
     </div>` : `
     <div class="label">Today's challenge · ${d.answers.length?`in progress (${d.answers.length}/10)`:"10 questions"}</div>
     <h1>${d.answers.length?"Pick up where you left off":"Ready for today's crawl?"}</h1>
-    <p class="note">10 questions for ${lvl().label}s${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, across ${Object.keys(CATS).length} topics, with extra weight on your weak spots.</p>
+    <p class="note">${DAILY_BASE} questions for ${lvl().label}s${d.ids.some(id=>S.missed[id])?", including some you missed before":""}, plus ${DAILY_STRETCH} ${lvl().next?`stretch questions from the ${LEVELS[lvl().next].label} level`:"extra hard stretch questions"}. ${XP_BASE} XP per at-level answer, ${XP_STRETCH} XP per stretch answer: up to ${DAILY_MAX} XP a day.</p>
     <button class="btn" onclick="startDaily()">${d.answers.length?"Continue":"Start today's quiz"} →</button>`;
 
   app.className=""; document.getElementById("hdr").className="";
@@ -924,6 +937,7 @@ ${TEST?"":`    <div class="card" style="margin-bottom:16px">
 `}    <div class="card">
       <div class="rank"><span>Rank: <b>${r[1]}</b></span><span>${n?`${n[0]-S.xp} XP to ${n[1]}`:"Max rank"}</span></div>
       <div class="progress" style="margin:0"><div style="width:${pct}%"></div></div>
+      ${(()=>{ const p=promoStatus(); return p?`<p class="note" style="margin-top:12px">Next level: <b>${LEVELS[p.next].label}</b>. Last ${p.n}/${PROMO_DAYS} dailies at your level · average ${p.avg.toFixed(1)}/10 (need ${PROMO_AVG}) · stretch ${p.st.toFixed(1)}/3 (need ${PROMO_STRETCH}).</p>`:`<p class="note" style="margin-top:12px">You're at the top level. Keep the streak going.</p>`; })()}
       <div class="section"><div class="label">Last 7 days</div><div class="week">${days.join("")}</div></div>
     </div>
     <div class="card section">
@@ -932,7 +946,7 @@ ${TEST?"":`    <div class="card" style="margin-bottom:16px">
         <select id="pcat"><option value="">All topics</option>${weakest?`<option value="__weak">My weakest topic (${weakest})</option>`:""}${reviewCount?`<option value="__review">Questions I've missed (${reviewCount})</option>`:""}${Object.entries(CATS).map(([c,l])=>`<option value="${c}">${l}</option>`).join("")}</select>
         <button class="btn ghost" onclick="startPractice()">Start 10-question round</button>
       </div>
-      <p class="note" style="margin-top:10px">Practice earns half XP and doesn't affect your streak.</p>
+      <p class="note" style="margin-top:10px">Practice is for learning: it earns no XP and doesn't affect your streak or promotion.</p>
     </div>
     <div class="card section">
       <div class="label">Topic mastery</div>
@@ -956,6 +970,7 @@ function tick(){ clearInterval(cdTimer); const f=()=>{ const el=$("#cd"); if(!el
 
 /* ---------- Quiz engine ---------- */
 let RUN = null; // {mode, ids, answers, salt}
+let PROMOTED = null; // level key just promoted to (shown on the results screen)
 function startDaily(){ const d=ensureDaily(); RUN={mode:"daily",ids:d.ids,answers:d.answers,salt:d.date}; question(); }
 function startPractice(){
   const sel=$("#pcat").value, r=rng("p"+Date.now()+Math.random());
@@ -975,7 +990,7 @@ function question(){
     <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="meta">${RUN.mode==="daily"?"Daily":"Practice"} · ${i+1} / ${RUN.ids.length}</span><button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="home()">Exit</button></div>
     <div class="progress"><div style="width:${i/RUN.ids.length*100}%"></div></div>
     <div class="qwrap"><div class="kso-dock" id="ksoDock"></div><div class="card qmain">
-      <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span>${isReview?'<span class="tag rev">Review</span>':""}</div>
+      <div class="tags"><span class="tag">${CATS[q[0]]||"SEO news"}</span>${isReview?'<span class="tag rev">Review</span>':""}${RUN.mode==="daily"&&isStretch(id)?`<span class="tag rev">Stretch · ${XP_STRETCH} XP</span>`:""}</div>
       <div class="q">${fmt(q[2])}</div>
       <div class="opts">${opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${"ABCD"[j]}</span><span>${fmt(o.t)}</span></button>`).join("")}</div>
       <div id="after"></div>
@@ -1004,7 +1019,7 @@ function question(){
     record(id,ok);
     RUN.answers.push(ok?1:0); if(RUN.mode==="daily"){ S.daily.answers=RUN.answers; } save();
     const last=RUN.answers.length>=RUN.ids.length;
-    $("#after").innerHTML=`<div class="explain ${ok?"":"bad"}"><strong>${ok?"Correct — +"+(RUN.mode==="daily"?XP[q[1]]:XP[q[1]]/2)+" XP":"Not quite"}</strong>${fmt(q[5])}</div>
+    $("#after").innerHTML=`<div class="explain ${ok?"":"bad"}"><strong>${ok?(RUN.mode==="daily"?"Correct — +"+dailyXP(id)+" XP":"Correct"):"Not quite"}</strong>${fmt(q[5])}</div>
       <div class="foot"><span class="note">Press Enter to continue</span><button class="btn" id="next">${last?"See results":"Next question"} →</button></div>`;
     $("#next").onclick=question; $("#next").focus();
   };
@@ -1020,17 +1035,23 @@ function record(id,ok){
   const q=BANK[id], c=q[0];
   S.cat[c]=S.cat[c]||[0,0]; S.cat[c][1]++; if(ok) S.cat[c][0]++;
   S.seen[id]=(S.seen[id]||0)+1;
-  if(ok){ S.xp+=RUN.mode==="daily"?XP[q[1]]:XP[q[1]]/2; delete S.missed[id]; }
+  if(ok){ if(RUN.mode==="daily") S.xp+=dailyXP(id); delete S.missed[id]; }   // practice earns no XP
   else S.missed[id]=dateKey();
 }
 function finish(){
   document.onkeydown=null;
+  PROMOTED=null;
   if(RUN.mode==="daily" && !S.daily.done){
     const k=S.daily.date, score=RUN.answers.reduce((a,b)=>a+b,0);
+    const xp=RUN.ids.reduce((a,id,i)=>a+(RUN.answers[i]?dailyXP(id):0),0);
+    const st=RUN.ids.reduce((a,id,i)=>a+(RUN.answers[i]&&isStretch(id)?1:0),0);
     S.daily.done=true; S.history[k]=score;
+    S.xpDay=S.xpDay||{}; S.xpDay[k]=xp;
+    S.log=S.log||{}; S.log[k]={lv:S.daily.level||S.level, s:score, st};
     S.streak = S.lastDaily===addDays(k,-1) ? S.streak+1 : (S.lastDaily===k ? S.streak : 1);
     S.lastDaily=k; S.bestStreak=Math.max(S.bestStreak,S.streak);
-    if(score===10) S.xp+=50;
+    const p=promoStatus();
+    if(p&&p.ready){ PROMOTED=p.next; S.level=p.next; }
     save();
   }
   pushScore();
@@ -1040,12 +1061,16 @@ function results(forceDaily){
   VIEW="results"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const run = !forceDaily && RUN && RUN.answers.length===RUN.ids.length ? RUN : {mode:"daily",ids:S.daily.ids,answers:S.daily.answers};
   const score=run.answers.reduce((a,b)=>a+b,0), n=run.ids.length;
-  const msg = score===n?"Flawless crawl. +50 XP bonus.":score>=8?"Strong work — you know your stuff.":score>=5?"Solid. Read the explanations for the misses.":"Rough one — missed questions come back for review.";
+  const msg = score===n?"Flawless crawl.":score>=8?"Strong work — you know your stuff.":score>=5?"Solid. Read the explanations for the misses.":"Rough one — missed questions come back for review.";
+  const dayXP = run.mode==="daily" ? (S.xpDay&&S.xpDay[S.daily.date]!=null ? S.xpDay[S.daily.date] : run.ids.reduce((a,id,i)=>a+(run.answers[i]?dailyXP(id):0),0)) : 0;
+  const p = run.mode==="daily" ? promoStatus() : null;
   app.innerHTML=`
     <div class="card">
       <div class="label">${run.mode==="daily"?"Daily results":"Practice results"}</div>
       <div class="big">${score}<span style="font-size:24px;color:var(--muted)">/${n}</span></div>
-      <p style="margin-top:8px">${msg}</p>
+      <p style="margin-top:8px">${msg}${run.mode==="daily"?` <b>+${dayXP} XP</b> of ${DAILY_MAX} possible.`:" Practice doesn't earn XP."}</p>
+      ${run.mode==="daily"&&PROMOTED&&LEVELS[PROMOTED]?`<div class="explain" style="margin-top:12px"><strong>🎉 Promoted to ${LEVELS[PROMOTED].label}!</strong>Over your last ${PROMO_DAYS} dailies you averaged ${PROMO_AVG}/10 or better and got at least ${PROMO_STRETCH} of 3 stretch questions right. From tomorrow your quiz moves up a level.</div>`:""}
+      ${run.mode==="daily"&&!PROMOTED&&p?`<p class="note">Promotion to ${LEVELS[p.next].label}: ${p.n}/${PROMO_DAYS} dailies · average ${p.avg.toFixed(1)}/10 (need ${PROMO_AVG}) · stretch ${p.st.toFixed(1)}/3 (need ${PROMO_STRETCH})</p>`:""}
       ${run.mode==="daily"?`<p class="note">Streak: ${S.streak} day${S.streak===1?"":"s"} 🔥 · Come back tomorrow for a new set.</p>`:""}
       <div class="row" style="margin-top:14px"><button class="btn" onclick="home()">Back to dashboard</button><button class="btn ghost" onclick="copyScore(${score},${n},'${run.mode}')" id="cp">Copy score</button></div>
     </div>
@@ -1066,12 +1091,13 @@ let BOARD=[], BOARD_STATE="loading", BOARD_TAB="week", VIEW="home", SEASON_SEEN=
 let writeChain=Promise.resolve(), lastPushed="", pollTimer=null;
 const num=(v,max=1e7)=>{ const n=Number(v); return Number.isFinite(n)&&n>=0 ? Math.min(n,max) : 0; };
 function weekStartKey(k){ const [y,m,d]=k.split("-").map(Number); const dt=new Date(y,m-1,d); dt.setDate(dt.getDate()-((dt.getDay()+6)%7)); return dateKey(dt); }
-function recentHistory(){ const k=dateKey(), out={}; for(let i=0;i<14;i++){ const dk=addDays(k,-i); if(S.history[dk]!=null) out[dk]=S.history[dk]; } return out; }
+/* Daily XP for the last 14 days (feeds the Today and This week tabs). */
+function recentHistory(){ const k=dateKey(), x=S.xpDay||{}, out={}; for(let i=0;i<14;i++){ const dk=addDays(k,-i); if(x[dk]!=null) out[dk]=x[dk]; } return out; }
 function newId(){ const a=new Uint8Array(12); try{ crypto.getRandomValues(a); }catch(e){ for(let i=0;i<12;i++) a[i]=Math.random()*256|0; } return Array.from(a,b=>b.toString(16).padStart(2,"0")).join(""); }
 function pushScore(){
   if(TEST) return;
   if(!SHEET_URL||!S.pid||!S.name||!SEASON_SEEN) return;
-  const row={board:TEST?"test":"", id:S.pid, name:S.name, xp:S.xp, streak:S.streak, bestStreak:S.bestStreak, lastDaily:S.lastDaily||"", recent:recentHistory(), season:S.season||""};
+  const row={board:TEST?"test":"", id:S.pid, name:S.name, xp:S.xp, streak:S.streak, bestStreak:S.bestStreak, lastDaily:S.lastDaily||"", recent:recentHistory(), season:S.season||"", level:S.level||""};
   const sig=JSON.stringify(row); if(sig===lastPushed) return; lastPushed=sig;
   writeChain=writeChain.then(()=>fetch(SHEET_URL,{method:"POST",body:sig})).then(()=>loadBoard()).catch(()=>{ lastPushed=""; });
 }
@@ -1081,9 +1107,9 @@ function boardRows(){
   return BOARD.map(r=>{
     const recent=(r.recent&&typeof r.recent==="object")?r.recent:{};
     const live=(r.lastDaily===today||r.lastDaily===yest)?num(r.streak,5000):0;
-    let week=0; for(const [d,v] of Object.entries(recent)) if(d>=ws&&d<=today) week+=num(v,10);
-    const val={today:recent[today]!=null?num(recent[today],10):null, week, xp:num(r.xp), streak:live}[BOARD_TAB];
-    return {id:String(r.id), name:String(r.name||"").slice(0,30), val, xp:num(r.xp)};
+    let week=0; for(const [d,v] of Object.entries(recent)) if(d>=ws&&d<=today) week+=num(v,DAILY_MAX);
+    const val={today:recent[today]!=null?num(recent[today],DAILY_MAX):null, week, xp:num(r.xp), streak:live}[BOARD_TAB];
+    return {id:String(r.id), name:String(r.name||"").slice(0,30), val, xp:num(r.xp), level:LEVELS[r.level]?r.level:""};
   }).filter(r=>r.val!==null && r.val>0).sort((a,b)=>b.val-a.val||b.xp-a.xp).slice(0,25);
 }
 function renderBoard(){
@@ -1096,7 +1122,7 @@ function renderBoard(){
   const rows=boardRows();
   if(live) live.textContent = BOARD.length ? `${BOARD.length} player${BOARD.length===1?"":"s"}` : "";
   el.innerHTML="";
-  const unit={today:"/10",week:" pts",xp:" XP",streak:" 🔥"}[BOARD_TAB];
+  const unit={today:" XP",week:" XP",xp:" XP",streak:" 🔥"}[BOARD_TAB];
   const empty={today:"Nobody has finished today's quiz yet. Be the first.",week:"No scores yet this week.",xp:"No players yet.",streak:"No active streaks right now."}[BOARD_TAB];
   if(!rows.length){ const p=document.createElement("p"); p.className="note"; p.textContent=empty; el.appendChild(p); }
   else {
@@ -1107,6 +1133,7 @@ function renderBoard(){
       const pos=document.createElement("span"); pos.className="pos"+(i<3?" top":""); pos.textContent=i<3?["🥇","🥈","🥉"][i]:String(i+1);
       const av=document.createElement("span"); av.className="av"; av.textContent=(r.name.trim()[0]||"?").toUpperCase(); av.style.background=`hsl(${[...r.id].reduce((h,c)=>h*31+c.charCodeAt(0)>>>0,7)%360} 45% 45%)`;
       const nm=document.createElement("span"); nm.className="nm"; nm.textContent=r.name||"Player";
+      if(r.level){ const lv=document.createElement("small"); lv.textContent=LEVELS[r.level].label.replace(/ SEO Specialist$/,"").replace(/-level$/,""); lv.title=LEVELS[r.level].label; nm.appendChild(lv); }
       if(me){ const y=document.createElement("small"); y.textContent="you"; nm.appendChild(y); }
       const val=document.createElement("span"); val.className="val"; val.textContent=r.val+unit;
       row.append(pos,av,nm,val); list.appendChild(row);
@@ -1194,7 +1221,7 @@ function browseQuestions(){
   qbList();
 }
 function qbSample(level){
-  const keep=S.level; S.level=level; const ids=buildDaily(dateKey()); S.level=keep;
+  const keep=S.level; S.level=level; const ids=buildDaily(dateKey()).ids; S.level=keep;
   QB.sample={level, ids}; QB.diff=""; QB.cat=""; QB.q="";
   ["#qbd","#qbc","#qbs"].forEach(x=>$(x).value="");
   qbList(); $("#qbn").scrollIntoView({behavior:"smooth",block:"start"});
@@ -1239,6 +1266,11 @@ function setTheme(patch){ const t=Object.assign(getTheme(),patch); try{ localSto
   applyTheme(getTheme());
 })();
 /* ---------- Name ---------- */
+/* Once you've played a daily this season, you can only move up a level, never down. */
+function levelLocked(k){
+  if(!S.level || !LEVELS[S.level] || !Object.keys(S.history||{}).length) return false;
+  return LEVEL_ORDER.indexOf(k) < LEVEL_ORDER.indexOf(S.level);
+}
 function nameScreen(){
   VIEW="name"; app.className="narrow"; document.getElementById("hdr").className="narrow";
   const returning=!!S.name;
@@ -1247,7 +1279,8 @@ function nameScreen(){
     <form id="nf" style="margin-top:14px">
       <input id="nm" maxlength="30" autocomplete="name" style="width:100%;font:16px var(--sans);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
       <div class="label" style="margin:20px 0 10px">Your level</div>
-      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>`<label class="lvl"><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}><span><b>${v.label}</b><small>${v.blurb}</small></span></label>`).join("")}</div>
+      <div class="lvls">${Object.entries(LEVELS).map(([k,v])=>{ const off=levelLocked(k); return `<label class="lvl"${off?' style="opacity:.45;cursor:not-allowed"':""}><input type="radio" name="lvl" value="${k}"${S.level===k?" checked":""}${off?" disabled":""}><span><b>${v.label}</b><small>${v.blurb}</small></span></label>`; }).join("")}</div>
+      ${returning&&Object.keys(S.history||{}).length?`<p class="note" style="margin:10px 0 0">You can move up a level any time, but not down this season. You'll also be promoted automatically when your daily scores show you're ready.</p>`:""}
       <p class="note" id="nerr" style="color:var(--bad);min-height:1.2em;margin:10px 0 0"></p>
       <div class="row" style="margin-top:8px">${returning&&LEVELS[S.level]?'<button class="btn ghost" type="button" id="ncancel">Cancel</button>':""}<button class="btn" type="submit">${returning?"Save":"Start →"}</button></div>
     </form></div>`;
@@ -1259,6 +1292,7 @@ function nameScreen(){
     const pickedEl=document.querySelector('input[name="lvl"]:checked'), picked=pickedEl&&pickedEl.value;
     if(!v){ $("#nerr").textContent="Please enter your name."; return; }
     if(!LEVELS[picked]){ $("#nerr").textContent="Please choose your level."; return; }
+    if(levelLocked(picked)){ $("#nerr").textContent="You can't move down a level during a season."; return; }
     const changed=S.level!==picked;
     S.name=v; S.level=picked; if(!S.pid) S.pid=newId();
     // a new level gets a fresh daily set, unless today's quiz is already under way
