@@ -839,7 +839,8 @@ function shuffle(arr,r){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ con
 function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function fmt(s){ return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>"); }
 const DIFF = {0:"Beginner",1:"Easy",2:"Medium",3:"Hard"}, XP = {0:10,1:10,2:20,3:30};
-const RANKS = [[0,"Intern"],[200,"Junior SEO"],[600,"SEO Specialist"],[1300,"Senior SEO"],[2500,"Technical SEO Lead"],[4500,"Crawl Whisperer"]];
+/* XP ranks: milestones on a page's journey through search. Kept separate from job levels (Intern, Junior...) so the two never clash. */
+const RANKS = [[0,"Discovered"],[200,"Crawled"],[600,"Indexed"],[1300,"Ranking"],[2500,"Page One"],[4500,"Crawl Whisperer"]];
 function rankOf(xp){ let r=RANKS[0],n=null; for(let i=0;i<RANKS.length;i++){ if(xp>=RANKS[i][0]){ r=RANKS[i]; n=RANKS[i+1]||null; } } return {r,n}; }
 function catAcc(c){ const v=S.cat[c]; return v&&v[1] ? v[0]/v[1] : null; }
 
@@ -935,7 +936,7 @@ ${TEST?"":`    <div class="card" style="margin-bottom:16px">
       <div id="board"><p class="note">Loading leaderboard…</p></div>
     </div>
 `}    <div class="card">
-      <div class="rank"><span>Rank: <b>${r[1]}</b></span><span>${n?`${n[0]-S.xp} XP to ${n[1]}`:"Max rank"}</span></div>
+      <div class="rank"><span>XP rank: <b>${r[1]}</b></span><span>${n?`${n[0]-S.xp} XP to ${n[1]}`:"Top XP rank"}</span></div>
       <div class="progress" style="margin:0"><div style="width:${pct}%"></div></div>
       ${(()=>{ const p=promoStatus(); return p?`<p class="note" style="margin-top:12px">Next level: <b>${LEVELS[p.next].label}</b>. Last ${p.n}/${PROMO_DAYS} dailies at your level · average ${p.avg.toFixed(1)}/10 (need ${PROMO_AVG}) · stretch ${p.st.toFixed(1)}/3 (need ${PROMO_STRETCH}).</p>`:`<p class="note" style="margin-top:12px">You're at the top level. Keep the streak going.</p>`; })()}
       <div class="section"><div class="label">Last 7 days</div><div class="week">${days.join("")}</div></div>
