@@ -7,7 +7,9 @@
  * Reset everyone's progress on the LIVE quiz:  run resetLeaderboard
  * Reset the TEST copy (/seo-daily/test/):       run resetTestLeaderboard
  */
-const HEADERS = ['id', 'name', 'xp', 'streak', 'bestStreak', 'lastDaily', 'recent', 'updated'];
+const HEADERS = ['id', 'name', 'xp', 'streak', 'bestStreak', 'lastDaily', 'recent', 'updated', 'level'];
+const DAILY_MAX = 130;   // most XP anyone can earn from one daily quiz (7 x 10 + 3 x 20)
+const LEVELS = ['intern', 'junior', 'mid', 'senior'];
 
 function board_(b) { return b === 'test' ? 'test' : ''; }
 function sheetName_(b) { return b === 'test' ? 'Test scores' : 'Scores'; }
@@ -41,7 +43,7 @@ function recent_(v) {
   const out = {};
   if (v && typeof v === 'object') {
     Object.keys(v).slice(0, 31).forEach(function (k) {
-      if (/^\d{4}-\d{2}-\d{2}$/.test(k)) out[k] = num_(v[k], 10);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(k)) out[k] = num_(v[k], DAILY_MAX);
     });
   }
   return out;
@@ -55,7 +57,8 @@ function doGet(e) {
     try { recent = recent_(JSON.parse(r[6] || '{}')); } catch (err) {}
     return {
       id: r[0], name: r[1], xp: num_(r[2], 1e7), streak: num_(r[3], 5000),
-      bestStreak: num_(r[4], 5000), lastDaily: r[5], recent: recent
+      bestStreak: num_(r[4], 5000), lastDaily: r[5], recent: recent,
+      level: LEVELS.indexOf(r[8]) > -1 ? r[8] : ''
     };
   });
   return json_({ board: b, season: season_(b), rows: rows });
@@ -71,7 +74,8 @@ function doPost(e) {
   if (String(d.season || '') !== season_(b)) return json_({ ok: false, error: 'old season' });
   const lastDaily = /^\d{4}-\d{2}-\d{2}$/.test(String(d.lastDaily || '')) ? String(d.lastDaily) : '';
   const row = [id, name, num_(d.xp, 1e7), num_(d.streak, 5000), num_(d.bestStreak, 5000),
-               lastDaily, JSON.stringify(recent_(d.recent)), new Date().toISOString()];
+               lastDaily, JSON.stringify(recent_(d.recent)), new Date().toISOString(),
+               LEVELS.indexOf(String(d.level || '')) > -1 ? String(d.level) : ''];
 
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
